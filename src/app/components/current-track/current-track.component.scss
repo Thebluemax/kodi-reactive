@@ -1,0 +1,29 @@
+.current {
+    height: 97%;
+    width: 450px;
+    &>ion-card{
+        background-size: auto 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+        height: inherit;
+        &>ion-card-header{
+            background-color: rgba(0,0,0,.4);
+        }
+        .artist-card {
+            height: 100%;
+        }
+    }
+}
+.current-track {
+    width: 100%;
+    &>ion-card{
+        bottom: 10px;
+        left: 2%;
+        position: fixed;
+        display: flex;
+        width: 90%;
+        img {
+            width: 100px;
+        }
+    }
+}

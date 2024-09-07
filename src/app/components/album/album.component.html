@@ -1,0 +1,10 @@
+<div class="flex-tile-list">
+  <ion-card  style="background-image: url({{album.thumbnail|assets}});background-size: 100%;" class="tile" *ngFor="let album of albums" appTileHover>
+    <ion-card-header>
+      <ion-card-title>{{ album.label}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ album.artist|arrayToString }}
+    </ion-card-content>
+    </ion-card>
+</div>

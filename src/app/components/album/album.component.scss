@@ -1,0 +1,32 @@
+.flex-tile-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 400px;
+    height: 380px;
+    overflow: hidden scroll;
+    .tile{
+        width: 120px;
+        height: 120px;
+        margin: 4px;
+        ion-card-header {
+            background-color: rgba(0,0,0,.6);
+            color: white;
+            font-size: .9em;
+            opacity: 0;
+            height: 50%;
+            ion-card-title {
+                font-size: .9em;
+                font-weight: 900;
+            }
+        }
+        ion-card-content {
+            background-color: rgba(0,0,0,.6);
+            color: #acacac;
+            height: 50%;
+            opacity: 0;
+            font-size: .8em;
+            font-weight: 900;
+        }
+    }
+}

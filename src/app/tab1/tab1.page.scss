@@ -1,0 +1,33 @@
+.control-nav {
+    background-color: rgba(0,0,0,.4);
+    bottom: 0px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 10px;
+    width: 100%;
+    position: fixed;
+    .volume-control {
+        width: 15%;
+    }
+    .player-control {
+        width: 80%;
+    }
+}
+.canvas-player{
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: left;
+    height: 100%;
+}
+.flex-div{
+    display: flex;
+    justify-content: start;
+    flex-direction: row;
+    height: 85%;
+}
+.selector-category {
+    height: 480px;
+    width: 460px;
+    
+}

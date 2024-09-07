@@ -1,0 +1,22 @@
+<div class="current">
+  <ion-card style="background-image: url({{currentTrack?.fanart|assets}});">
+    <ion-card-header>
+      <ion-card-title>{{ printArtist() }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="artist-card">
+      <div class="current-track">
+        <ion-card>
+          <img
+            class="current-thumb"
+            alt="Silhouette of mountains"
+            src="{{ currentTrack?.thumbnail | assets }}"
+          />
+          <ion-card-header>
+            <ion-card-title>{{ currentTrack?.title }}</ion-card-title>
+            <ion-card-subtitle>{{ currentTrack?.album }}</ion-card-subtitle>
+          </ion-card-header>
+        </ion-card>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</div>

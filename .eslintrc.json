@@ -1,6 +1,7 @@
 {
   "root": true,
   "ignorePatterns": ["projects/**/*"],
+  "plugins": ["jasmine"],
   "overrides": [
     {
       "files": ["*.ts"],
@@ -10,7 +11,8 @@
       },
       "extends": [
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:jasmine/recommended"
       ],
       "rules": {
         "@angular-eslint/component-class-suffix": [
@@ -23,7 +25,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "app",
+            "prefix": ["app", "player"],
             "style": "kebab-case"
           }
         ],
@@ -31,7 +33,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "app",
+            "prefix": ["app", "cat"],
             "style": "camelCase"
           }
         ]

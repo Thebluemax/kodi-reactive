@@ -4,6 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab1Page } from './tab1.page';
+import { PlayerService } from '../core/services/player.service';
 
 describe('Tab1Page', () => {
   let component: Tab1Page;

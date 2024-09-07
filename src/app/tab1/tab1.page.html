@@ -1,17 +1,45 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+    <ion-title> {{ title }} </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <ion-header collapse="condense"> </ion-header>
+  <div class="canvas-player">
+    <div class="flex-div">
+      <player-current-track [currentTrack]="playerInfo"></player-current-track>
+      <app-current-play-list
+        [playlist]="playlist"
+        [currentTrackPosition]="appInfo?.position ? appInfo?.position : null"
+      ></app-current-play-list>
+      <div class="selector-category">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{activeComponent}} <ion-button (click)="change()">Play</ion-button></ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            
+            <div [ngSwitch]="activeComponent">
+              <div *ngSwitchCase="'artist'"><app-artists></app-artists></div>
+              <div *ngSwitchCase="'album'"><app-album></app-album></div>
+              <div *ngSwitchDefault>output2</div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+    <div class="control-nav">
+      <app-player-control
+        [appInfo]="appInfo"
+        class="player-control"
+      ></app-player-control>
+      <app-sound
+        class="volume-control"
+        [volume]="volume"
+        (updateVolume)="updateVolume($event)"
+      ></app-sound>
+    </div>
+  </div>
+  <div></div>
 </ion-content>

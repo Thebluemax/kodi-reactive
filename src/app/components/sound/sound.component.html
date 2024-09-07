@@ -1,0 +1,22 @@
+<div>
+  <ion-button shape="round" (click)="openVolume()">
+    <ion-icon
+      [name]="calculateVolumeIcon()"
+      slot="icon-only"
+    ></ion-icon>
+  </ion-button>
+  <div *ngIf="isOpen" class="float-volume-control">
+    <div class="volume-slide">
+      <ion-range [value]="volume" (ionChange)="setVolume($event)"></ion-range>
+    </div>
+    <div>
+      <ion-button shape="round" (click)="muteVolume()">
+        <ion-icon
+          [name]="'volume-mute-outline'"
+          [color]="!isMute ? 'default' : 'danger'"
+          slot="icon-only"
+        ></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</div>
