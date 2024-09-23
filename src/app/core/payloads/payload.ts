@@ -41,9 +41,14 @@ export const payloads = {
             "start": 1,
             "end": 10
           },
-          "sort": {
-            "method": "label",
-            "order": "ascending"
+         "sort": {
+          "method":"album",
+          "order":"ascending"
+          },
+          "filter": {
+              "field": "albumartist",
+              "operator": "contains",
+              "value": ""
           }
         }
       },
@@ -60,15 +65,44 @@ export const payloads = {
               "style"
           ],
           "limits": {
-              "start": 0
+              "start": 0,
+              "end": 10
           },
           "sort": {
-              "method": "title",
+              "method": "label",
               "order": "ascending",
               "ignorearticle": true
+          },
+          "filter": {
+              "field": "artist",
+              "operator": "contains",
+              "value": ""
           }
       }
   },
+  artistRequestDetail: {
+    "jsonrpc": "2.0",
+    "method": "AudioLibrary.GetArtistDetails",
+    "id": "1712437435620",
+  "params": {
+  "artistid": 23,
+  "properties": [
+    "thumbnail",
+    "mood",
+    "genre",
+    "style",
+    "fanart",
+    "born",
+    "formed",
+    "description",
+    "died",
+    "disbanded",
+    "yearsactive",
+    "instrument",
+    "musicbrainzartistid"
+  ]
+  },
+},
     artistDetaill: {
       "jsonrpc": "2.0",
       "method": "AudioLibrary.SetArtistDetails",
@@ -85,7 +119,8 @@ export const payloads = {
           "genre": [],
           "style": [],
           "instrument": [],
-          "mood": []
+          "mood": [],
+          "musicbrainzartistid": "",
       },
       "id": 84
   }

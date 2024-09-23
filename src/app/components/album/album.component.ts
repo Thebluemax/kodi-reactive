@@ -14,6 +14,7 @@ export class AlbumComponent  implements OnInit, OnDestroy {
   end: number = 10;
   limit: number = 20;
   totalAlbums: number = 9999;
+  searchTerms: string = '';
   constructor(private playerService: PlayerService) { }
   ngOnDestroy(): void {
 
@@ -26,8 +27,8 @@ export class AlbumComponent  implements OnInit, OnDestroy {
     console.log('albums ngOnInit');
   }
   getAlbums(start: number, end: number) {
-    this.playerService.getAlbums(this.start, this.end).subscribe((data: any) => {
-      console.log(data.result);
+    this.playerService.getAlbums(this.start, this.end, this.searchTerms).subscribe((data: any) => {
+      console.log(data);
       this.totalAlbums = data.result.limits.total;
       const albumsReecibed = data.result.albums.map( (item: any) => {
         const album:Album = {...item};
@@ -49,5 +50,14 @@ export class AlbumComponent  implements OnInit, OnDestroy {
     setTimeout(() => {
       (event as InfiniteScrollCustomEvent).target.complete();
     }, 500);
+  }
+
+  handleSearch(event: any) {
+    this.searchTerms = event.detail.value;
+    console.log(event.detail, this.searchTerms);
+    this.albums = [];
+    this.start = 0;
+    this.end = this.limit;
+    this.getAlbums(this.start, this.end);
   }
 }

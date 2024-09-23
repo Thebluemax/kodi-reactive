@@ -1,3 +1,63 @@
-<p>
-  artists works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Artists:{{ totalArtist }} </ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      show-clear-button="always"
+      [debounce]="800"
+      (ionInput)="handleSearch($event)"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+<div *ngIf="!selectedArtist">
+  <ion-content class="flex-tile-list">
+    <ion-list>
+      <ion-card
+        *ngFor="let artist of artists"
+        class="tile"
+        style="background-image: url({{
+          artist.thumbnail | assets : 'scape'
+        }}) , url(assets/site/no_cover.webp)"
+        [style.backgroundSize]="artist.thumbnail ? '100%' : 'cover'"
+        appTileHover
+      >
+        <ion-card-header>
+          <ion-card-title (click)="getArtist(artist)">{{
+            artist.label
+          }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          {{ artist.genre | arrayToString }}
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+    <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-content>
+</div>
+<div *ngIf="selectedArtist">
+  <ion-content [style.height]="'350px'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ selectedArtist.label }} - <a (click)="deleteSelected()">x</a></ion-card-title>
+        <ion-card-subtitle>{{
+          selectedArtist.genre | arrayToString
+        }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-img
+          src="{{ selectedArtist.thumbnail | assets : 'scape' }}"
+          alt="{{ selectedArtist.label }}"
+        ></ion-img>
+        <div>
+          <h3>{{ selectedArtist.born }}</h3>
+          <p style="font-size: 0.9em">{{ selectedArtist.description }}</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
+</div>

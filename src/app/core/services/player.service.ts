@@ -139,15 +139,32 @@ playListPayload: any ={
     .pipe( result => result);
   } 
 
-  getAlbums(start: number, end: number) {
+  getAlbums(start: number, end: number, searchTerm: string = '') {
     payloads.album.params.limits.start = start;
     payloads.album.params.limits.end = end;
+    if (!searchTerm) searchTerm = '';
+    payloads.album.params.filter.field = 'album';
+    payloads.album.params.filter.value = searchTerm;
     return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.album))
     .pipe( result => result);
   }
 
-  getArtists() {
-    return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.artist))
+  getArtists(start: number, end: number, searchTerm: string = '') {
+    payloads.artist.params.limits.start = start;
+    payloads.artist.params.limits.end = end;
+    if (!searchTerm) searchTerm = '';
+      payloads.artist.params.filter =  {
+      "field": "artist",
+      "operator": "contains",
+      "value": searchTerm
+    };
+
+    return this.http.post<{result:{artists:[], limits:any}}>(this.uriMediaPlayer, JSON.stringify(payloads.artist))
     .pipe( result => result);
+  }
+
+  getArtist(artistId: number) {
+    payloads.artistRequestDetail.params.artistid = artistId;
+    return this.http.post<any>(this.uriMediaPlayer, JSON.stringify(payloads.artistRequestDetail))
   }
 }

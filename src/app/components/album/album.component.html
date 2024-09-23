@@ -2,6 +2,12 @@
   <ion-toolbar>
     <ion-title>Albums:{{totalAlbums}}</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+  <ion-searchbar 
+  show-clear-button="always" 
+  [debounce]="800" 
+  (ionInput)="handleSearch($event)"></ion-searchbar>
+</ion-toolbar>
 </ion-header>
 <div>
   <ion-content   class="flex-tile-list">
@@ -15,7 +21,12 @@
             <ion-card-title>{{ album.label }}</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            {{ album.artist | arrayToString }}
+            <div>
+              {{ album.artist | arrayToString }}
+            </div>
+            <div>
+              {{ album.year }}
+            </div>
           </ion-card-content>
         </ion-card>
     </ion-list>

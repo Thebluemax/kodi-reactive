@@ -87,7 +87,7 @@ export class Tab1Page implements OnInit {
 
   getPlaylists() {
     this.plService.getPlayList().subscribe((data: any) => {
-      console.log(data);
+     // console.log(data);
       this.playlist = data.result.items.map((item: any) => {
         return item as ItemPlaylist;
       });
