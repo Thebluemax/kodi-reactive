@@ -11,6 +11,7 @@
       <div class="flex-col small-col">
         <player-current-track [currentTrack]="playerInfo"></player-current-track>
         <app-current-play-list
+          #playlistObject
           [playlist]="playlist"
           [currentTrackPosition]="appInfo?.position ? appInfo?.position : null"
         ></app-current-play-list>
@@ -18,27 +19,31 @@
       <div class="selector-category">
         <ion-card>
           <ion-card-content>
-            
             <div [ngSwitch]="activeComponent">
               <div *ngSwitchCase="'artist'"><app-artists (next)="change()"></app-artists></div>
-              <div *ngSwitchCase="'album'"><app-album  (next)="change()"></app-album></div>
+              <div *ngSwitchCase="'album'">
+                <app-album  (next)="change()"
+                (toPlaylist)="toPlayList($event)"
+                [playlist]="playlist"
+                [currentTrackPosition]="appInfo?.position ? appInfo?.position : null"></app-album></div>
               <div *ngSwitchDefault>output2</div>
             </div>
           </ion-card-content>
         </ion-card>
+        <div class="control-nav">
+          <app-player-control
+            [appInfo]="appInfo"
+            class="player-control"
+          ></app-player-control>
+          <app-sound
+            class="volume-control"
+            [volume]="volume"
+            (updateVolume)="updateVolume($event)"
+          ></app-sound>
+        </div>
       </div>
     </div>
-    <div class="control-nav">
-      <app-player-control
-        [appInfo]="appInfo"
-        class="player-control"
-      ></app-player-control>
-      <app-sound
-        class="volume-control"
-        [volume]="volume"
-        (updateVolume)="updateVolume($event)"
-      ></app-sound>
-    </div>
+   
   </div>
   <div></div>
 </ion-content>

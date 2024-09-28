@@ -1,6 +1,15 @@
+.component-holder {
+    height: 100%;
+    &>ion-card{
+        height: inherit;
+        ion-card-content {
+            height: 90%;
+        }
+    }
+}
 .current-list {
-    width: 400px;
-    height: 380;
+    width: 100%;
+    height: 100%;
     overflow: hidden scroll;
     ion-item {
         font-size: 1em;

@@ -181,4 +181,18 @@ playListPayload: any ={
     payloads.artistRequestDetail.params.artistid = artistId;
     return this.http.post<any>(this.uriMediaPlayer, JSON.stringify(payloads.artistRequestDetail))
   }
+
+  setToPlayList(item: any,listPosition: number, listActive: number = 0) {
+    payloads.sendAlbumToList.params = [listActive, listPosition,item];
+    return this.http.post<any>(this.uriMediaPlayer, JSON.stringify(payloads.sendAlbumToList))
+  }
+  
+  clearPlaylist() {
+    return this.http.post<any>(this.uriMediaPlayer, JSON.stringify(payloads.clearPlaylist))
+  }
+
+  playItem(playlistId: number, position: number) {
+    payloads.playItem.params.item = {playlistid: playlistId, position: position};
+    return this.http.post<any>(this.uriMediaPlayer, JSON.stringify(payloads.playItem))
+  }
 }

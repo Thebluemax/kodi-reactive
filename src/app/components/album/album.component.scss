@@ -8,8 +8,8 @@
         flex-wrap: wrap;
     }
     .tile{
-        width: 120px;
-        height: 120px;
+        width: 140px;
+        height: 140px;
         margin: 4px;
         ion-card-header {
             background-color: rgba(0,0,0,.6);
@@ -31,4 +31,5 @@
             font-weight: 900;
         }
     }
+    
 }

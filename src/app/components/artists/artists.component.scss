@@ -8,7 +8,11 @@
         flex-wrap: wrap;
     }
     .tile{
-        width: 28%;
+        background-repeat: no-repeat;
+        background-size: auto 100%;
+        background-attachment: center  center; 
+        width: 200px;
+        height: 200px;
         margin: 4px;
         ion-card-header {
             background-color: rgba(0,0,0,.6);

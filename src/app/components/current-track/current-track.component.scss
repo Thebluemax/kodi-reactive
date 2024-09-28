@@ -1,29 +1,40 @@
 .current {
     height: 100%;
-    width: inherit;
-    &>ion-card{
-        background-size: auto 100%;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: inherit;
-        &>ion-card-header{
-            background-color: rgba(0,0,0,.4);
-        }
+    width: 100%;
+
+    &>ion-card {
         .artist-card {
             height: 100%;
         }
     }
 }
+
 .current-track {
     width: 100%;
-    &>ion-card{
-        bottom: 10px;
-        left: 2%;
-        position: fixed;
-        display: flex;
-        width: 90%;
-        img {
-            width: 100px;
+    display: flex;
+    flex-direction: row;
+
+    &>img {
+        height: 120px;
+        width: 120px;
+    }
+
+    .track-info {
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        height: 120px;
+        padding-left: 3%;
+        width: inherit;
+
+        ion-card-title {
+            font-size: 1em;
+            font-weight: 900;
+        }
+
+        ion-card-subtitle {
+            font-size: .8em;
+            font-weight: 900;
         }
     }
 }

@@ -6,7 +6,6 @@
     flex-direction: row;
     padding: 10px;
     width: 100%;
-    position: fixed;
     .volume-control {
         width: 15%;
     }
@@ -24,7 +23,7 @@
         display: flex;
         justify-content: start;
         flex-direction: row;
-        height: 95%;
+        height: 100%;
         width: 100%;
 
     }
@@ -35,7 +34,7 @@
         justify-content: space-between;
         }
         .small-col {
-            width: 30%;
+            width: 25%;
         }
     }
 .flex-div{
@@ -47,14 +46,20 @@
 .selector-category {
     height: 100%;
     width: 70%;
-    
+    &>ion-card {
+        height: 85%;
+        ion-card-content {
+            height: 90%;
+        }
+    }
 }
 
 player-current-track {
+    background-color: rgba(0,0,0,.4);
     height: 30%;
     width: 100%;
 }
 app-current-play-list {
-    height: 68%;
+    height: 70%;
     width: 100%;
 }

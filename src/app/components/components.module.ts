@@ -9,6 +9,7 @@ import { CurrentPlayListComponent } from './current-play-list/current-play-list.
 import { ArtistsComponent } from './artists/artists.component';
 import { AlbumComponent } from './album/album.component';
 import { DirectivesModule } from '../directives/directives.module';
+import { AlbumDetailComponent } from './album-detail/album-detail.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { DirectivesModule } from '../directives/directives.module';
     CurrentTrackComponent,
     CurrentPlayListComponent,
     ArtistsComponent,
-    AlbumComponent
+    AlbumComponent,
+    AlbumDetailComponent
   ],
   exports: [
     SoundComponent,
@@ -25,7 +27,8 @@ import { DirectivesModule } from '../directives/directives.module';
     CurrentTrackComponent,
     CurrentPlayListComponent,
     ArtistsComponent,
-    AlbumComponent
+    AlbumComponent,
+    AlbumDetailComponent
   ],
   imports: [IonicModule, CommonModule, PipesModule, DirectivesModule],
   providers: [],

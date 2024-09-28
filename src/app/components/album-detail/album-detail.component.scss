@@ -1,0 +1,39 @@
+.float-rigth {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    z-index: 1000;
+}
+
+.album-frame {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    flex-wrap: wrap;
+}
+.album-col {
+    width: 46%;
+    .img-canvas {
+        width: 80%;
+    }
+}
+.tracks {
+    width: 100%;
+}
+
+.custom-card-header {
+    padding: 3%;
+    color: white;
+}
+
+.title-header {
+    font-size: 1.5em;
+    font-weight: 900;
+    line-height: 2em;
+    height: 55px;
+    padding: 7px;
+    background-color: rgba(0,0,0,.6);
+
+}

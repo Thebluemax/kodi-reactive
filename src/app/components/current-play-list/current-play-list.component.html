@@ -1,13 +1,14 @@
-<div >
+<div class="component-holder">
 <ion-card>
-  <ion-card-header>
-    <ion-card-title>Current List</ion-card-title>
-  </ion-card-header>
   <ion-card-content>
+    <div> <ion-buttons  slot="end">
+      
+    </ion-buttons></div>
     <div class="current-list">
       <ion-list lines="full">
         
-        <ion-item-sliding *ngFor="let item of playlist; let idx = index">
+        <ion-item-sliding *ngFor="let item of playlist; let idx = index"
+        (click)="playItem(idx)">
           <ion-item button="true">
             <ion-avatar aria-hidden="true" slot="start">
               <img alt="" src="{{item.thumbnail|assets}}" />
@@ -35,6 +36,7 @@
       </ion-list>
     </div>
   </ion-card-content>
+  <ion-button fill="clear" (click)="clearList()">Next</ion-button>
 </ion-card>
 
 </div>

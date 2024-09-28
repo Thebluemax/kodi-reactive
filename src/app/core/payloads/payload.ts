@@ -209,5 +209,30 @@ requestTracks:{
           "albumid": 1824
       }
   }
-}
+},
+sendAlbumToList: {
+    "jsonrpc": "2.0",
+    "method": "Playlist.Insert",
+    "params": [
+      0,0,{}
+    ],
+    "id": 56
+},  clearPlaylist:{
+    "jsonrpc": "2.0",
+    "method": "Playlist.Clear",
+    "params": [0],
+    "id": 1
+  },
+  playItem: {
+    "jsonrpc": "2.0",
+    "method": "Player.Open",
+    "params": {
+      "item": {
+        "position": 2,
+        "playlistid": 0
+      },
+      "options": {}
+    },
+    "id": 7
+  }
 }

@@ -1,0 +1,46 @@
+<ion-card>
+  <ion-card-content>
+    <div class="title-header">
+      <h1>{{ album?.label }}</h1>
+      <div class="float-rigth">
+        <ion-button (click)="deleteSelected()" shape="round" color="medium">
+          <ion-icon slot="icon-only" name="close"></ion-icon
+        ></ion-button>
+      </div>
+    </div>
+    <div class="album-frame">
+      <div class="album-col image-col">
+        <ion-img class="img-canvas"
+          src="{{ album?.thumbnail | assets : 'scape' }}"
+          alt="{{ album?.label }}"
+        ></ion-img>
+      </div>
+      <div class="album-col custom-card-header">
+        <h2>{{ album?.year }} - {{ album?.albumlabel }}</h2>
+        <h5>{{ album?.genre | arrayToString }}</h5>
+        <p style="font-size: 0.9em">{{ album?.description }}</p>
+      </div>
+      <div class="tracks">
+        <ion-card>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let track of tracks">
+                <ion-button slot="start" (click)="sendToPlayList(track)">
+                  <ion-icon slot="icon-only" name="play"></ion-icon>
+                </ion-button>
+                <ion-label>{{ track.label }}</ion-label>
+                <ion-note>{{ track.duration | secondsToStr }}</ion-note>
+                <ion-avatar slot="end">
+                  <img
+                    alt="{{ album?.label }}"
+                    src="{{ track.thumbnail | assets : 'scape' }}"
+                  />
+                </ion-avatar>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card>

@@ -1,7 +1,9 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, viewChild } from '@angular/core';
 import { PlayerService } from 'src/app/core/services/player.service';
 import { Album } from 'src/app/core/models/album';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { ItemPlaylist } from 'src/app/core/models/item-playlist';
+import { payloads } from 'src/app/core/payloads/payload';
 @Component({
   selector: 'app-album',
   templateUrl: './album.component.html',
@@ -18,7 +20,10 @@ export class AlbumComponent  implements OnInit, OnDestroy {
   totalAlbums: number = 9999;
   searchTerms: string = '';
   selectedAlbum: Album | null = null;
+  @Input() playlist: ItemPlaylist[] = [];
+  @Input() currentTrackPosition:number | null | undefined = null;
   @Output() next = new EventEmitter<void>();
+  @Output() toPlaylist = new EventEmitter<Album | number>();
   constructor(private playerService: PlayerService) { }
 
   ngOnDestroy() {
@@ -86,6 +91,13 @@ getTracks(album: Album) {
     this.tracks = data.result.songs;
     this.totalTracks = data.result.limits.total;
   })
+}
+
+sendToPlaylist(media: Album | number | any) {
+  console.log('sendToPlaylist', media);
+  
+  this.toPlaylist.emit(media);
+
 }
 
 goNext() {

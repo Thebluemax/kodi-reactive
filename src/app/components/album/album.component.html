@@ -17,8 +17,10 @@
       <ion-card
         *ngFor="let album of albums"
         class="tile"
-        style="background-image: url({{ album.thumbnail | assets : 'scape' }}) , url(assets/site/no_cover.webp)"
-        [style.backgroundSize]="album.thumbnail ? '100%' : 'cover'"
+        style="background-image: url({{
+          album.thumbnail | assets : 'scape'
+        }}) , url(assets/site/no_cover.webp)"
+        [style.backgroundSize]="'cover'"
         appTileHover
       >
         <ion-card-header>
@@ -32,7 +34,13 @@
         </ion-card-header>
         <ion-card-content>
           <div class="fav-btn">
-            <ion-button slot="end" shape="round" size="small" color="secondary">
+            <ion-button
+              slot="end"
+              shape="round"
+              size="small"
+              color="ligth"
+              (click)="sendToPlaylist(album)"
+            >
               <ion-icon slot="icon-only" name="play-outline"></ion-icon>
             </ion-button>
           </div>
@@ -41,51 +49,16 @@
     </ion-list>
     <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
       <ion-infinite-scroll-content
-        loadingText="Please wait..."
         loadingSpinner="bubbles"
       ></ion-infinite-scroll-content>
     </ion-infinite-scroll>
   </ion-content>
-  <ion-content *ngIf="selectedAlbum" [style.height]="'300px'">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>
-          <ion-note>{{ selectedAlbum.label }}</ion-note>
-          <ion-note>
-            <ion-button (click)="deleteSelected()">
-              <ion-icon name="close"></ion-icon>
-            </ion-button>
-          </ion-note>
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-img
-          src="{{ selectedAlbum.thumbnail | assets : 'scape' }}"
-          alt="{{ selectedAlbum.label }}"
-        ></ion-img>
-        <div>
-          <h3>{{ selectedAlbum.year }} - {{ selectedAlbum.albumlabel }}</h3>
-          <h5>{{ selectedAlbum.genre | arrayToString }}</h5>
-          <p style="font-size: 0.9em">{{ selectedAlbum.description }}</p>
-        </div>
-        <div class="tracks">
-          <ion-list>
-            <ion-item *ngFor="let track of tracks">
-              <ion-button slot="start">
-                <ion-icon slot="icon-only" name="play"></ion-icon>
-              </ion-button>
-              <ion-label>{{ track.label }}</ion-label>
-              <ion-note>{{ track.duration | secondsToStr }}</ion-note>
-              <ion-avatar slot="end">
-                <img
-                  alt="{{ selectedAlbum.label }}"
-                  src="{{ track.thumbnail | assets : 'scape' }}"
-                />
-              </ion-avatar>
-            </ion-item>
-          </ion-list>
-        </div>
-      </ion-card-content>
-    </ion-card>
+  <ion-content *ngIf="selectedAlbum" [style.height]="'350px'">
+<app-album-detail  
+ [album]="selectedAlbum"
+ [tracks]="tracks"
+ (closeDetail)="deleteSelected()"
+ (sendToPlaylist)="sendToPlaylist($event)"></app-album-detail>
+    
   </ion-content>
 </div>

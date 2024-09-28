@@ -1,10 +1,12 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { PlayerService } from '../core/services/player.service';
 import { AppInfo, CurrentTrack } from '../core/models/app-info';
 import { WsPlayerService } from '../core/services/ws-player.service';
 import { ItemPlaylist } from '../core/models/item-playlist';
 import { Methods } from '../core/enums/methods';
 import { payloads } from '../core/payloads/payload';
+import { Album } from '../core/models/album';
+import { CurrentPlayListComponent } from '../components/current-play-list/current-play-list.component';
 
 @Component({
   selector: 'app-tab1',
@@ -21,6 +23,8 @@ export class Tab1Page implements OnInit {
   playerInfo: CurrentTrack | null = null;
   showComponent:boolean = false;
   activeComponent:string = '';
+  @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null = null;
+
   constructor(
     private plService: PlayerService,
     private wsService: WsPlayerService,
@@ -93,6 +97,7 @@ export class Tab1Page implements OnInit {
         return item as ItemPlaylist;
       });
     });
+
   }
 
   proceesMethod(data: any) {
@@ -120,5 +125,9 @@ export class Tab1Page implements OnInit {
     } else {
       this.activeComponent = this.pages[0];
     }
+  }
+
+  toPlayList(event: Album | number) {
+    this.playlistObject?.sendToPlaylist(event);
   }
 }
