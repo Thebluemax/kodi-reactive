@@ -1,5 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { RangeCustomEvent } from '@ionic/angular';
 import { AppInfo } from 'src/app/core/models/app-info';
+import { PlayerService } from 'src/app/core/services/player.service';
 @Component({
   selector: 'app-player-control',
   templateUrl: './player-control.component.html',
@@ -10,7 +12,7 @@ export class PlayerControlComponent  implements OnInit, OnChanges {
   speed:number = 1;
   @Input() appInfo:AppInfo | null = null;
   
-  constructor() {  
+  constructor(private playerService: PlayerService) {  
    
    }
 
@@ -22,11 +24,40 @@ export class PlayerControlComponent  implements OnInit, OnChanges {
   }
 
   play() {
+    console.log('play',this.isPlaying);
     this.isPlaying = !this.isPlaying;
+    this.playerService.setPause(this.isPlaying)
+    .subscribe((data) => {
+      console.log(this.isPlaying);
+    });
   }
   isPlayerPlaying() {
     const speed = this.appInfo?.speed ?? 0;
    // console.log('isPlayerPlaying', this.isPlaying, speed);
     return this.isPlaying || speed > 0;
+  }
+
+  shuffle() {
+    this.playerService.setShuffle(true)
+    .subscribe((data) => {
+      console.log(data);
+    });
+  }
+
+  repeat() {
+    this.playerService.setRepeat(true)
+    .subscribe((data) => {
+      console.log(data);
+    });
+  }
+
+  seekChange(event: any) {
+    let rangeEvent: RangeCustomEvent = (event as RangeCustomEvent)
+    let value: number = rangeEvent.detail.value as number;
+    console.log('seekChange', value);
+    this.playerService.setSeek(value)
+    .subscribe((data) => {
+      console.log(data);
+    });
   }
 }

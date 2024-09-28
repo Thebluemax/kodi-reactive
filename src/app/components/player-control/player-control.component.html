@@ -15,7 +15,8 @@
     </div>
   </div>
   <div class="player-bar">
-    <ion-range [value]="appInfo?.percentage"></ion-range>
+    <ion-range [value]="appInfo?.percentage"
+    (ionChange)="seekChange($event)"></ion-range>
   </div>
   <div class="time-div">
     <div>
@@ -25,6 +26,7 @@
   </div>
   <div>
     <ion-button shape="round" 
+    (click)="shuffle()"
     [color]="appInfo?.shuffled ? 'success' : 'dark'"
     [disabled]="!appInfo?.canshuffle">
       <ion-icon
@@ -35,6 +37,7 @@
   </div>
   <div>
     <ion-button
+      (click)="repeat()"
       shape="round"
       [color]="appInfo?.repeat === 'off' ? 'dark' : (appInfo?.repeat === 'all' ) ? 'success' : 'secondary'"
       [disabled]="!appInfo?.canrepeat"

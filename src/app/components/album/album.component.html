@@ -38,11 +38,24 @@
               slot="end"
               shape="round"
               size="small"
-              color="ligth"
+              color="default"
               (click)="sendToPlaylist(album)"
             >
               <ion-icon slot="icon-only" name="play-outline"></ion-icon>
             </ion-button>
+          
+          </div>
+          <div class="fav-btn">
+            <ion-button
+              slot="end"
+              shape="round"
+              size="small"
+              color="dark"
+              (click)="sendToPlaylist(album)"
+            >
+            <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+            </ion-button>
+          
           </div>
         </ion-card-content>
       </ion-card>

@@ -195,4 +195,23 @@ playListPayload: any ={
     payloads.playItem.params.item = {playlistid: playlistId, position: position};
     return this.http.post<any>(this.uriMediaPlayer, JSON.stringify(payloads.playItem))
   }
+  setPause(pause:boolean) {
+    return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.togglePause))
+    .pipe( result => result);   
+  }
+
+  setShuffle(shuffle:boolean) {
+    return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.setShuffle))
+    .pipe( result => result);   
+  }
+  setRepeat(repeat:boolean) {
+    return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.setRepeat))
+    .pipe( result => result);   
+  }
+
+  setSeek(position: number) {
+    payloads.setSeeek[0].params = [0,{percentage: position}];
+    return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.setSeeek))
+    .pipe( result => result);   
+  }
 }
