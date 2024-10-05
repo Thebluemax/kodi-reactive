@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, JsonpInterceptor } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { payloads } from '../payloads/payload';
 HttpClient
@@ -139,13 +139,14 @@ playListPayload: any ={
     .pipe( result => result);
   } 
 
-  getAlbums(start: number, end: number, searchTerm: string = '') {
+  getAlbums(start: number, end: number, searchTerm: string = '', field:string = 'album', operator: string = 'contains' ) {
     payloads.album.params.limits.start = start;
     payloads.album.params.limits.end = end;
     if (!searchTerm) searchTerm = '';
-    payloads.album.params.filter.field = 'album';
+    payloads.album.params.filter.field = field;
+    payloads.album.params.filter.operator = operator;
     payloads.album.params.filter.value = searchTerm;
-    return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.album))
+    return this.http.post<{result:any}>(this.uriMediaPlayer, JSON.stringify(payloads.album))
     .pipe( result => result);
   }
 
@@ -213,5 +214,10 @@ playListPayload: any ={
     payloads.setSeeek[0].params = [0,{percentage: position}];
     return this.http.post(this.uriMediaPlayer, JSON.stringify(payloads.setSeeek))
     .pipe( result => result);   
+  }
+
+  getGenres() {
+    return this.http.post<{result:any}>(this.uriMediaPlayer,JSON.stringify(payloads.getGenre))
+    .pipe( result => result);
   }
 }

@@ -15,15 +15,12 @@
     flex-direction: row;
 
     &>img {
-        height: 120px;
-        width: 120px;
+        height: 100px;
+        width: 100px;
     }
 
     .track-info {
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: 120px;
+        height: 100px;
         padding-left: 3%;
         width: inherit;
 
@@ -33,6 +30,8 @@
         }
 
         ion-card-subtitle {
+            color: #e0e0e0;
+            padding-top: 7px;
             font-size: .8em;
             font-weight: 900;
         }

@@ -1,13 +1,34 @@
-.flex-tile-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    height: 350px;
-    &>ion-list {
-        display: flex;
-        flex-wrap: wrap;
+.tile{
+    width: 140px;
+    height: 140px;
+    margin: 4px;
+    ion-card-content {
+        background-color: rgba(0,0,0,.15);
+        height: 100%;
+        opacity: 0;
+        font-size: .8em;
+        font-weight: 900;
+        h4 {
+            color: aliceblue;
+            font-size: 1em;
+            font-weight: 900;
+        }
+        h5, h6 {
+            padding: 3px;
+            color: #acacac;
+            font-size: .8em;
+            font-weight: 900;
+        }
     }
-   
+    .fav-buttons{
+        bottom: 10px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        position: absolute;
+        width: 85%;
+    }
 }
 /* 
   ##Device = Desktops
@@ -17,9 +38,18 @@
 @media (min-width: 1281px) {
   
     /* CSS */
-    .flex-tile-list {
-        height: 985px;
-       
+    .tile{
+        width: 220px;
+        height: 220px;
+        margin: 5px;
+        ion-card-content {
+            h4 {
+                font-size: 1.5em;
+            }
+            h5, h6 {
+                font-size: 1.2em;
+            }
+    }
     }
     
   }

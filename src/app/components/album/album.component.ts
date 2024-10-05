@@ -14,9 +14,9 @@ export class AlbumComponent  implements OnInit, OnDestroy {
   albums: Album[] = [];
   tracks: any[] = [];
   totalTracks: number = 0;
-  start: number = 1;
+  start: number = 0;
   end: number = 10;
-  limit: number = 20;
+  limit: number = 40;
   totalAlbums: number = 9999;
   searchTerms: string = '';
   selectedAlbum: Album | null = null;
@@ -93,10 +93,10 @@ getTracks(album: Album) {
   })
 }
 
-sendToPlaylist(media: Album | number | any) {
-  console.log('sendToPlaylist', media);
+sendToPlaylist(event: any) {
+  console.log('sendToPlaylist from album', event);
   
-  this.toPlaylist.emit(media);
+  this.toPlaylist.emit(event);
 
 }
 

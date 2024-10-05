@@ -1,0 +1,51 @@
+<ion-card
+  class="tile"
+  style="background-image: url({{
+    album?.thumbnail | assets : 'scape'
+  }}) , url(assets/site/no_cover.webp)"
+  [style.backgroundSize]="'cover'"
+  appTileHover
+>
+  <ion-card-content>
+    <div>
+      <h4>{{ album?.label }}</h4>
+      <h5>{{ album?.artist | arrayToString }}</h5>
+      <h6>{{ album?.year }}</h6>
+    </div>
+    <div class="fav-buttons">
+      <div class="fav-btn">
+        <ion-button
+          slot="end"
+          shape="round"
+          size="small"
+          color="dark"
+          (click)="emitToPlaylist(album, true)"
+        >
+          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="fav-btn">
+        <ion-button
+          slot="end"
+          shape="round"
+          size="small"
+          color="dark"
+          (click)="emitToPlaylist(album, false)"
+        >
+          <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="fav-btn">
+        <ion-button
+          slot="end"
+          shape="round"
+          size="small"
+          color="dark"
+          (click)="getAlbum(album)"
+        >
+        <ion-icon name="eye-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card>

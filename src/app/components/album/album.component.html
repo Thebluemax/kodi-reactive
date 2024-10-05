@@ -6,7 +6,9 @@
       (ionInput)="handleSearch($event)"
     ></ion-searchbar>
     <ion-buttons slot="end">
-      <ion-button (click)="goNext()">Button</ion-button>
+      <ion-button (click)="goNext()">
+        <ion-icon name="caret-forward-circle-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <div>Albums:{{ totalAlbums }}</div>
   </ion-toolbar>
@@ -14,51 +16,11 @@
 <div>
   <ion-content class="flex-tile-list" *ngIf="!selectedAlbum">
     <ion-list>
-      <ion-card
+      <app-album-square
         *ngFor="let album of albums"
-        class="tile"
-        style="background-image: url({{
-          album.thumbnail | assets : 'scape'
-        }}) , url(assets/site/no_cover.webp)"
-        [style.backgroundSize]="'cover'"
-        appTileHover
-      >
-        <ion-card-header>
-          <ion-card-title (click)="getAlbum(album)">{{
-            album.label
-          }}</ion-card-title>
-          <ion-card-subtitle
-            >{{ album.artist | arrayToString }} -
-            {{ album.year }}</ion-card-subtitle
-          >
-        </ion-card-header>
-        <ion-card-content>
-          <div class="fav-btn">
-            <ion-button
-              slot="end"
-              shape="round"
-              size="small"
-              color="default"
-              (click)="sendToPlaylist(album)"
-            >
-              <ion-icon slot="icon-only" name="play-outline"></ion-icon>
-            </ion-button>
-          
-          </div>
-          <div class="fav-btn">
-            <ion-button
-              slot="end"
-              shape="round"
-              size="small"
-              color="dark"
-              (click)="sendToPlaylist(album)"
-            >
-            <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
-            </ion-button>
-          
-          </div>
-        </ion-card-content>
-      </ion-card>
+        [album]="album"
+        (sendAlbum)="getAlbum(album)"
+        (sendToPlaylist)="sendToPlaylist($event)"></app-album-square>
     </ion-list>
     <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
       <ion-infinite-scroll-content
@@ -66,7 +28,7 @@
       ></ion-infinite-scroll-content>
     </ion-infinite-scroll>
   </ion-content>
-  <ion-content *ngIf="selectedAlbum" [style.height]="'350px'">
+  <ion-content *ngIf="selectedAlbum" [style.height]="'985px'">
 <app-album-detail  
  [album]="selectedAlbum"
  [tracks]="tracks"

@@ -14,9 +14,33 @@
     flex-wrap: wrap;
 }
 .album-col {
-    width: 46%;
+    &.col-30{
+        width: 25%;
+    }
+    &.col-70{
+        width: 75%;
+    }
     .img-canvas {
+        margin: auto;
         width: 80%;
+    }
+    h2 {
+        font-size: 1.7em;
+        font-weight: 900;
+        line-height: 2em;
+        padding: 0px 3px;
+    }
+    h5{
+        font-size: 1.2em;
+        font-weight: 900;
+        line-height: 2em;
+        padding: 0px 2px;
+    }
+    p {
+        font-size: .9em;
+        font-weight: 900;
+        line-height: 1.5em;
+        padding: 0px 2px;
     }
 }
 .tracks {
@@ -24,7 +48,6 @@
 }
 
 .custom-card-header {
-    padding: 3%;
     color: white;
 }
 

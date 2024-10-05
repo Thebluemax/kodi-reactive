@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Album } from 'src/app/core/models/album';
+import { Track } from 'src/app/core/models/track';
 
 @Component({
   selector: 'app-album-detail',
@@ -8,18 +9,17 @@ import { Album } from 'src/app/core/models/album';
 })
 export class AlbumDetailComponent {
   @Input() album: Album | null = null;
-  @Input() tracks: any[] = [];
+  @Input() tracks: Track[] = [];
   @Output() closeDetail = new EventEmitter<void>();
-  @Output() sendToPlaylist = new EventEmitter<number>();
+  @Output() sendToPlaylist = new EventEmitter<Track>();
   constructor() { }
   deleteSelected() {
     this.closeDetail.emit();
   }
 
-  sendToPlayList(track: any) {
+  sendToPlayList(track: Track) {
     console.log('sendToPlayList', track);
-    this.sendToPlaylist.emit(track.songid
-    );
+    this.sendToPlaylist.emit(track);
   }
 
 }

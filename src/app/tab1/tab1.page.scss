@@ -5,7 +5,7 @@
     justify-content: space-between;
     flex-direction: row;
     padding: 10px;
-    width: 100%;
+    width: 99%;
     .volume-control {
         width: 15%;
     }
@@ -17,7 +17,7 @@
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: left;
-    height: 95%;
+    height: 98%;
     width: 100%;
     .flex-div {
         display: flex;
@@ -45,7 +45,7 @@
 }
 .selector-category {
     height: 100%;
-    width: 70%;
+    width: 75%;
     &>ion-card {
         height: 85%;
         ion-card-content {
@@ -56,10 +56,79 @@
 
 player-current-track {
     background-color: rgba(0,0,0,.4);
-    height: 30%;
+    height: 25%;
     width: 100%;
 }
 app-current-play-list {
-    height: 70%;
+    height: 74%;
     width: 100%;
 }
+
+/* 
+  ##Device = Desktops
+  ##Screen = 1281px to higher resolution desktops
+*/
+
+@media (min-width: 1281px) {
+  
+    player-current-track {
+      height: 12%;
+  }
+  app-current-play-list {
+      height: 87%;
+  }
+}
+  /* 
+    ##Device = Laptops, Desktops
+    ##Screen = B/w 1025px to 1280px
+  */
+  
+  @media (min-width: 1025px) and (max-width: 1280px) {
+    
+    /* CSS */
+    
+  }
+  
+  /* 
+    ##Device = Tablets, Ipads (portrait)
+    ##Screen = B/w 768px to 1024px
+  */
+  
+  @media (min-width: 768px) and (max-width: 1024px) {
+    
+    /* CSS */
+    
+  }
+  
+  /* 
+    ##Device = Tablets, Ipads (landscape)
+    ##Screen = B/w 768px to 1024px
+  */
+  
+  @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    
+    /* CSS */
+    
+  }
+  
+  /* 
+    ##Device = Low Resolution Tablets, Mobiles (Landscape)
+    ##Screen = B/w 481px to 767px
+  */
+  
+  @media (min-width: 481px) and (max-width: 767px) {
+    
+    /* CSS */
+    
+  }
+  
+  /* 
+    ##Device = Most of the Smartphones Mobiles (Portrait)
+    ##Screen = B/w 320px to 479px
+  */
+  
+  @media (min-width: 320px) and (max-width: 480px) {
+    
+    /* CSS */
+    
+  }

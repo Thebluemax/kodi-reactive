@@ -1,9 +1,3 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> {{ title }} </ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense"> </ion-header>
   <div class="canvas-player">
@@ -26,6 +20,9 @@
                 (toPlaylist)="toPlayList($event)"
                 [playlist]="playlist"
                 [currentTrackPosition]="appInfo?.position ? appInfo?.position : null"></app-album></div>
+                <div *ngSwitchCase="'genre'">
+                  <app-genres (next)="change()"></app-genres>
+                </div>
               <div *ngSwitchDefault>output2</div>
             </div>
           </ion-card-content>
