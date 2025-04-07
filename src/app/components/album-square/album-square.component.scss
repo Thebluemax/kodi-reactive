@@ -1,27 +1,30 @@
 .tile {
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 140px;
   margin: 4px;
 
   ion-card-content {
-    background-color: rgba(0, 0, 0, .15);
+    background-color: rgba(0, 0, 0, .65);
     height: 100%;
     opacity: 0;
-    font-size: .8em;
-    font-weight: 900;
 
     h4 {
       color: aliceblue;
-      font-size: 1em;
+      font-size: .8em;
       font-weight: 900;
     }
 
     h5,
     h6 {
-      padding: 3px;
-      color: #acacac;
-      font-size: .8em;
+      line-height: 1em;
+      color: #d6d6d6;
+      font-size: .7em;
       font-weight: 900;
+    }
+
+    h5 {
+      font-size: .7em;
+      font-weight: 400;
     }
   }
 
@@ -44,22 +47,6 @@
 @media (min-width: 1281px) {
 
   /* CSS */
-  .tile {
-    width: 140px;
-    height: 140px;
-    margin: 5px;
-
-    ion-card-content {
-      h4 {
-        font-size: 1.5em;
-      }
-
-      h5,
-      h6 {
-        font-size: 1.2em;
-      }
-    }
-  }
 
 }
 
