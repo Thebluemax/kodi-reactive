@@ -13,50 +13,67 @@
     justify-content: start;
     flex-wrap: wrap;
 }
+
 .album-col {
-    &.col-30{
+    &.col-30 {
         width: 25%;
     }
-    &.col-70{
+
+    &.col-70 {
         width: 75%;
     }
+
     .img-canvas {
-        margin: auto;
-        width: 80%;
+        margin: 7px;
+        width: 82%;
+
+
     }
+
+    &.image-col {
+        span {
+            font-size: .6em;
+            line-height: 1em;
+            padding: 0px 7px;
+        }
+    }
+
+    h1,
     h2 {
-        font-size: 1.7em;
-        font-weight: 900;
-        line-height: 2em;
-        padding: 0px 3px;
+        margin: 0;
     }
-    h5{
-        font-size: 1.2em;
+
+    h1 {
+        font-size: 1em;
         font-weight: 900;
-        line-height: 2em;
-        padding: 0px 2px;
+        line-height: 1.5em;
+        padding: 3px 7px;
     }
-    p {
+
+    h2 {
         font-size: .9em;
-        font-weight: 900;
+        font-weight: 500;
+        line-height: 1.2em;
+        padding: 3px 7px;
+    }
+
+    p {
+        font-size: .8em;
+        font-weight: 500;
         line-height: 1.5em;
         padding: 0px 2px;
     }
 }
+
+.album-info {
+    width: 100%;
+    height: 200px;
+    overflow: hidden scroll;
+    margin-bottom: 10px;
+}
+
 .tracks {
     width: 100%;
-}
-
-.custom-card-header {
-    color: white;
-}
-
-.title-header {
-    font-size: 1.5em;
-    font-weight: 900;
-    line-height: 2em;
-    height: 55px;
-    padding: 7px;
-    background-color: rgba(0,0,0,.6);
-
+    height: calc(100% - 270px);
+    overflow: hidden scroll;
 }
