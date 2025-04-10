@@ -10,31 +10,28 @@
     ></app-current-play-list>
   </ion-content>
 </ion-menu>
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button auto-hide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Header Toolbar</ion-title>
+    <ion-searchbar></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button> End </ion-button>
+      <ion-button> End </ion-button>
+      <ion-button> End </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content id="main-content" [fullscreen]="true">
   <ion-header collapse="condense"> </ion-header>
   <div class="canvas-player">
     <div class="flex-div">
       <div class="selector-category">
-        <ion-menu-toggle>
-          <ion-button>Click to open the menu</ion-button>
-        </ion-menu-toggle>
-        <div [ngSwitch]="activeComponent">
-          <div *ngSwitchCase="'artist'">
-            <app-artists (next)="change()"></app-artists>
-          </div>
-          <div *ngSwitchCase="'album'">
-            <app-album
-              (next)="change()"
-              (toPlaylist)="toPlayList($event)"
-              [playlist]="playlist"
-              [currentTrackPosition]="appInfo?.position ? appInfo?.position : null"
-            ></app-album>
-          </div>
-          <div *ngSwitchCase="'genre'">
-            <app-genres (next)="change()"></app-genres>
-          </div>
-          <div *ngSwitchDefault>output2</div>
-        </div>
+        <router-outlet></router-outlet>
       </div>
     </div>
 

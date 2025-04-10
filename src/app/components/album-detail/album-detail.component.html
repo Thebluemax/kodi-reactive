@@ -1,46 +1,51 @@
-<ion-card>
-  <ion-card-content>
-      <div class="float-rigth">
-        <ion-button (click)="deleteSelected()" shape="round" color="medium">
-          <ion-icon slot="icon-only" name="close"></ion-icon
-        ></ion-button>
+<ion-modal [isOpen]="isModalOpen" (willDismiss)="onWillDismiss($event)">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cancel()">Cancel</ion-button>
+        </ion-buttons>
+        <ion-title>{{ album?.label }}</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="album-frame">
+        <div class="album-col col-30 image-col">
+          <ion-img
+            class="img-canvas"
+            src="{{ album?.thumbnail | assets : 'scape' }}"
+            alt="{{ album?.label }}"
+          ></ion-img>
+        </div>
+        <div class="album-col col-70 custom-card-header">
+          <h4>{{ album?.year }} - {{ album?.albumlabel }}</h4>
+          <h5>{{ album?.genre | arrayToString }}</h5>
+          <p>{{ album?.description }}</p>
+        </div>
+        <div class="tracks">
+          <ion-card>
+            <ion-card-content>
+              <ion-list>
+                <ion-item *ngFor="let track of tracks">
+                  <ion-label>{{ track.label }}</ion-label>
+                  <ion-note>{{ track.duration | secondsToStr }}</ion-note>
+                  <ion-buttons slot="end">
+                    <ion-button>
+                      <ion-icon slot="icon-only" name="play"></ion-icon>
+                    </ion-button>
+                    <ion-button>
+                      <ion-icon slot="icon-only" name="play"></ion-icon>
+                    </ion-button>
+                    <ion-button (click)="sendToPlayList(track)">
+                      <ion-icon slot="icon-only" name="play"></ion-icon>
+                    </ion-button>
+                  </ion-buttons>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </div>
       </div>
-    <div class="album-frame">
-      <div class="album-col col-30 image-col">
-        <ion-img class="img-canvas"
-          src="{{ album?.thumbnail | assets : 'scape' }}"
-          alt="{{ album?.label }}"
-        ></ion-img>
-      </div>
-      <div class="album-col col-70 custom-card-header">
-        <h2>{{ album?.label }}</h2>
-        <h4>{{ album?.year }} - {{ album?.albumlabel }}</h4>
-        <h5>{{ album?.genre | arrayToString }}</h5>
-        <p>{{ album?.description }}</p>
-      </div>
-      <div class="tracks">
-        <ion-card>
-          <ion-card-content>
-            <ion-list>
-              <ion-item *ngFor="let track of tracks">
-                <ion-label>{{ track.label }}</ion-label>
-                <ion-note>{{ track.duration | secondsToStr }}</ion-note>
-                <ion-buttons slot="end">
-                  <ion-button>
-                    <ion-icon slot="icon-only" name="play"></ion-icon>
-                  </ion-button>
-                  <ion-button>
-                    <ion-icon slot="icon-only" name="play"></ion-icon>
-                  </ion-button>
-                <ion-button (click)="sendToPlayList(track)">
-                  <ion-icon slot="icon-only" name="play"></ion-icon>
-                </ion-button>
-              </ion-buttons>
-              </ion-item>
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
-      </div>
-    </div>
-  </ion-card-content>
-</ion-card>
+    </ion-content>
+  </ng-template>
+</ion-modal>
