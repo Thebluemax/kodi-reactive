@@ -38,13 +38,21 @@
               <ion-note>{{ track.duration | secondsToStr }}</ion-note>
               <ion-buttons slot="end">
                 <ion-button>
-                  <ion-icon slot="icon-only" name="play"></ion-icon>
+                  <ion-icon slot="icon-only" size="small" name="add"></ion-icon>
                 </ion-button>
                 <ion-button>
-                  <ion-icon slot="icon-only" name="play"></ion-icon>
+                  <ion-icon
+                    slot="icon-only"
+                    size="small"
+                    name="duplicate-outline"
+                  ></ion-icon>
                 </ion-button>
                 <ion-button (click)="sendToPlayList(track)">
-                  <ion-icon slot="icon-only" name="play"></ion-icon>
+                  <ion-icon
+                    slot="icon-only"
+                    size="small"
+                    name="play"
+                  ></ion-icon>
                 </ion-button>
               </ion-buttons>
             </ion-item>

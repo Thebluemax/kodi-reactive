@@ -76,4 +76,8 @@
     width: 100%;
     height: calc(100% - 270px);
     overflow: hidden scroll;
+
+    ion-note {
+        margin: auto;
+    }
 }
