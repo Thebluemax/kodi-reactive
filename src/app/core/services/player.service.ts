@@ -1,6 +1,7 @@
 import { HttpClient, JsonpInterceptor } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { payloads } from '../payloads/payload';
+import { payload, PayloadRequest, payloads } from '../payloads/payload';
+import { Method } from 'ionicons/dist/types/stencil-public-runtime';
 HttpClient;
 @Injectable({
   providedIn: 'root',
@@ -194,21 +195,6 @@ export class PlayerService {
       .pipe((result) => result);
   }
 
-  getArtistsAlbums(artistId: number) {
-    payloads.artist.params.limits.start = 1;
-    payloads.artist.params.limits.end = 9999;
-    payloads.artist.params.filter = {
-      artistid: artistId,
-    };
-
-    return this.http
-      .post<{ result: { artists: []; limits: any } }>(
-        this.uriMediaPlayer,
-        JSON.stringify(payloads.artist)
-      )
-      .pipe((result) => result);
-  }
-
   getArtist(artistId: number) {
     payloads.artistRequestDetail.params.artistid = artistId;
     return this.http.post<any>(
@@ -217,6 +203,14 @@ export class PlayerService {
     );
   }
 
+  getArtistAlbums(artistId: number) {
+    const params: JsonRpcRequestParams = {};
+    const payload = PayloadRequest.create(Method.AudioLibrary, params);
+    return this.http.post<any>(
+      this.uriMediaPlayer,
+      JSON.stringify(payloads.artistAlbums)
+    );
+  }
   setToPlayList(item: any, listPosition: number, listActive: number = 0) {
     payloads.sendAlbumToList.params = [listActive, listPosition, item];
     return this.http.post<any>(

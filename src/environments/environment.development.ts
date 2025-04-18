@@ -4,4 +4,5 @@ export const environment = {
   serverApiUrl: 'http://localhost:8080',
   socketPort: 9090,
   apiPort: 8008,
+  jsonrpcVersion: '2.0',
 };

@@ -1,3 +1,9 @@
+import { JsonRpcRequest } from '../models/jsonrpcRequest';
+import { JsonRpcRequestParams } from '../models/jsonrpcRequest';
+import { JssonRpcSortParams } from '../models/jsonrpcRequest';
+import { JsonRpcFilterParams } from '../models/jsonrpcRequest';
+import { environment } from 'src/environments/environment';
+
 export const payloads = {
   volume: {
     jsonrpc: '2.0',
@@ -73,21 +79,6 @@ export const payloads = {
     id: '1712437435620',
     params: {
       artistid: 23,
-      properties: [
-        'thumbnail',
-        'mood',
-        'genre',
-        'style',
-        'fanart',
-        'born',
-        'formed',
-        'description',
-        'died',
-        'disbanded',
-        'yearsactive',
-        'instrument',
-        'musicbrainzartistid',
-      ],
     },
   },
   artistDetaill: {
@@ -276,3 +267,52 @@ export const payloads = {
     },
   },
 };
+
+export class PayloadRequest {
+  payload: JsonRpcRequest;
+  applicationProperties: string[][] = [['volume', 'muted', 'version', 'name']];
+  static artistProperties: string[] = [
+    'thumbnail',
+    'mood',
+    'genre',
+    'style',
+    'fanart',
+    'born',
+    'formed',
+    'description',
+    'died',
+    'disbanded',
+    'yearsactive',
+    'instrument',
+    'musicbrainzartistid',
+  ];
+  albumProperties: string[] = [
+    'thumbnail',
+    'playcount',
+    'artistid',
+    'artist',
+    'genre',
+    'albumlabel',
+    'year',
+    'dateadded',
+    'style',
+    'fanart',
+    'mood',
+    'description',
+    'rating',
+    'type',
+    'theme',
+  ];
+  constructor(method: string, params: any, id: number) {
+    this.payload = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: method,
+      params: params,
+      id: id,
+    };
+  }
+  static create(method: string, params: JsonRpcRequestParams | any[]) {
+    const id = new Date().getTime();
+    return new PayloadRequest(method, params, id);
+  }
+}
