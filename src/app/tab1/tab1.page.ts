@@ -15,6 +15,7 @@ import { Album } from '../core/models/album';
 import { CurrentPlayListComponent } from '../components/current-play-list/current-play-list.component';
 import { Subscriber, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { SideBarService } from '../core/services/side-bar.service';
 
 @Component({
   selector: 'app-tab1',
@@ -31,6 +32,7 @@ export class Tab1Page implements OnInit {
   playerInfo: CurrentTrack | null = null;
   showComponent: boolean = false;
   activeComponent: string = '';
+  showLateral: boolean = false;
   statusSubcription: Subscription | null = null;
   @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null =
     null;
@@ -39,7 +41,8 @@ export class Tab1Page implements OnInit {
     private plService: PlayerService,
     private wsService: WsPlayerService,
     private ref: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private sidebarService: SideBarService
   ) {}
   ionViewDidEnter(): void {
     console.log('ionViewDidEnter');
@@ -160,5 +163,8 @@ export class Tab1Page implements OnInit {
         break;
     }
     //this.activeComponent = event.detail.value;
+  }
+  toggleLateral() {
+    this.showLateral = !this.showLateral;
   }
 }

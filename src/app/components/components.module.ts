@@ -14,6 +14,7 @@ import { GenresComponent } from './genres/genres.component';
 import { AlbumSquareComponent } from './album-square/album-square.component';
 import { ArtistDetailComponent } from './artist-detail/artist-detail.component';
 import { TrackItemComponent } from './track-item/track-item.component';
+import { LateralSlideComponent } from './lateral-slide/lateral-slide.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { TrackItemComponent } from './track-item/track-item.component';
     GenresComponent,
     AlbumSquareComponent,
     TrackItemComponent,
+    LateralSlideComponent,
   ],
   exports: [
     SoundComponent,
@@ -41,6 +43,7 @@ import { TrackItemComponent } from './track-item/track-item.component';
     GenresComponent,
     AlbumSquareComponent,
     TrackItemComponent,
+    LateralSlideComponent,
   ],
   imports: [IonicModule, CommonModule, PipesModule, DirectivesModule],
   providers: [],

@@ -1,64 +1,58 @@
-<ion-modal [isOpen]="isModalOpen" (willDismiss)="onWillDismiss($event)">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="end">
-          <ion-button (click)="cancel()">Close</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <div class="album-frame">
-        <div class="album-col col-30 image-col">
-          <ion-img
-            class="img-canvas"
-            src="{{ album?.thumbnail | assets : 'scape' }}"
-            alt="{{ album?.label }}"
-          ></ion-img>
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="title">
+      {{ album?.label }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="album-frame">
+    <div class="album-col col-30 image-col">
+      <ion-img
+        class="img-canvas"
+        src="{{ album?.thumbnail | assets : 'scape' }}"
+        alt="{{ album?.label }}"
+      ></ion-img>
 
-          <span>{{ album?.year }}</span
-          ><br />
-          <span>{{ album?.albumlabel }}</span
-          ><br />
-          <span>{{ album?.genre | arrayToString }}</span>
-        </div>
-        <div class="album-col col-70">
-          <h1 class="main-title">{{ album?.label }}</h1>
-          <h2 class="main-subtitle">{{ album?.artist | arrayToString }}</h2>
-          <div class="album-info">
-            <div class="scroll-info">
-              <p>{{ album?.description }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="tracks">
-          <ion-list>
-            <ion-item *ngFor="let track of tracks">
-              <ion-label>{{ track.label }}</ion-label>
-              <ion-note>{{ track.duration | secondsToStr }}</ion-note>
-              <ion-buttons slot="end">
-                <ion-button>
-                  <ion-icon slot="icon-only" size="small" name="add"></ion-icon>
-                </ion-button>
-                <ion-button>
-                  <ion-icon
-                    slot="icon-only"
-                    size="small"
-                    name="duplicate-outline"
-                  ></ion-icon>
-                </ion-button>
-                <ion-button (click)="sendToPlayList(track)">
-                  <ion-icon
-                    slot="icon-only"
-                    size="small"
-                    name="play"
-                  ></ion-icon>
-                </ion-button>
-              </ion-buttons>
-            </ion-item>
-          </ion-list>
+      <span>{{ album?.year }}</span
+      ><br />
+      <span>{{ album?.albumlabel }}</span
+      ><br />
+      <span>{{ album?.genre | arrayToString }}</span>
+    </div>
+    <div class="album-col col-70">
+      <h2 class="main-subtitle">{{ album?.artist | arrayToString }}</h2>
+      <div class="album-info">
+        <div class="scroll-info">
+          <p>{{ album?.description }}</p>
         </div>
       </div>
-    </ion-content>
-  </ng-template>
-</ion-modal>
+    </div>
+    <div class="tracks">
+      <ion-list>
+        <ion-item *ngFor="let track of tracks">
+          <ion-label>{{ track.label }}</ion-label>
+          <ion-note>{{ track.duration | secondsToStr }}</ion-note>
+          <ion-buttons slot="end">
+            <ion-button>
+              <ion-icon slot="icon-only" size="small" name="add"></ion-icon>
+            </ion-button>
+            <ion-button>
+              <ion-icon
+                slot="icon-only"
+                size="small"
+                name="duplicate-outline"
+              ></ion-icon>
+            </ion-button>
+            <ion-button (click)="sendToPlayList(track)">
+              <ion-icon slot="icon-only" size="small" name="play"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

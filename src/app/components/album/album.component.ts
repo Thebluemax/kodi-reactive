@@ -28,6 +28,7 @@ export class AlbumComponent implements OnInit, OnDestroy {
   searchTerms: string = '';
   selectedAlbum: Album | null = null;
   isModalOpen: boolean = false;
+  isLoading: boolean = false;
   @Input() playlist: ItemPlaylist[] = [];
   @Input() currentTrackPosition: number | null | undefined = null;
   @Output() next = new EventEmitter<void>();
@@ -80,6 +81,7 @@ export class AlbumComponent implements OnInit, OnDestroy {
   }
 
   getAlbum(album: Album) {
+    this.isLoading = true;
     console.log('getAlbum data', album);
     this.playerService.getAlbum(album.albumid).subscribe((data) => {
       console.log('getAlbum', data);
@@ -101,6 +103,7 @@ export class AlbumComponent implements OnInit, OnDestroy {
       this.tracks = data.result.songs;
       this.totalTracks = data.result.limits.total;
       this.isModalOpen = true;
+      this.isLoading = false;
     });
   }
 

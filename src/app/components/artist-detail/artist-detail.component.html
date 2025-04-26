@@ -53,11 +53,13 @@
             </ion-buttons>
           </div>
           <div class="tracks-holder">
-            <ul class="track-list">
-              <li *ngFor="let track of album.songs">
-                {{ track.label }}
-              </li>
-            </ul>
+            <ion-content class="scroll-info">
+              <ion-list class="track-list">
+                <ion-item *ngFor="let track of album.songs">
+                  <app-track-item [track]="track"></app-track-item>
+                </ion-item>
+              </ion-list>
+            </ion-content>
           </div>
         </ion-item>
       </ion-list>

@@ -1,18 +1,4 @@
-<!-- <ion-header>
-  <ion-toolbar>
-    <ion-searchbar
-      show-clear-button="always"
-      [debounce]="800"
-      (ionInput)="handleSearch($event)"
-    ></ion-searchbar>
-    <ion-buttons slot="end">
-      <ion-button (click)="goNext()">
-        <ion-icon name="caret-forward-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <div>Albums:{{ totalAlbums }}</div>
-  </ion-toolbar>
-</ion-header> -->
+<ion-progress-bar type="indeterminate" *ngIf="isLoading"></ion-progress-bar>
 <ion-content class="flex-tile-list">
   <ion-list>
     <app-album-square
@@ -29,12 +15,19 @@
   </ion-infinite-scroll>
 </ion-content>
 <!--<ion-content *ngIf="selectedAlbum" [style.height]="'985px'">-->
-<app-album-detail
-  [isModalOpen]="isModalOpen"
-  [album]="selectedAlbum"
-  [tracks]="tracks"
-  (closeDetail)="deleteSelected()"
-  (sendToPlaylist)="sendToPlaylist($event)"
-></app-album-detail>
 
 <!--</ion-content>-->
+<app-lateral-slide
+  [id]="'playlist'"
+  [title]="selectedAlbum?.label"
+  [openSlideBar]="isModalOpen"
+  [customWidth]="'60%'"
+>
+  <app-album-detail
+    [isModalOpen]="isModalOpen"
+    [album]="selectedAlbum"
+    [tracks]="tracks"
+    (closeDetail)="deleteSelected()"
+    (sendToPlaylist)="sendToPlaylist($event)"
+  ></app-album-detail>
+</app-lateral-slide>

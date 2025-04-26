@@ -1,5 +1,5 @@
-<ion-item>
-  <ion-label>{{ track?.label }}</ion-label>
+<ion-content class="item-container">
+  <ion-label>{{ track?.title }}</ion-label>
   <ion-note>{{ (track ? track.duration : 0.0) | secondsToStr }}</ion-note>
   <ion-buttons slot="end">
     <ion-button>
@@ -16,4 +16,4 @@
       <ion-icon slot="icon-only" size="small" name="play"></ion-icon>
     </ion-button>
   </ion-buttons>
-</ion-item>
+</ion-content>
