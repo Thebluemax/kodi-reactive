@@ -45,13 +45,11 @@ export class Tab1Page implements OnInit {
     private sidebarService: SideBarService
   ) {}
   ionViewDidEnter(): void {
-    console.log('ionViewDidEnter');
     this.wsService.run();
     this.activeComponent = this.pages[0];
   }
 
   ionViewDidLeave(): void {
-    console.log('ngOnDestroy');
     if (this.statusSubcription) {
       this.statusSubcription.unsubscribe();
     }
@@ -77,16 +75,13 @@ export class Tab1Page implements OnInit {
     this.wsService.getSocket().subscribe((data) => {
       if (data.method) {
         this.proceesMethod(data);
-        //console.log('GET sOCKET method',data.method);
       } else if (Array.isArray(data)) {
         this.appInfo = { ...data[0].result };
         this.playerInfo = { ...data[1].result.item };
         this.ref.markForCheck();
-        //console.log('GET sOCKET array',data.length);
       } else {
         console.log('GET sOCKET .id', data);
       }
-      // this.wsService.send(payloads.appInfo);
     });
   }
 
@@ -95,7 +90,6 @@ export class Tab1Page implements OnInit {
     const payload: any = payloads.volume;
     payload.params.volume = this.volume;
     this.wsService.send(payload);
-    // this.getMainInfo();
   }
 
   getMainInfo() {
@@ -104,14 +98,11 @@ export class Tab1Page implements OnInit {
       this.appInfo = { ...data_[0].result };
       this.playerInfo = { ...data_[1].result.item };
       console.log(this.appInfo, this.playerInfo);
-
-      //this.isMute = appInfo.muted;
     });
   }
 
   getPlaylists() {
     this.plService.getPlayList().subscribe((data: any) => {
-      // console.log(data);
       this.playlist = data.result.items.map((item: any) => {
         return item as ItemPlaylist;
       });
@@ -119,7 +110,6 @@ export class Tab1Page implements OnInit {
   }
 
   proceesMethod(data: any) {
-    console.log('proceesMethod', data.method);
     switch (data.method) {
       case Methods.PlaylistOnAdd:
         this.getPlaylists();
@@ -145,7 +135,6 @@ export class Tab1Page implements OnInit {
   }
 
   toPlayList(event: any) {
-    console.log('toPlayList from tab1', event);
     this.playlistObject?.sendToPlaylist(event);
   }
 

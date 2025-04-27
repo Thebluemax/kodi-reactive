@@ -61,6 +61,8 @@ export class ArtistsComponent implements OnInit, OnDestroy {
   selectedArtist: any = null;
   albums: AlbumGroup[] = [];
   isModalOpen: boolean = false;
+  isLoading: boolean = false;
+  isSlideBarOpen: boolean = false;
   @Output() next = new EventEmitter<void>();
 
   constructor(
@@ -84,7 +86,6 @@ export class ArtistsComponent implements OnInit, OnDestroy {
     end: number,
     event: InfiniteScrollCustomEvent | null = null
   ) {
-    console.log('getArtists', start, end, this.searchTerms, event);
     this.subcription = this.playerService
       .getArtists(this.start, this.end, this.searchTerms)
       .subscribe((data) => {
@@ -107,7 +108,6 @@ export class ArtistsComponent implements OnInit, OnDestroy {
 
   handleSearch(event: any) {
     this.searchTerms = event.detail.value;
-    console.log(event.detail, this.searchTerms);
     this.artists = [];
     this.start = 0;
     this.end = this.limit;
@@ -115,7 +115,7 @@ export class ArtistsComponent implements OnInit, OnDestroy {
   }
 
   getArtist(artist: any) {
-    console.log('getArtist data in function', artist);
+    this.isLoading = true;
 
     const artistData = this.playerService.getArtist(artist.artistid);
     const artistAlbums = this.playerService.getArtistAlbums(artist.artistid);
@@ -125,16 +125,14 @@ export class ArtistsComponent implements OnInit, OnDestroy {
     })
       .pipe(
         map(({ artistData, artistAlbums }) => {
-          console.log('getArtist from map', artistData);
           this.selectedArtist = artistData.result.artistdetails;
           this.albums = this.groupSongsByAlbumId(artistAlbums);
-          console.log('grouped albums', this.albums);
         })
       )
       .subscribe({
         next: (data) => {
-          console.log('getArtist data in subsc', data);
-          this.openModal();
+          this.isLoading = false;
+          this.isSlideBarOpen = true;
         },
         error: (error) => {
           console.error('Error fetching artist data:', error);
@@ -146,7 +144,7 @@ export class ArtistsComponent implements OnInit, OnDestroy {
   deleteSelected() {
     this.selectedArtist = null;
     this.albums = [];
-    this.isModalOpen = false;
+    this.isSlideBarOpen = false;
   }
 
   goNext() {
@@ -191,7 +189,7 @@ export class ArtistsComponent implements OnInit, OnDestroy {
         artist: this.selectedArtist,
         albums: this.albums,
       },
-      cssClass: 'artist-detail-modal'
+      cssClass: 'artist-detail-modal',
     });
     (await modal).present();
   }

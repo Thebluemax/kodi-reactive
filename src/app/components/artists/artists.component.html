@@ -1,3 +1,4 @@
+<ion-progress-bar type="indeterminate" *ngIf="isLoading"></ion-progress-bar>
 <ion-content class="flex-tile-list">
   <ion-list>
     <ion-card
@@ -6,7 +7,8 @@
       style="background-image: url({{
         artist.thumbnail | assets : 'scape'
       }}) , url('assets/site/no_cover.webp')"
-      [style.backgroundSize]="artist.thumbnail ? '100%' : 'cover'"
+      [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
+      [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"
       appTileHover
     >
       <ion-card-header>
@@ -36,3 +38,14 @@
     ></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>
+<app-lateral-slide
+  [id]="'artistDetail'"
+  [openSlideBar]="isSlideBarOpen"
+  [customWidth]="'60%'"
+>
+  <app-artist-detail
+    [artist]="selectedArtist"
+    (closeDetail)="deleteSelected()"
+    [albums]="albums"
+  ></app-artist-detail>
+</app-lateral-slide>

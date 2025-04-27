@@ -42,13 +42,11 @@ export class AlbumComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.end = this.limit;
     this.getAlbums(this.start, this.end);
-    console.log('albums ngOnInit');
   }
   getAlbums(start: number, end: number) {
     this.playerService
       .getAlbums(this.start, this.end, this.searchTerms)
       .subscribe((data: any) => {
-        console.log(data);
         this.totalAlbums = data.result.limits.total;
         const albumsReecibed = data.result.albums.map((item: any) => {
           const album: Album = { ...item };
@@ -58,7 +56,6 @@ export class AlbumComponent implements OnInit, OnDestroy {
       });
   }
   onIonInfinite(event: any) {
-    console.log('onIonInfinite', event);
     if (this.totalAlbums < this.start) {
       (event as InfiniteScrollCustomEvent).target.disabled = true;
       return;
@@ -73,7 +70,6 @@ export class AlbumComponent implements OnInit, OnDestroy {
 
   handleSearch(event: any) {
     this.searchTerms = event.detail.value;
-    console.log(event.detail, this.searchTerms);
     this.albums = [];
     this.start = 0;
     this.end = this.limit;
@@ -82,9 +78,7 @@ export class AlbumComponent implements OnInit, OnDestroy {
 
   getAlbum(album: Album) {
     this.isLoading = true;
-    console.log('getAlbum data', album);
     this.playerService.getAlbum(album.albumid).subscribe((data) => {
-      console.log('getAlbum', data);
       this.selectedAlbum = data.result.albumdetails;
       this.getTracks(album);
     });
@@ -99,7 +93,6 @@ export class AlbumComponent implements OnInit, OnDestroy {
   getTracks(album: Album) {
     console.log('getTracks', album);
     this.playerService.getTracks(album.albumid).subscribe((data) => {
-      console.log('getTracks', data.result.songs);
       this.tracks = data.result.songs;
       this.totalTracks = data.result.limits.total;
       this.isModalOpen = true;
@@ -108,8 +101,6 @@ export class AlbumComponent implements OnInit, OnDestroy {
   }
 
   sendToPlaylist(event: any) {
-    console.log('sendToPlaylist from album', event);
-
     this.toPlaylist.emit(event);
   }
 

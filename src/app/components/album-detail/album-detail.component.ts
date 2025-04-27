@@ -24,12 +24,10 @@ export class AlbumDetailComponent {
   }
 
   onWillDismiss(event: any) {
-    console.log('onWillDismiss', event);
     this.closeDetail.emit();
   }
 
   cancel() {
-    console.log('cancel');
     this.closeDetail.emit();
   }
 }

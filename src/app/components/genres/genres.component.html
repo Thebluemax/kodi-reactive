@@ -1,19 +1,23 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-searchbar
-      show-clear-button="always"
-      [debounce]="800"
-      (ionInput)="handleSearch($event)"
-    ></ion-searchbar>
-    <ion-buttons slot="end">
-      <ion-button (click)="goNext()">Button</ion-button>
-    </ion-buttons>
-    <div>Genres:{{ totalGenres }}</div>
-  </ion-toolbar>
-</ion-header>
 <div class="genre-list" *ngIf="!selectedGenre">
-  <ion-chip *ngFor="let genre of genreList"
-  (click)="selectGenre(genre)">{{ genre.label }}</ion-chip>
+  <ion-accordion-group>
+    <ion-accordion
+      *ngFor="let letterGroup of groupedList"
+      [value]="letterGroup.letter"
+    >
+      <ion-item slot="header" color="light">
+        <ion-label
+          >{{ letterGroup.letter }} ({{ letterGroup.genres.length }})</ion-label
+        >
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <ion-chip
+          *ngFor="let genre of letterGroup.genres"
+          (click)="selectGenre(genre)"
+          >{{ genre.label }}</ion-chip
+        >
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
 </div>
 <div *ngIf="selectedGenre">
   <ion-card>
@@ -22,9 +26,12 @@
     </ion-card-header>
     <ion-card-content>
       <div class="albums-list">
-        <app-album-square *ngFor="let album of albums"
+        <app-album-square
+          *ngFor="let album of albums"
           [album]="album"
-          (back)="back()"></app-album-square>
+          (back)="back()"
+        ></app-album-square>
       </div>
     </ion-card-content>
   </ion-card>
+</div>

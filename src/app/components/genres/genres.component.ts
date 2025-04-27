@@ -7,42 +7,61 @@ import { PlayerService } from 'src/app/core/services/player.service';
   templateUrl: './genres.component.html',
   styleUrls: ['./genres.component.scss'],
 })
-export class GenresComponent  implements OnInit {
-  totalGenres: number  = 0;
+export class GenresComponent implements OnInit {
+  totalGenres: number = 0;
   genreList: any[] = [];
   selectedGenre: any;
   albums: Album[] = [];
+  groupedList: { letter: string; genres: any[] }[] = [];
   @Output() next = new EventEmitter<void>();
 
-  constructor(private playerService: PlayerService) { }
+  constructor(private playerService: PlayerService) {}
 
   ngOnInit() {
-    this.playerService.getGenres()
-    .subscribe( (data) => {
+    this.playerService.getGenres().subscribe((data) => {
       this.genreList = data.result.genres;
       this.totalGenres = data.result.limits.total;
-      console.log(data)
-    })
+      this.groupedList = this.groupGenresByLetter(this.genreList);
+    });
   }
 
-  handleSearch(event: any)
-  {
+  groupGenresByLetter(genres: any[]): { letter: string; genres: any[] }[] {
+    const grouped = genres.reduce((acc: { [key: string]: any[] }, genre) => {
+      const firstLetter = genre.label.charAt(0).toUpperCase();
+      if (!acc[firstLetter]) {
+        acc[firstLetter] = [];
+      }
+      acc[firstLetter].push(genre);
+      return acc;
+    }, {});
+
+    return Object.entries(grouped)
+      .map(([letter, genres]) => ({ letter, genres }))
+      .sort((a, b) => a.letter.localeCompare(b.letter));
+  }
+
+  handleSearch(event: any) {
     console.log(event);
   }
-goNext() {
-  this.next.emit();
-}
 
-selectGenre(genre:any) {
-  this.selectedGenre = genre;
-  console.log(genre);
-  this.playerService.getAlbums(0, 100, genre.title, 'genre', 'is').subscribe((data) => {
-    this.albums = data.result.albums;
-  } );
-}
+  goNext() {
+    this.next.emit();
+  }
 
-back() {
-  this.selectedGenre = null;
-  this.albums = [];
-}
+  selectGenre(genre: any) {
+    this.selectedGenre = genre;
+    console.log(genre);
+    this.playerService
+      .getAlbums(0, 100, genre.title, 'genre', 'is')
+      .subscribe((data) => {
+        this.albums = data.result.albums;
+
+        console.log(this.albums);
+      });
+  }
+
+  back() {
+    this.selectedGenre = null;
+    this.albums = [];
+  }
 }

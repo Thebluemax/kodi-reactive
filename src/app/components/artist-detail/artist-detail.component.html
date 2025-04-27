@@ -56,7 +56,33 @@
             <ion-content class="scroll-info">
               <ion-list class="track-list">
                 <ion-item *ngFor="let track of album.songs">
-                  <app-track-item [track]="track"></app-track-item>
+                  <ion-label>{{ track?.title }}</ion-label>
+                  <ion-note>{{
+                    (track ? track.duration : 0.0) | secondsToStr
+                  }}</ion-note>
+                  <ion-buttons slot="end">
+                    <ion-button>
+                      <ion-icon
+                        slot="icon-only"
+                        size="small"
+                        name="add"
+                      ></ion-icon>
+                    </ion-button>
+                    <ion-button>
+                      <ion-icon
+                        slot="icon-only"
+                        size="small"
+                        name="duplicate-outline"
+                      ></ion-icon>
+                    </ion-button>
+                    <ion-button (click)="sendToPlayList(track)">
+                      <ion-icon
+                        slot="icon-only"
+                        size="small"
+                        name="play"
+                      ></ion-icon>
+                    </ion-button>
+                  </ion-buttons>
                 </ion-item>
               </ion-list>
             </ion-content>

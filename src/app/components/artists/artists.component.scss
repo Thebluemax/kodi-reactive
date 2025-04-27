@@ -12,19 +12,24 @@
     }
 
     .tile {
+        background-attachment: center center;
         background-repeat: no-repeat;
         background-size: auto 100%;
-        background-attachment: center center;
-        width: 200px;
         height: 200px;
         margin: 4px;
+        position: relative;
+        width: 200px;
 
         ion-card-header {
+            //   opacity: 0;
             background-color: rgba(0, 0, 0, .6);
+            bottom: 0;
             color: white;
-            font-size: .9em;
-            opacity: 0;
-            height: 50%;
+            font-size: 1em;
+            height: min-content;
+            left: 0;
+            position: absolute;
+            width: 100%;
 
             ion-card-title {
                 font-size: .9em;

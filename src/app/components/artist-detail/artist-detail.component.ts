@@ -22,12 +22,10 @@ export class ArtistDetailComponent {
   }
 
   onWillDismiss(event: any) {
-    console.log('onWillDismiss', event);
     this.closeDetail.emit();
   }
 
   cancel() {
-    console.log('cancel');
-    this.modalCtrl.dismiss(null, 'cancel');
+    this.closeDetail.emit();
   }
 }

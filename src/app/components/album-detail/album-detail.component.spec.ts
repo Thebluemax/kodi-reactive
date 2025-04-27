@@ -119,7 +119,7 @@ class TestHostComponent {
   }
 }
 
-fdescribe('AlbumDetailComponent', () => {
+describe('AlbumDetailComponent', () => {
   let hostComponent: TestHostComponent;
   let hostFixture: ComponentFixture<TestHostComponent>;
   let component: AlbumDetailComponent;
