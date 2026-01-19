@@ -10,7 +10,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "proxy": "/usr/local/bin/node ops/proxy.js"
+    "proxy": "/usr/local/bin/node ops/proxy.js",
+    "create-issue": "node ops/create-issue.js"
   },
   "private": true,
   "dependencies": {
