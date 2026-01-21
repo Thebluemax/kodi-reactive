@@ -1,11 +1,8 @@
 import { TestBed, getTestBed } from '@angular/core/testing';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { PlayerService } from './player.service';
 import { PipesModule } from '../pipes/pipes-module';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('PlayerService', () => {
   let injector: TestBed;
@@ -15,9 +12,9 @@ describe('PlayerService', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, PipesModule],
-      providers: [PlayerService],
-    });
+    imports: [PipesModule],
+    providers: [PlayerService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     await TestBed.compileComponents();
     service = TestBed.inject(PlayerService);
     httpClient = TestBed.inject(HttpClient);
