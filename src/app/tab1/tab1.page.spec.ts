@@ -3,8 +3,8 @@ import { IonicModule } from '@ionic/angular';
 
 import { Tab1Page } from './tab1.page';
 import { PlayerService } from '../core/services/player.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { HttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('Tab1Page', () => {
   let component: Tab1Page;
@@ -12,14 +12,12 @@ describe('Tab1Page', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [Tab1Page, PlayerService],
-      imports: [
-        IonicModule.forRoot(),
+    declarations: [Tab1Page, PlayerService],
+    imports: [IonicModule.forRoot(),
         HttpClientTestingModule,
-        HttpClientTestingModule,
-        HttpClient,
-      ],
-    }).compileComponents();
+        HttpClient],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(Tab1Page);
     component = fixture.componentInstance;
