@@ -140,8 +140,8 @@ describe('AlbumDetailComponent', () => {
     standalone: false
 })
   class MockArrayToStringPipe implements PipeTransform {
-    transform(value: string[]) {
-      return value.join(', ');
+    transform(value: string[] | null | undefined) {
+      return value ? value.join(', ') : '';
     }
   }
   @Pipe({

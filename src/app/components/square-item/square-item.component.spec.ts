@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { SquareItemComponent } from './square-item.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 describe('SquareItemComponent', () => {
   let component: SquareItemComponent;
@@ -10,7 +11,7 @@ describe('SquareItemComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SquareItemComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule.forRoot(), SharedModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SquareItemComponent);
