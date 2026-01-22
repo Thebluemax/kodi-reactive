@@ -46,9 +46,10 @@ interface AlbumGroup {
 }
 
 @Component({
-  selector: 'app-artists',
-  templateUrl: './artists.component.html',
-  styleUrls: ['./artists.component.scss'],
+    selector: 'app-artists',
+    templateUrl: './artists.component.html',
+    styleUrls: ['./artists.component.scss'],
+    standalone: false
 })
 export class ArtistsComponent implements OnInit, OnDestroy {
   artists: any[] = [];

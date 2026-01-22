@@ -13,9 +13,10 @@ import {
 import { SideBarService } from 'src/app/core/services/side-bar.service';
 
 @Component({
-  selector: 'app-lateral-slide',
-  templateUrl: './lateral-slide.component.html',
-  styleUrls: ['./lateral-slide.component.scss'],
+    selector: 'app-lateral-slide',
+    templateUrl: './lateral-slide.component.html',
+    styleUrls: ['./lateral-slide.component.scss'],
+    standalone: false
 })
 export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
   public width: number = 300;

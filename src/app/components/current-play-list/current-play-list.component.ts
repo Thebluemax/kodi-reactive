@@ -4,9 +4,10 @@ import { ItemPlaylist } from 'src/app/core/models/item-playlist';
 import { PlayerService } from 'src/app/core/services/player.service';
 
 @Component({
-  selector: 'app-current-play-list',
-  templateUrl: './current-play-list.component.html',
-  styleUrls: ['./current-play-list.component.scss'],
+    selector: 'app-current-play-list',
+    templateUrl: './current-play-list.component.html',
+    styleUrls: ['./current-play-list.component.scss'],
+    standalone: false
 })
 export class CurrentPlayListComponent implements OnDestroy{
   @Input() playlist: ItemPlaylist[] = [];

@@ -90,8 +90,8 @@ class MockAssetsPipe {
 }
 
 @Component({
-  template:
-    '<body><div><app-album-detail [isModalOpen]="isModalOpen" [album]="album" ></app-album-detail></div>',
+    template: '<body><div><app-album-detail [isModalOpen]="isModalOpen" [album]="album" ></app-album-detail></div>',
+    standalone: false
 })
 class TestHostComponent {
   isModalOpen: boolean = true;
@@ -128,7 +128,8 @@ describe('AlbumDetailComponent', () => {
   // Mock Pipes
   @Pipe({
     name: 'assets',
-  })
+    standalone: false
+})
   class MockAssetsPipe implements PipeTransform {
     transform(value: string) {
       return `assets/${value}`;
@@ -136,7 +137,8 @@ describe('AlbumDetailComponent', () => {
   }
   @Pipe({
     name: 'arrayToString',
-  })
+    standalone: false
+})
   class MockArrayToStringPipe implements PipeTransform {
     transform(value: string[]) {
       return value.join(', ');
@@ -144,7 +146,8 @@ describe('AlbumDetailComponent', () => {
   }
   @Pipe({
     name: 'secondsToStr',
-  })
+    standalone: false
+})
   // Mock Pipe for converting seconds to string format
   class MockSecondsToStrPipe implements PipeTransform {
     transform(value: number) {

@@ -5,9 +5,10 @@ import { Artist } from 'src/app/core/models/artist';
 import { Track } from 'src/app/core/models/track';
 
 @Component({
-  selector: 'app-artist-detail',
-  templateUrl: './artist-detail.component.html',
-  styleUrls: ['./artist-detail.component.scss'],
+    selector: 'app-artist-detail',
+    templateUrl: './artist-detail.component.html',
+    styleUrls: ['./artist-detail.component.scss'],
+    standalone: false
 })
 export class ArtistDetailComponent {
   @Input() isModalOpen: boolean = true;
