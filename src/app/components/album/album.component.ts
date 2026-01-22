@@ -13,9 +13,10 @@ import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { ItemPlaylist } from 'src/app/core/models/item-playlist';
 import { payloads } from 'src/app/core/payloads/payload';
 @Component({
-  selector: 'app-album',
-  templateUrl: './album.component.html',
-  styleUrls: ['./album.component.scss'],
+    selector: 'app-album',
+    templateUrl: './album.component.html',
+    styleUrls: ['./album.component.scss'],
+    standalone: false
 })
 export class AlbumComponent implements OnInit, OnDestroy {
   albums: Album[] = [];

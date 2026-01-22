@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-genre-detail',
-  templateUrl: './genre-detail.component.html',
-  styleUrls: ['./genre-detail.component.scss'],
+    selector: 'app-genre-detail',
+    templateUrl: './genre-detail.component.html',
+    styleUrls: ['./genre-detail.component.scss'],
+    standalone: false
 })
 export class GenreDetailComponent {
   @Input() albums: any[] = [];

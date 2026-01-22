@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { ArtistDetailComponent } from './artist-detail.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 describe('ArtistDetailComponent', () => {
   let component: ArtistDetailComponent;
@@ -10,7 +11,7 @@ describe('ArtistDetailComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ArtistDetailComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule.forRoot(), SharedModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ArtistDetailComponent);
