@@ -89,10 +89,7 @@ class MockAssetsPipe {
   }
 }
 
-@Component({
-    template: '<body><div><app-album-detail [isModalOpen]="isModalOpen" [album]="album" ></app-album-detail></div>',
-    standalone: false
-})
+@Component({ template: '<body><div><app-album-detail [isModalOpen]="isModalOpen" [album]="album" ></app-album-detail></div>' })
 class TestHostComponent {
   isModalOpen: boolean = true;
   album: Album | null = null;
@@ -126,28 +123,19 @@ describe('AlbumDetailComponent', () => {
   let modalController: ModalController;
 
   // Mock Pipes
-  @Pipe({
-    name: 'assets',
-    standalone: false
-})
+  @Pipe({ name: 'assets' })
   class MockAssetsPipe implements PipeTransform {
     transform(value: string) {
       return `assets/${value}`;
     }
   }
-  @Pipe({
-    name: 'arrayToString',
-    standalone: false
-})
+  @Pipe({ name: 'arrayToString' })
   class MockArrayToStringPipe implements PipeTransform {
     transform(value: string[] | null | undefined) {
       return value ? value.join(', ') : '';
     }
   }
-  @Pipe({
-    name: 'secondsToStr',
-    standalone: false
-})
+  @Pipe({ name: 'secondsToStr' })
   // Mock Pipe for converting seconds to string format
   class MockSecondsToStrPipe implements PipeTransform {
     transform(value: number) {
@@ -159,21 +147,18 @@ describe('AlbumDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        AlbumDetailComponent,
+    imports: [IonicModule.forRoot(), AlbumDetailComponent,
         MockAssetsPipe,
         MockArrayToStringPipe,
         MockSecondsToStrPipe,
-        TestHostComponent,
-      ],
-      imports: [IonicModule.forRoot()],
-      providers: [
+        TestHostComponent],
+    providers: [
         { provide: AssetsPipe, useClass: MockAssetsPipe },
         ArrayToStringPipe,
         { provide: SecondsToStringPipe, useClass: MockSecondsToStrPipe },
         AngularDelegate,
-      ],
-    }).compileComponents();
+    ],
+}).compileComponents();
     hostFixture = TestBed.createComponent(TestHostComponent);
     hostComponent = hostFixture.componentInstance;
     modalController = TestBed.inject(ModalController);

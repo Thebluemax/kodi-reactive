@@ -10,9 +10,8 @@ describe('ArtistDetailComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ArtistDetailComponent ],
-      imports: [IonicModule.forRoot(), SharedModule]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SharedModule, ArtistDetailComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(ArtistDetailComponent);
     component = fixture.componentInstance;

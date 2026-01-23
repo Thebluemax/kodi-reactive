@@ -1,12 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Album } from 'src/app/core/models/album';
 import { Track } from 'src/app/core/models/track';
+import { IonicModule } from '@ionic/angular';
+import { NgFor } from '@angular/common';
+import { AssetsPipe } from '../../core/pipes/assets.pipe';
+import { ArrayToStringPipe } from '../../core/pipes/array-to-string.pipe';
+import { SecondsToStringPipe } from '../../core/pipes/seconds-to-string.pipe';
 
 @Component({
     selector: 'app-album-detail',
     templateUrl: './album-detail.component.html',
     styleUrls: ['./album-detail.component.scss'],
-    standalone: false
+    imports: [IonicModule, NgFor, AssetsPipe, ArrayToStringPipe, SecondsToStringPipe]
 })
 export class AlbumDetailComponent {
   @Input() album: Album | null = null;

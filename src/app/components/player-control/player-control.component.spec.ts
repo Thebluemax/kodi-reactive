@@ -12,10 +12,9 @@ describe('PlayerControlComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PlayerControlComponent ],
-      imports: [IonicModule.forRoot(), SharedModule],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SharedModule, PlayerControlComponent],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(PlayerControlComponent);
     component = fixture.componentInstance;

@@ -9,9 +9,8 @@ describe('SoundComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SoundComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SoundComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SoundComponent);
     component = fixture.componentInstance;

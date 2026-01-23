@@ -1,11 +1,15 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Album } from 'src/app/core/models/album';
+import { IonicModule } from '@ionic/angular';
+import { TileHoverDirective } from '../../directives/tile-hover.directive';
+import { AssetsPipe } from '../../core/pipes/assets.pipe';
+import { ArrayToStringPipe } from '../../core/pipes/array-to-string.pipe';
 
 @Component({
     selector: 'app-album-square',
     templateUrl: './album-square.component.html',
     styleUrls: ['./album-square.component.scss'],
-    standalone: false
+    imports: [IonicModule, TileHoverDirective, AssetsPipe, ArrayToStringPipe]
 })
 export class AlbumSquareComponent {
   @Input() album: Album | null = null;

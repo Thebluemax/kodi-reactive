@@ -1,14 +1,18 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, IonicModule } from '@ionic/angular';
 import { Album } from 'src/app/core/models/album';
 import { Artist } from 'src/app/core/models/artist';
 import { Track } from 'src/app/core/models/track';
+import { NgFor } from '@angular/common';
+import { AssetsPipe } from '../../core/pipes/assets.pipe';
+import { ArrayToStringPipe } from '../../core/pipes/array-to-string.pipe';
+import { SecondsToStringPipe } from '../../core/pipes/seconds-to-string.pipe';
 
 @Component({
     selector: 'app-artist-detail',
     templateUrl: './artist-detail.component.html',
     styleUrls: ['./artist-detail.component.scss'],
-    standalone: false
+    imports: [IonicModule, NgFor, AssetsPipe, ArrayToStringPipe, SecondsToStringPipe]
 })
 export class ArtistDetailComponent {
   @Input() isModalOpen: boolean = true;

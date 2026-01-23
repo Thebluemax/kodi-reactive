@@ -2,12 +2,15 @@ import { Component, Input } from '@angular/core';
 import { Album } from 'src/app/core/models/album';
 import { ItemPlaylist } from 'src/app/core/models/item-playlist';
 import { PlayerService } from 'src/app/core/services/player.service';
+import { IonicModule } from '@ionic/angular';
+import { NgFor } from '@angular/common';
+import { AssetsPipe } from '../../core/pipes/assets.pipe';
 
 @Component({
     selector: 'app-current-play-list',
     templateUrl: './current-play-list.component.html',
     styleUrls: ['./current-play-list.component.scss'],
-    standalone: false
+    imports: [IonicModule, NgFor, AssetsPipe]
 })
 export class CurrentPlayListComponent {
   @Input() playlist: ItemPlaylist[] = [];

@@ -11,12 +11,13 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { SideBarService } from 'src/app/core/services/side-bar.service';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
     selector: 'app-lateral-slide',
     templateUrl: './lateral-slide.component.html',
     styleUrls: ['./lateral-slide.component.scss'],
-    standalone: false
+    imports: [IonicModule]
 })
 export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
   public width: number = 300;

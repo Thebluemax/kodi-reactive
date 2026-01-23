@@ -28,9 +28,8 @@ describe('TrackItemComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TrackItemComponent],
-      imports: [IonicModule.forRoot(), ArrayToStringPipe, SecondsToStringPipe],
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), ArrayToStringPipe, SecondsToStringPipe, TrackItemComponent],
+}).compileComponents();
 
     fixture = TestBed.createComponent(TrackItemComponent);
     component = fixture.componentInstance;

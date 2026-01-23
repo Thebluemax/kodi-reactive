@@ -28,9 +28,8 @@ describe('AlbumSquareComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AlbumSquareComponent],
-      imports: [IonicModule.forRoot(), AssetsPipe, ArrayToStringPipe],
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), AssetsPipe, ArrayToStringPipe, AlbumSquareComponent],
+}).compileComponents();
   });
 
   beforeEach(() => {

@@ -11,10 +11,9 @@ describe('ArtistsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ArtistsComponent ],
-      imports: [IonicModule.forRoot()],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), ArtistsComponent],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(ArtistsComponent);
     component = fixture.componentInstance;

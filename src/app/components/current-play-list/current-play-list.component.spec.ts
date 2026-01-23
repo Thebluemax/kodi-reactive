@@ -11,10 +11,9 @@ describe('CurrentPlayListComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CurrentPlayListComponent ],
-      imports: [IonicModule.forRoot()],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), CurrentPlayListComponent],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(CurrentPlayListComponent);
     component = fixture.componentInstance;

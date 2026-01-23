@@ -1,10 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { TileHoverDirective } from '../../directives/tile-hover.directive';
+import { NgIf, NgClass } from '@angular/common';
+import { AssetsPipe } from '../../core/pipes/assets.pipe';
 
 @Component({
     selector: 'app-square-item',
     templateUrl: './square-item.component.html',
     styleUrls: ['./square-item.component.scss'],
-    standalone: false
+    imports: [IonicModule, TileHoverDirective, NgIf, NgClass, AssetsPipe]
 })
 export class SquareItemComponent {
   @Input() headerActive: boolean = false;

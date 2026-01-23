@@ -10,9 +10,8 @@ describe('SquareItemComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SquareItemComponent ],
-      imports: [IonicModule.forRoot(), SharedModule]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SharedModule, SquareItemComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SquareItemComponent);
     component = fixture.componentInstance;

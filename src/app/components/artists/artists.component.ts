@@ -5,11 +5,15 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { InfiniteScrollCustomEvent, ModalController } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ModalController, IonicModule } from '@ionic/angular';
 import { forkJoin, map, Observable, Subscription } from 'rxjs';
 import { Album } from 'src/app/core/models/album';
 import { PlayerService } from 'src/app/core/services/player.service';
 import { ArtistDetailComponent } from '../artist-detail/artist-detail.component';
+import { NgIf, NgFor } from '@angular/common';
+import { TileHoverDirective } from '../../directives/tile-hover.directive';
+import { LateralSlideComponent } from '../lateral-slide/lateral-slide.component';
+import { AssetsPipe } from '../../core/pipes/assets.pipe';
 
 interface Song {
   albumid: number;
@@ -49,7 +53,7 @@ interface AlbumGroup {
     selector: 'app-artists',
     templateUrl: './artists.component.html',
     styleUrls: ['./artists.component.scss'],
-    standalone: false
+    imports: [NgIf, IonicModule, NgFor, TileHoverDirective, LateralSlideComponent, ArtistDetailComponent, AssetsPipe]
 })
 export class ArtistsComponent implements OnInit, OnDestroy {
   artists: any[] = [];

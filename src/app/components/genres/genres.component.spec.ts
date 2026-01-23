@@ -11,10 +11,9 @@ describe('GenresComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ GenresComponent ],
-      imports: [IonicModule.forRoot()],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), GenresComponent],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(GenresComponent);
     component = fixture.componentInstance;

@@ -10,9 +10,8 @@ describe('CurrentTrackComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CurrentTrackComponent ],
-      imports: [IonicModule.forRoot(), SharedModule]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SharedModule, CurrentTrackComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(CurrentTrackComponent);
     component = fixture.componentInstance;

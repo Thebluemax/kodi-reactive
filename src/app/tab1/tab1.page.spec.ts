@@ -11,8 +11,7 @@ describe('Tab1Page', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [Tab1Page],
-    imports: [IonicModule.forRoot()],
+    imports: [IonicModule.forRoot(), Tab1Page],
     providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 }).compileComponents();
 

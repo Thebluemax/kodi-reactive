@@ -9,9 +9,8 @@ describe('LateralSlideComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LateralSlideComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), LateralSlideComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(LateralSlideComponent);
     component = fixture.componentInstance;

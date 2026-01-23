@@ -1,12 +1,13 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { RangeCustomEvent } from '@ionic/angular';
+import { RangeCustomEvent, IonicModule } from '@ionic/angular';
 import { AppInfo } from 'src/app/core/models/app-info';
 import { PlayerService } from 'src/app/core/services/player.service';
+import { ZeroPaddingPipe } from '../../core/pipes/zero-padding.pipe';
 @Component({
     selector: 'app-player-control',
     templateUrl: './player-control.component.html',
     styleUrls: ['./player-control.component.scss'],
-    standalone: false
+    imports: [IonicModule, ZeroPaddingPipe]
 })
 export class PlayerControlComponent  implements OnInit, OnChanges {
   isPlaying:boolean = false;

@@ -1,11 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Track } from 'src/app/core/models/track';
+import { IonicModule } from '@ionic/angular';
+import { SecondsToStringPipe } from '../../core/pipes/seconds-to-string.pipe';
 
 @Component({
     selector: 'app-track-item',
     templateUrl: './track-item.component.html',
     styleUrls: ['./track-item.component.scss'],
-    standalone: false
+    imports: [IonicModule, SecondsToStringPipe]
 })
 export class TrackItemComponent implements OnInit {
   @Input() track: Track | null = null;

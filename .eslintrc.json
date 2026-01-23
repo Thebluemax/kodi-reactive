@@ -15,7 +15,6 @@
         "plugin:jasmine/recommended"
       ],
       "rules": {
-        "@angular-eslint/prefer-standalone": "off",
         "@angular-eslint/component-class-suffix": [
           "error",
           {

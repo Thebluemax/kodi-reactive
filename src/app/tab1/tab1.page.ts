@@ -14,14 +14,18 @@ import { payloads } from '../core/payloads/payload';
 import { Album } from '../core/models/album';
 import { CurrentPlayListComponent } from '../components/current-play-list/current-play-list.component';
 import { Subscriber, Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { SideBarService } from '../core/services/side-bar.service';
+import { IonicModule } from '@ionic/angular';
+import { CurrentTrackComponent } from '../components/current-track/current-track.component';
+import { PlayerControlComponent } from '../components/player-control/player-control.component';
+import { SoundComponent } from '../components/sound/sound.component';
 
 @Component({
     selector: 'app-tab1',
     templateUrl: 'tab1.page.html',
     styleUrls: ['tab1.page.scss'],
-    standalone: false
+    imports: [IonicModule, CurrentPlayListComponent, RouterOutlet, CurrentTrackComponent, PlayerControlComponent, SoundComponent]
 })
 export class Tab1Page implements OnInit {
   volume: number = 0;

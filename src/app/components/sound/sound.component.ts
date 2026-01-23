@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { NgIf } from '@angular/common';
 
 @Component({
     selector: 'app-sound',
     templateUrl: './sound.component.html',
     styleUrls: ['./sound.component.scss'],
-    standalone: false
+    imports: [IonicModule, NgIf]
 })
 export class SoundComponent  implements OnInit {
 
