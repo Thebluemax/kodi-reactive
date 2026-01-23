@@ -1,10 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { PlayerService } from '../core/services/player.service';
 import { AppInfo, CurrentTrack } from '../core/models/app-info';
 import { WsPlayerService } from '../core/services/ws-player.service';
@@ -28,6 +22,12 @@ import { SoundComponent } from '../components/sound/sound.component';
     imports: [IonicModule, CurrentPlayListComponent, RouterOutlet, CurrentTrackComponent, PlayerControlComponent, SoundComponent]
 })
 export class Tab1Page implements OnInit {
+  private plService = inject(PlayerService);
+  private wsService = inject(WsPlayerService);
+  private ref = inject(ChangeDetectorRef);
+  private router = inject(Router);
+  private sidebarService = inject(SideBarService);
+
   volume: number = 0;
   isMute: boolean = false;
   title: string = 'Volume Control';
@@ -41,14 +41,6 @@ export class Tab1Page implements OnInit {
   statusSubcription: Subscription | null = null;
   @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null =
     null;
-
-  constructor(
-    private plService: PlayerService,
-    private wsService: WsPlayerService,
-    private ref: ChangeDetectorRef,
-    private router: Router,
-    private sidebarService: SideBarService
-  ) {}
   ionViewDidEnter(): void {
     this.wsService.run();
     this.activeComponent = this.pages[0];

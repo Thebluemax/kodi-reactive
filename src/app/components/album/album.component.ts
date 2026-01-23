@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  viewChild,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, viewChild, inject } from '@angular/core';
 import { PlayerService } from 'src/app/core/services/player.service';
 import { Album } from 'src/app/core/models/album';
 import { InfiniteScrollCustomEvent, IonicModule } from '@ionic/angular';
@@ -23,6 +15,8 @@ import { AlbumDetailComponent } from '../album-detail/album-detail.component';
     imports: [NgIf, IonicModule, NgFor, AlbumSquareComponent, LateralSlideComponent, AlbumDetailComponent]
 })
 export class AlbumComponent implements OnInit, OnDestroy {
+  private playerService = inject(PlayerService);
+
   albums: Album[] = [];
   tracks: any[] = [];
   totalTracks: number = 0;
@@ -38,7 +32,6 @@ export class AlbumComponent implements OnInit, OnDestroy {
   @Input() currentTrackPosition: number | null | undefined = null;
   @Output() next = new EventEmitter<void>();
   @Output() toPlaylist = new EventEmitter<Album | number>();
-  constructor(private playerService: PlayerService) {}
 
   ngOnDestroy() {
     console.log('albums ngOnDestroy');

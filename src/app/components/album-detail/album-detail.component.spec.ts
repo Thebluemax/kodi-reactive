@@ -4,12 +4,7 @@ import { By } from '@angular/platform-browser';
 import { AlbumDetailComponent } from './album-detail.component';
 import { Album } from 'src/app/core/models/album';
 import { Track } from 'src/app/core/models/track';
-import {
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform, inject as inject_1 } from '@angular/core';
 import { AssetsPipe } from 'src/app/core/pipes/assets.pipe';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
 import { SecondsToStringPipe } from 'src/app/core/pipes/seconds-to-string.pipe';
@@ -91,10 +86,11 @@ class MockAssetsPipe {
 
 @Component({ template: '<body><div><app-album-detail [isModalOpen]="isModalOpen" [album]="album" ></app-album-detail></div>' })
 class TestHostComponent {
+  private modalController = inject_1(ModalController);
+
   isModalOpen: boolean = true;
   album: Album | null = null;
   tracks: Track[] = [];
-  constructor(private modalController: ModalController) {}
 
   async openModal() {
     this.album = mockAlbum;

@@ -1,11 +1,13 @@
-import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostListener, Renderer2, inject } from '@angular/core';
 
 @Directive({
   selector: '[appTileHover]',
   standalone: true,
 })
 export class TileHoverDirective {
-  constructor(private renderer: Renderer2, private el: ElementRef) {}
+  private renderer = inject(Renderer2);
+  private el = inject(ElementRef);
+
 
   @HostListener('mouseover', ['$event.target']) overElement(target: any) {
     // Assuming you want to add 'highlighted' class to 'ion-card-header' on mouseover

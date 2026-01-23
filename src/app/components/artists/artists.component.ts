@@ -1,10 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, inject } from '@angular/core';
 import { InfiniteScrollCustomEvent, ModalController, IonicModule } from '@ionic/angular';
 import { forkJoin, map, Observable, Subscription } from 'rxjs';
 import { Album } from 'src/app/core/models/album';
@@ -56,6 +50,9 @@ interface AlbumGroup {
     imports: [NgIf, IonicModule, NgFor, TileHoverDirective, LateralSlideComponent, ArtistDetailComponent, AssetsPipe]
 })
 export class ArtistsComponent implements OnInit, OnDestroy {
+  private playerService = inject(PlayerService);
+  private modalCtrl = inject(ModalController);
+
   artists: any[] = [];
   start: number = 1;
   end: number = 10;
@@ -69,11 +66,6 @@ export class ArtistsComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isSlideBarOpen: boolean = false;
   @Output() next = new EventEmitter<void>();
-
-  constructor(
-    private playerService: PlayerService,
-    private modalCtrl: ModalController
-  ) {}
 
   ngOnDestroy(): void {
     if (this.subcription) this.subcription.unsubscribe();

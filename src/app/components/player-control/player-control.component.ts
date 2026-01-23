@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { RangeCustomEvent, IonicModule } from '@ionic/angular';
 import { AppInfo } from 'src/app/core/models/app-info';
 import { PlayerService } from 'src/app/core/services/player.service';
@@ -10,13 +10,11 @@ import { ZeroPaddingPipe } from '../../core/pipes/zero-padding.pipe';
     imports: [IonicModule, ZeroPaddingPipe]
 })
 export class PlayerControlComponent  implements OnInit, OnChanges {
+  private playerService = inject(PlayerService);
+
   isPlaying:boolean = false;
   speed:number = 1;
   @Input() appInfo:AppInfo | null = null;
-  
-  constructor(private playerService: PlayerService) {  
-   
-   }
 
   ngOnInit() {
     console.log('PlayerControlComponent');
