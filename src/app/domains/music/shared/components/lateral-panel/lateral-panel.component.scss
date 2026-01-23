@@ -1,0 +1,108 @@
+// ==========================================================================
+// COMPONENT - Lateral Panel (BEM)
+// ==========================================================================
+
+@use '../../styles' as *;
+
+// Block
+.lateral-panel {
+  background: $lateral-panel-bg;
+  position: fixed;
+  height: 100vh;
+  min-width: $lateral-panel-min-width;
+  max-width: $lateral-panel-max-width;
+  top: 0;
+  right: -100%;
+  z-index: $lateral-panel-z-index;
+  @include flex-column;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.05);
+  @include transition(right, $transition-slow);
+
+  // Modifier: Open
+  &--open {
+    right: 0;
+
+    & + .lateral-panel__overlay {
+      display: block;
+    }
+  }
+
+  // Element: Body
+  &__body {
+    background: inherit;
+    overflow-y: hidden;
+    height: 100%;
+    @include flex-column;
+  }
+
+  // Element: Header
+  &__header {
+    flex-shrink: 0;
+  }
+
+  // Element: Title
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  // Element: Close Button
+  &__close-btn {
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+
+  // Element: Content
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  // Element: Grabber
+  &__grabber {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: col-resize;
+    height: 100%;
+    width: $lateral-panel-grabber-width;
+    overflow: hidden;
+    background-color: transparent;
+    opacity: 1;
+    @include transition(background-color);
+
+    &:hover,
+    &:active {
+      background-color: $lateral-panel-grabber-hover-bg;
+    }
+  }
+
+  // Element: Overlay
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $lateral-panel-overlay-bg;
+    z-index: $lateral-panel-z-index - 1000;
+    display: none;
+  }
+}
+
+// ==========================================================================
+// RESPONSIVE - Breakpoints
+// ==========================================================================
+
+@include respond-to('sm') {
+  .lateral-panel {
+    max-width: 100%;
+  }
+}
+
+@include respond-to('md') {
+  .lateral-panel {
+    max-width: 100%;
+  }
+}

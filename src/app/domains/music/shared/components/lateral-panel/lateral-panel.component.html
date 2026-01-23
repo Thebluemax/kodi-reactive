@@ -1,0 +1,19 @@
+<div class="lateral-panel" [style.width.px]="width()">
+  <div class="lateral-panel__body">
+    <ion-header class="lateral-panel__header">
+      <ion-toolbar>
+        <ion-title class="lateral-panel__title">{{ title() }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button class="lateral-panel__close-btn" (click)="close()">
+            <ion-icon slot="icon-only" name="close-outline" />
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <div class="lateral-panel__content">
+      <ng-content />
+    </div>
+  </div>
+  <div class="lateral-panel__grabber"></div>
+</div>
+<div class="lateral-panel__overlay"></div>

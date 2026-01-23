@@ -4,6 +4,12 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "baseUrl": "./",
+    "paths": {
+      "@domains/*": ["src/app/domains/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@core/*": ["src/app/core/*"],
+      "@components/*": ["src/app/components/*"]
+    },
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,

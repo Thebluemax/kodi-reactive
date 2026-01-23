@@ -1,0 +1,84 @@
+// ==========================================================================
+// TOOLS - Music Domain Mixins
+// ==========================================================================
+
+@use 'settings' as *;
+
+// Responsive breakpoint mixin
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (max-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == 'md' {
+    @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == 'lg' {
+    @media (min-width: $breakpoint-lg + 1) and (max-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == 'xl' {
+    @media (min-width: $breakpoint-xl + 1) { @content; }
+  }
+}
+
+// Media tile size mixin
+@mixin media-tile-size($size, $margin) {
+  width: $size;
+  height: $size;
+  margin: $margin;
+}
+
+// Overlay mixin
+@mixin overlay($bg-color, $opacity: 1) {
+  background-color: $bg-color;
+  opacity: $opacity;
+}
+
+// Absolute positioning mixin
+@mixin absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+@mixin absolute-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+// Flexbox helpers
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-row-wrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Transition mixin
+@mixin transition($property: all, $duration: $transition-normal) {
+  transition: $property $duration;
+}
+
+// Text ellipsis
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Card hover effect
+@mixin card-hover-effect {
+  &:hover {
+    opacity: 1;
+  }
+}

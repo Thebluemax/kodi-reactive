@@ -1,0 +1,122 @@
+// ==========================================================================
+// COMPONENT - Media Tile (BEM)
+// ==========================================================================
+
+@use '../../styles' as *;
+
+// Block
+.media-tile {
+  @include media-tile-size($media-tile-size-sm, $media-tile-margin-sm);
+  position: relative;
+  overflow: hidden;
+
+  // Element: Header
+  &__header {
+    @include absolute-bottom;
+    @include overlay($media-tile-header-bg);
+    color: $media-tile-title-color;
+    font-size: 1em;
+    height: min-content;
+    padding: 8px;
+
+    // Modifier: Clickable
+    &--clickable {
+      cursor: pointer;
+    }
+  }
+
+  // Element: Title
+  &__title {
+    font-size: $media-tile-title-font-size;
+    font-weight: 900;
+    margin: 0;
+    @include text-ellipsis;
+  }
+
+  // Element: Subtitle
+  &__subtitle {
+    font-size: $media-tile-subtitle-font-size;
+    font-weight: 400;
+    margin: 0;
+    color: $media-tile-subtitle-color;
+    @include text-ellipsis;
+  }
+
+  // Element: Content
+  &__content {
+    @include overlay($media-tile-overlay-bg, 0);
+    @include transition(opacity);
+    height: 100%;
+    padding: 12px;
+
+    // Modifier: Hoverable
+    &--hoverable {
+      @include card-hover-effect;
+    }
+  }
+
+  // Element: Info
+  &__info {
+    h4 {
+      color: $media-tile-info-color;
+      font-size: $media-tile-info-font-size;
+      font-weight: 900;
+      margin: 0 0 4px 0;
+      @include text-ellipsis;
+    }
+
+    h5,
+    h6 {
+      line-height: 1.2em;
+      color: $media-tile-subtitle-color;
+      font-size: $media-tile-subtitle-font-size;
+      font-weight: 400;
+      margin: 0;
+    }
+  }
+
+  // Element: Actions
+  &__actions {
+    @include flex-row-wrap;
+    justify-content: space-around;
+    position: absolute;
+    bottom: 10px;
+    width: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  // Element: Action Button
+  &__action-btn {
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+}
+
+// ==========================================================================
+// RESPONSIVE - Breakpoints
+// ==========================================================================
+
+@include respond-to('xl') {
+  .media-tile {
+    @include media-tile-size($media-tile-size-xl, $media-tile-margin-lg);
+  }
+}
+
+@include respond-to('lg') {
+  .media-tile {
+    @include media-tile-size($media-tile-size-lg, $media-tile-margin-lg);
+  }
+}
+
+@include respond-to('md') {
+  .media-tile {
+    @include media-tile-size($media-tile-size-md, $media-tile-margin-md);
+  }
+}
+
+@include respond-to('sm') {
+  .media-tile {
+    @include media-tile-size($media-tile-size-sm, $media-tile-margin-sm);
+  }
+}
