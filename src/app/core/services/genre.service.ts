@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { PayloadRequest } from '../payloads/payload';
 import { Methods } from '../enums/methods';
@@ -9,8 +9,10 @@ import { JsonRpcRequestParams } from '../models/jsonrpcRequest';
   providedIn: 'root',
 })
 export class GenreService {
+  private http = inject(HttpClient);
+
   uriMediaPlayer = 'http://localhost:3000/mediaplayer';
-  constructor(private http: HttpClient) {
+  constructor() {
     this.uriMediaPlayer = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
   }
   getGenres() {

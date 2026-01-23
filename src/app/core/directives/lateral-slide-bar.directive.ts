@@ -1,22 +1,18 @@
-import {
-  Directive,
-  ElementRef,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, inject } from '@angular/core';
 
 @Directive({
   selector: '[appLateralSlideBar]',
   standalone: true,
 })
 export class LateralSlideBarDirective implements OnInit, OnChanges, OnDestroy {
+  private el = inject(ElementRef);
+
   private element: any;
   private width: number = 300;
   @Input() openSlideBar: boolean = true;
-  constructor(private el: ElementRef) {
+  constructor() {
+    const el = this.el;
+
     this.element = el.nativeElement;
   }
   ngOnChanges(changes: SimpleChanges): void {

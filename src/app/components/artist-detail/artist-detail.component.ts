@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { ModalController, IonicModule } from '@ionic/angular';
 import { Album } from 'src/app/core/models/album';
 import { Artist } from 'src/app/core/models/artist';
@@ -15,12 +15,13 @@ import { SecondsToStringPipe } from '../../core/pipes/seconds-to-string.pipe';
     imports: [IonicModule, NgFor, AssetsPipe, ArrayToStringPipe, SecondsToStringPipe]
 })
 export class ArtistDetailComponent {
+  private modalCtrl = inject(ModalController);
+
   @Input() isModalOpen: boolean = true;
   @Input() artist: Artist | null = null;
   @Input() albums: any[] = [];
   @Output() closeDetail = new EventEmitter<void>();
   @Output() sendToPlaylist = new EventEmitter<Track>();
-  constructor(private modalCtrl: ModalController) {}
   sendToPlayList(track: Track) {
     console.log('sendToPlayList', track);
     this.sendToPlaylist.emit(track);

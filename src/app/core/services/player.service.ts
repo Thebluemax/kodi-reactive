@@ -1,5 +1,5 @@
 import { HttpClient, JsonpInterceptor } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { PayloadRequest, payloads } from '../payloads/payload';
 import { Method } from 'ionicons/dist/types/stencil-public-runtime';
 import { Methods } from '../enums/methods';
@@ -9,6 +9,8 @@ HttpClient;
   providedIn: 'root',
 })
 export class PlayerService {
+  private http = inject(HttpClient);
+
   uriMediaPlayer = 'http://localhost:8008/jsonrpc';
   payload: any[] = [
     {
@@ -48,8 +50,6 @@ export class PlayerService {
       },
     },
   };
-
-  constructor(private http: HttpClient) {}
 
   getPlayerStatus() {
     return this.http
