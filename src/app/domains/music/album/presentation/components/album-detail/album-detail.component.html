@@ -15,6 +15,12 @@
 
     <div class="album-detail__info">
       <h2 class="album-detail__artist">{{ album().artists | arrayToString }}</h2>
+      <div class="album-detail__actions">
+        <ion-button fill="outline" (click)="onAddAlbumToPlaylist()">
+          <ion-icon slot="start" name="duplicate-outline"></ion-icon>
+          Agregar a cola
+        </ion-button>
+      </div>
       @if (album().description) {
         <div class="album-detail__description">
           <p>{{ album().description }}</p>

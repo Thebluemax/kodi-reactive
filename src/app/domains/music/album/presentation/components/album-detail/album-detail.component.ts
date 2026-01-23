@@ -2,7 +2,8 @@ import {
   Component,
   ChangeDetectionStrategy,
   input,
-  output
+  output,
+  inject
 } from '@angular/core';
 import {
   IonContent,
@@ -21,6 +22,7 @@ import { Track } from '@domains/music/track/domain/entities/track.entity';
 import { AssetsPipe } from '@core/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@core/pipes/array-to-string.pipe';
 import { SecondsToStringPipe } from '@core/pipes/seconds-to-string.pipe';
+import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 
 @Component({
   selector: 'app-album-detail',
@@ -44,6 +46,8 @@ import { SecondsToStringPipe } from '@core/pipes/seconds-to-string.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlbumDetailComponent {
+  private readonly addAlbumToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
+
   // Inputs
   readonly album = input.required<Album>();
   readonly tracks = input<Track[]>([]);
@@ -58,5 +62,17 @@ export class AlbumDetailComponent {
   onAddTrack(track: Track): void {
     // TODO: Implement add to queue
     console.log('Add track to queue:', track);
+  }
+
+  onAddAlbumToPlaylist(): void {
+    const albumId = this.album().albumId;
+    this.addAlbumToPlaylistUseCase.execute(albumId, false).subscribe({
+      next: () => {
+        console.log('Album added to playlist successfully');
+      },
+      error: (error) => {
+        console.error('Error adding album to playlist:', error);
+      }
+    });
   }
 }
