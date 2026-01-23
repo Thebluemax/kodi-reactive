@@ -36,13 +36,21 @@
             "prefix": ["app", "cat"],
             "style": "camelCase"
           }
-        ]
+        ],
+        "@angular-eslint/prefer-standalone": "warn",
+        "@angular-eslint/prefer-on-push-component-change-detection": "warn",
+        "@angular-eslint/no-empty-lifecycle-method": "warn",
+        "@angular-eslint/use-lifecycle-interface": "warn",
+        "@angular-eslint/prefer-inject": "warn"
       }
     },
     {
       "files": ["*.html"],
       "extends": ["plugin:@angular-eslint/template/recommended"],
-      "rules": {}
+      "rules": {
+        "@angular-eslint/template/prefer-control-flow": "warn",
+        "@angular-eslint/template/prefer-self-closing-tags": "warn"
+      }
     }
   ]
 }
