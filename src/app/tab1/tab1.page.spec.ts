@@ -2,9 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { Tab1Page } from './tab1.page';
-import { PlayerService } from '../core/services/player.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('Tab1Page', () => {
   let component: Tab1Page;
@@ -12,10 +11,8 @@ describe('Tab1Page', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [Tab1Page, PlayerService],
-    imports: [IonicModule.forRoot(),
-        HttpClientTestingModule,
-        HttpClient],
+    declarations: [Tab1Page],
+    imports: [IonicModule.forRoot()],
     providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 }).compileComponents();
 

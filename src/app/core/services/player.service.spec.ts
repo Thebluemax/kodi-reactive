@@ -34,14 +34,13 @@ describe('PlayerService', () => {
     expect(service.uriMediaPlayer).toBe('http://localhost:8008/jsonrpc');
   });
 
-  it('should getAlbum must have the right payload', async () => {
-    const mockResponse = {
-      /* mock response object */
-    };
-    const req = await httpMock.expectOne('http://localhost:8008/jsonrpc');
+  it('should getAlbum must have the right payload', () => {
+    const mockResponse = { result: { albumdetails: {} } };
 
+    service.getAlbum(1).subscribe();
+
+    const req = httpMock.expectOne('http://localhost:8008/jsonrpc');
     expect(req.request.method).toBe('POST');
-    req.flush({});
-    httpMock.verify();
+    req.flush(mockResponse);
   });
 });

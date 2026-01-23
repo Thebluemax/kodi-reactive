@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { CurrentTrackComponent } from './current-track.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 describe('CurrentTrackComponent', () => {
   let component: CurrentTrackComponent;
@@ -10,7 +11,7 @@ describe('CurrentTrackComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ CurrentTrackComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule.forRoot(), SharedModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(CurrentTrackComponent);

@@ -4,9 +4,10 @@ import { Artist } from 'src/app/core/models/artist';
 import { GenreService } from 'src/app/core/services/genre.service';
 
 @Component({
-  selector: 'app-genres',
-  templateUrl: './genres.component.html',
-  styleUrls: ['./genres.component.scss'],
+    selector: 'app-genres',
+    templateUrl: './genres.component.html',
+    styleUrls: ['./genres.component.scss'],
+    standalone: false
 })
 export class GenresComponent implements OnInit {
   totalGenres: number = 0;

@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-square-item',
-  templateUrl: './square-item.component.html',
-  styleUrls: ['./square-item.component.scss'],
+    selector: 'app-square-item',
+    templateUrl: './square-item.component.html',
+    styleUrls: ['./square-item.component.scss'],
+    standalone: false
 })
 export class SquareItemComponent {
   @Input() headerActive: boolean = false;

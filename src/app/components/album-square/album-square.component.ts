@@ -2,9 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Album } from 'src/app/core/models/album';
 
 @Component({
-  selector: 'app-album-square',
-  templateUrl: './album-square.component.html',
-  styleUrls: ['./album-square.component.scss'],
+    selector: 'app-album-square',
+    templateUrl: './album-square.component.html',
+    styleUrls: ['./album-square.component.scss'],
+    standalone: false
 })
 export class AlbumSquareComponent {
   @Input() album: Album | null = null;

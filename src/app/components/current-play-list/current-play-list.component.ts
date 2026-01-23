@@ -1,14 +1,15 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Album } from 'src/app/core/models/album';
 import { ItemPlaylist } from 'src/app/core/models/item-playlist';
 import { PlayerService } from 'src/app/core/services/player.service';
 
 @Component({
-  selector: 'app-current-play-list',
-  templateUrl: './current-play-list.component.html',
-  styleUrls: ['./current-play-list.component.scss'],
+    selector: 'app-current-play-list',
+    templateUrl: './current-play-list.component.html',
+    styleUrls: ['./current-play-list.component.scss'],
+    standalone: false
 })
-export class CurrentPlayListComponent implements OnDestroy{
+export class CurrentPlayListComponent {
   @Input() playlist: ItemPlaylist[] = [];
   @Input() currentTrackPosition: number | null | undefined = null;
   @Input() playlistId: number = 0;
@@ -46,9 +47,5 @@ export class CurrentPlayListComponent implements OnDestroy{
         }
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
   }
 }
