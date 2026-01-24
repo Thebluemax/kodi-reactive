@@ -20,7 +20,8 @@ export const appConfig: ApplicationConfig = {
 
 ## 2. Providers de cada Dominio
 
-### Album Domain (`album.providers.ts`):
+### Album Domain (`album.providers.ts`)
+
 ```typescript
 export const ALBUM_PROVIDERS: Provider[] = [
   {
@@ -30,7 +31,8 @@ export const ALBUM_PROVIDERS: Provider[] = [
 ];
 ```
 
-### Track Domain (`track.providers.ts`):
+### Track Domain (`track.providers.ts`)
+
 ```typescript
 export const TRACK_PROVIDERS: Provider[] = [
   {
@@ -44,7 +46,8 @@ export const TRACK_PROVIDERS: Provider[] = [
 
 ## 3. Flujo en el Componente de Presentación
 
-### AlbumDetailComponent:
+### AlbumDetailComponent
+
 ```typescript
 export class AlbumDetailComponent {
   // Inyección de casos de uso de AMBOS dominios
@@ -71,7 +74,8 @@ export class AlbumDetailComponent {
 
 ## 4. Casos de Uso (Application Layer)
 
-### AddAlbumToPlaylistUseCase:
+### AddAlbumToPlaylistUseCase
+
 ```typescript
 export class AddAlbumToPlaylistUseCase {
   private readonly albumRepository = inject(AlbumRepository); // Interface
@@ -82,7 +86,8 @@ export class AddAlbumToPlaylistUseCase {
 }
 ```
 
-### AddTrackToPlaylistUseCase:
+### AddTrackToPlaylistUseCase
+
 ```typescript
 export class AddTrackToPlaylistUseCase {
   private readonly trackRepository = inject(TrackRepository); // Interface
@@ -97,14 +102,16 @@ export class AddTrackToPlaylistUseCase {
 
 ## 5. Repositorios (Domain Layer)
 
-### AlbumRepository Interface:
+### AlbumRepository Interface
+
 ```typescript
 export abstract class AlbumRepository {
   abstract addToPlaylist(albumId: number, playImmediately: boolean): Observable<void>;
 }
 ```
 
-### TrackRepository Interface:
+### TrackRepository Interface
+
 ```typescript
 export abstract class TrackRepository {
   abstract addToPlaylist(trackId: number, playImmediately: boolean): Observable<void>;
@@ -116,7 +123,8 @@ export abstract class TrackRepository {
 
 ## 6. Implementaciones de Infraestructura
 
-### AlbumKodiRepository:
+### AlbumKodiRepository
+
 ```typescript
 export class AlbumKodiRepository extends AlbumRepository {
   addToPlaylist(albumId: number, playImmediately: boolean): Observable<void> {
@@ -126,7 +134,8 @@ export class AlbumKodiRepository extends AlbumRepository {
 }
 ```
 
-### TrackKodiRepository:
+### TrackKodiRepository
+
 ```typescript
 export class TrackKodiRepository extends TrackRepository {
   addToPlaylist(trackId: number, playImmediately: boolean): Observable<void> {
@@ -166,6 +175,7 @@ Kodi Media Center
 ## 8. Comunicación entre Dominios
 
 Los dominios se comunican a través de interfaces limpias:
+
 - Album Domain conoce tracks solo por `albumId`
 - Track Domain opera independientemente
 - Presentación puede usar ambos dominios según necesite
