@@ -1,0 +1,160 @@
+.artist-frame {
+  padding: 16px;
+
+  .artist-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .artist-col {
+    padding: 8px;
+  }
+
+  .col-30 {
+    width: 30%;
+  }
+
+  .col-70 {
+    width: 70%;
+  }
+
+  .image-col {
+    .img-canvas {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .artist-meta {
+      margin-top: 12px;
+
+      span {
+        display: block;
+        font-size: 0.9em;
+        color: var(--ion-color-medium);
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  .artist-bio {
+    .scroll-info {
+      max-height: 200px;
+      overflow-y: auto;
+
+      p {
+        font-size: 0.95em;
+        line-height: 1.6;
+        color: var(--ion-text-color);
+      }
+
+      .no-description {
+        color: var(--ion-color-medium);
+        font-style: italic;
+      }
+    }
+  }
+}
+
+.albums-section {
+  .album-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .album-cover {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px;
+    background: var(--ion-color-light);
+    border-radius: 8px;
+
+    .img-canvas {
+      width: 60px;
+      height: 60px;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+
+    .album-title {
+      flex: 1;
+      font-weight: 600;
+      font-size: 1em;
+      margin: 0;
+    }
+  }
+
+  .tracks-holder {
+    width: 100%;
+    padding: 0 8px;
+
+    .track-list {
+      padding: 0;
+
+      .track-item {
+        --min-height: 40px;
+
+        .track-number {
+          color: var(--ion-color-medium);
+          margin-right: 8px;
+          min-width: 24px;
+        }
+
+        ion-label {
+          font-size: 0.9em;
+          flex: 1;
+        }
+
+        ion-note {
+          font-size: 0.85em;
+          margin-right: 8px;
+          color: var(--ion-color-medium);
+        }
+
+        ion-button {
+          --padding-start: 8px;
+          --padding-end: 8px;
+
+          ion-icon {
+            font-size: 18px;
+            color: var(--ion-color-primary);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .artist-frame {
+    .artist-info {
+      flex-direction: column;
+    }
+
+    .col-30,
+    .col-70 {
+      width: 100%;
+    }
+
+    .image-col {
+      text-align: center;
+
+      .img-canvas {
+        max-width: 200px;
+        margin: 0 auto;
+      }
+
+      .artist-meta {
+        text-align: left;
+      }
+    }
+  }
+}

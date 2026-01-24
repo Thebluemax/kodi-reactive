@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ artist?.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onPlayArtist()" title="Play Artist">
+        <ion-icon slot="icon-only" name="play"></ion-icon>
+      </ion-button>
+      <ion-button (click)="onAddArtistToPlaylist()" title="Add to Playlist">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+      <ion-button (click)="onClose()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="artist-frame" *ngIf="artist">
+    <div class="artist-info">
+      <div class="artist-col col-30 image-col">
+        <ion-img
+          class="img-canvas"
+          [src]="artist.thumbnail | assets : 'scape'"
+          [alt]="artist.name"
+        ></ion-img>
+        <div class="artist-meta">
+          <span *ngIf="artist.yearsActive?.length">{{ artist.yearsActive | arrayToString }}</span>
+          <span *ngIf="artist.styles?.length">{{ artist.styles | arrayToString }}</span>
+          <span *ngIf="artist.genres?.length">{{ artist.genres | arrayToString }}</span>
+        </div>
+      </div>
+      <div class="artist-col col-70">
+        <div class="artist-bio">
+          <div class="scroll-info">
+            <p *ngIf="artist.description">{{ artist.description }}</p>
+            <p *ngIf="!artist.description" class="no-description">No biography available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="albums-section">
+      <ion-list>
+        <ion-item *ngFor="let album of albums" class="album-item">
+          <div class="album-cover">
+            <ion-img
+              class="img-canvas"
+              [src]="album.albumThumbnail | assets : 'scape'"
+              [alt]="album.albumLabel"
+            ></ion-img>
+            <p class="album-title">{{ album.albumLabel }}</p>
+            <ion-buttons>
+              <ion-button (click)="onPlayAlbum(album.albumId)" title="Play Album">
+                <ion-icon slot="icon-only" size="small" name="play"></ion-icon>
+              </ion-button>
+              <ion-button (click)="onAddAlbumToPlaylist(album.albumId)" title="Add Album to Playlist">
+                <ion-icon slot="icon-only" size="small" name="add"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </div>
+          <div class="tracks-holder">
+            <ion-list class="track-list">
+              <ion-item *ngFor="let track of album.tracks" class="track-item">
+                <ion-label>
+                  <span class="track-number">{{ track.trackNumber }}.</span>
+                  {{ track.title }}
+                </ion-label>
+                <ion-note>{{ track.duration | secondsToStr }}</ion-note>
+                <ion-button fill="clear" size="small" (click)="onAddTrackToPlaylist(track)" title="Add to Playlist">
+                  <ion-icon slot="icon-only" name="add"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" size="small" (click)="onPlayTrack(track)" title="Play Track">
+                  <ion-icon slot="icon-only" name="play"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </ion-list>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>
