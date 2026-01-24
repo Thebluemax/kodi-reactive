@@ -1,0 +1,16 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="genre-list-content">
+  <div class="genre-chips-container">
+    @for (genre of genres(); track genre.genreId) {
+      <ion-chip
+        class="genre-chip"
+        (click)="onGenreClick(genre)"
+      >
+        <ion-label>{{ genre.label }}</ion-label>
+      </ion-chip>
+    }
+  </div>
+</ion-content>

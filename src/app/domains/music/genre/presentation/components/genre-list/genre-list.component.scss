@@ -1,0 +1,29 @@
+.genre-list-content {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+}
+
+.genre-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.genre-chip {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+  cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.4);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
