@@ -3,18 +3,22 @@
     <div class="album-detail__cover">
       <ion-img
         class="album-detail__image"
-        [src]="album().thumbnail | assets : 'scape'"
+        [src]="album().thumbnail | assets: 'scape'"
         [alt]="album().title"
       />
       <div class="album-detail__meta">
         <span class="album-detail__year">{{ album().year }}</span>
         <span class="album-detail__label">{{ album().label }}</span>
-        <span class="album-detail__genres">{{ album().genres | arrayToString }}</span>
+        <span class="album-detail__genres">{{
+          album().genres | arrayToString
+        }}</span>
       </div>
     </div>
 
     <div class="album-detail__info">
-      <h2 class="album-detail__artist">{{ album().artists | arrayToString }}</h2>
+      <h2 class="album-detail__artist">
+        {{ album().artists | arrayToString }}
+      </h2>
       <div class="album-detail__actions">
         <ion-button fill="outline" (click)="onAddAlbumToPlaylist()">
           <ion-icon slot="start" name="duplicate-outline"></ion-icon>
@@ -33,7 +37,9 @@
         @for (track of tracks(); track track.songId) {
           <ion-item class="album-detail__track-item">
             <ion-label>
-              <span class="album-detail__track-number">{{ track.trackNumber }}.</span>
+              <span class="album-detail__track-number"
+                >{{ track.trackNumber }}.</span
+              >
               {{ track.title }}
             </ion-label>
             <ion-note slot="end">{{ track.duration | secondsToStr }}</ion-note>

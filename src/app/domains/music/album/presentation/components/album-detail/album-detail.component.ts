@@ -23,6 +23,7 @@ import { AssetsPipe } from '@core/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@core/pipes/array-to-string.pipe';
 import { SecondsToStringPipe } from '@core/pipes/seconds-to-string.pipe';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
+import { AddTrackToPlaylistUseCase, PlayTrackUseCase } from '@domains/music/track';
 
 @Component({
   selector: 'app-album-detail',
@@ -47,6 +48,8 @@ import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-al
 })
 export class AlbumDetailComponent {
   private readonly addAlbumToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
+  private readonly addTrackToPlaylistUseCase = inject(AddTrackToPlaylistUseCase);
+  private readonly playTrackUseCase = inject(PlayTrackUseCase);
 
   // Inputs
   readonly album = input.required<Album>();
@@ -56,12 +59,25 @@ export class AlbumDetailComponent {
   readonly trackSelected = output<Track>();
 
   onPlayTrack(track: Track): void {
-    this.trackSelected.emit(track);
+    this.playTrackUseCase.execute(track.songId).subscribe({
+      next: () => {
+        console.log('Track started playing:', track.title);
+      },
+      error: (error) => {
+        console.error('Error playing track:', error);
+      }
+    });
   }
 
   onAddTrack(track: Track): void {
-    // TODO: Implement add to queue
-    console.log('Add track to queue:', track);
+    this.addTrackToPlaylistUseCase.execute(track.songId, false).subscribe({
+      next: () => {
+        console.log('Track added to playlist successfully:', track.title);
+      },
+      error: (error) => {
+        console.error('Error adding track to playlist:', error);
+      }
+    });
   }
 
   onAddAlbumToPlaylist(): void {

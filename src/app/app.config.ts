@@ -5,6 +5,7 @@ import { provideIonicAngular, IonicRouteStrategy } from '@ionic/angular/standalo
 
 import { routes } from './app.routes';
 import { ALBUM_PROVIDERS } from '@domains/music/album';
+import { TRACK_PROVIDERS } from '@domains/music/track';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,6 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideIonicAngular(),
     provideHttpClient(withInterceptorsFromDi()),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    ...ALBUM_PROVIDERS
+    ...ALBUM_PROVIDERS,
+    ...TRACK_PROVIDERS
   ]
 };
