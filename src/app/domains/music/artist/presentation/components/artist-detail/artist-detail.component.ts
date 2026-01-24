@@ -2,9 +2,10 @@
 // PRESENTATION - Artist Detail Component
 // ==========================================================================
 
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { Component, inject, input, output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { play, add } from 'ionicons/icons';
 
 import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
@@ -17,8 +18,6 @@ import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
   selector: 'app-artist-detail',
   standalone: true,
   imports: [
-    NgFor,
-    NgIf,
     IonicModule,
     AssetsPipe,
     ArrayToStringPipe,
@@ -30,12 +29,18 @@ import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
 export class ArtistDetailComponent {
   private readonly addArtistToPlaylistUseCase = inject(AddArtistToPlaylistUseCase);
 
-  @Input() artist: Artist | null = null;
-  @Input() albums: ArtistAlbumGroup[] = [];
+  constructor() {
+    addIcons({ play, add });
+  }
 
-  @Output() closeDetail = new EventEmitter<void>();
-  @Output() trackSelected = new EventEmitter<Track>();
-  @Output() albumSelected = new EventEmitter<number>();
+  // Inputs (signal-based)
+  artist = input<Artist | null>(null);
+  albums = input<ArtistAlbumGroup[]>([]);
+
+  // Outputs (signal-based)
+  closeDetail = output<void>();
+  trackSelected = output<Track>();
+  albumSelected = output<number>();
 
   onClose(): void {
     this.closeDetail.emit();
@@ -60,21 +65,23 @@ export class ArtistDetailComponent {
   }
 
   onPlayArtist(): void {
-    if (!this.artist) return;
+    const artist = this.artist();
+    if (!artist) return;
     this.addArtistToPlaylistUseCase
-      .execute(this.artist.artistId, true)
+      .execute(artist.artistId, true)
       .subscribe({
-        next: () => console.log('Playing artist:', this.artist?.name),
+        next: () => console.log('Playing artist:', artist.name),
         error: error => console.error('Error playing artist:', error)
       });
   }
 
   onAddArtistToPlaylist(): void {
-    if (!this.artist) return;
+    const artist = this.artist();
+    if (!artist) return;
     this.addArtistToPlaylistUseCase
-      .execute(this.artist.artistId, false)
+      .execute(artist.artistId, false)
       .subscribe({
-        next: () => console.log('Added artist to playlist:', this.artist?.name),
+        next: () => console.log('Added artist to playlist:', artist.name),
         error: error => console.error('Error adding artist to playlist:', error)
       });
   }
