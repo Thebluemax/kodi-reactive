@@ -1,0 +1,71 @@
+.flex-tile-list {
+  flex-wrap: wrap;
+  height: calc(100% - 65px);
+  width: 100%;
+
+  > ion-list {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: start;
+    align-items: baseline;
+  }
+
+  .tile {
+    background-attachment: center center;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    height: 200px;
+    margin: 4px;
+    position: relative;
+    width: 200px;
+
+    ion-card-header {
+      background-color: rgba(0, 0, 0, 0.6);
+      bottom: 0;
+      color: white;
+      font-size: 1em;
+      height: min-content;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      cursor: pointer;
+
+      ion-card-title {
+        font-size: 0.9em;
+        font-weight: 900;
+      }
+    }
+
+    ion-card-content {
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #acacac;
+      height: 50%;
+      opacity: 0;
+      font-size: 0.8em;
+      font-weight: 900;
+    }
+  }
+}
+
+/* Desktop - 1281px and up */
+@media (min-width: 1281px) {
+  .flex-tile-list {
+    .tile {
+      width: 270px;
+      height: 270px;
+      margin: 7px;
+    }
+  }
+}
+
+/* Laptops, Desktops - 1025px to 1280px */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .flex-tile-list {
+    .tile {
+      width: 240px;
+      height: 240px;
+      margin: 7px;
+    }
+  }
+}

@@ -1,0 +1,37 @@
+<ion-progress-bar type="indeterminate" *ngIf="isLoading()"></ion-progress-bar>
+
+<ion-content class="flex-tile-list">
+  <ion-list>
+    <ion-card
+      *ngFor="let artist of artists()"
+      class="tile"
+      [style.backgroundImage]="'url(' + (artist.thumbnail | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
+      [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
+      [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"
+      appTileHover
+    >
+      <ion-card-header (click)="onArtistClick(artist)">
+        <ion-card-title>{{ artist.name }}</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($any($event))">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
+
+<app-lateral-slide
+  [id]="'artistDetail'"
+  [openSlideBar]="isPanelOpen()"
+  [customWidth]="'60%'"
+  (closeSlideBar)="onClosePanel()"
+>
+  <app-artist-detail
+    [artist]="selectedArtist()"
+    [albums]="albums()"
+    (closeDetail)="onClosePanel()"
+  ></app-artist-detail>
+</app-lateral-slide>
