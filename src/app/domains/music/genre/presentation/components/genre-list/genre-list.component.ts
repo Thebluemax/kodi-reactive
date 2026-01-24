@@ -54,7 +54,7 @@ export class GenreListComponent implements OnInit, OnDestroy {
   }
 
   onGenreClick(genre: Genre): void {
-    this.router.navigate(['/tabs/tab1/collections/genres', genre.genreId], {
+    this.router.navigate(['/collections/genres', genre.genreId], {
       state: { genre }
     });
   }

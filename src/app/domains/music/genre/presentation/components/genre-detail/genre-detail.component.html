@@ -5,9 +5,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="onBack()">
-        <ion-icon name="arrow-back" slot="icon-only" />
-      </ion-button>
+      <ion-back-button defaultHref="/collections/genres" text="Géneros" />
     </ion-buttons>
     <ion-title>{{ genre()?.label }}</ion-title>
   </ion-toolbar>

@@ -151,6 +151,6 @@ export class GenreDetailComponent implements OnInit, OnDestroy {
   }
 
   onBack(): void {
-    this.router.navigate(['/tabs/tab1/collections/genres']);
+    this.router.navigate(['/collections/genres']);
   }
 }
