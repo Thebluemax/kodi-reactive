@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
 import { IonicModule, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -21,8 +20,6 @@ const PAGE_SIZE = 40;
   selector: 'app-artist-list',
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     IonicModule,
     TileHoverDirective,
     LateralSlideComponent,

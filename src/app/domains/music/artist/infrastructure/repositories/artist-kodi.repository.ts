@@ -132,6 +132,37 @@ export class ArtistKodiRepository extends ArtistRepository {
     );
   }
 
+  playTrack(songId: number): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: '2.0',
+      method: 'Player.Open',
+      params: {
+        item: { songid: songId }
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+      map(() => void 0)
+    );
+  }
+
+  addTrackToPlaylist(songId: number): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: '2.0',
+      method: 'Playlist.Add',
+      params: {
+        playlistid: 0,
+        item: { songid: songId }
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+      map(() => void 0)
+    );
+  }
+
   private buildArtistsRequest(params: ArtistSearchParams): KodiJsonRpcRequest {
     const request: KodiJsonRpcRequest = {
       jsonrpc: '2.0',

@@ -89,6 +89,18 @@
       font-size: 1em;
       margin: 0;
     }
+
+    ion-buttons {
+      ion-button {
+        --padding-start: 8px;
+        --padding-end: 8px;
+
+        ion-icon {
+          font-size: 20px;
+          color: var(--ion-color-primary);
+        }
+      }
+    }
   }
 
   .tracks-holder {

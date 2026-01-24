@@ -3,14 +3,13 @@ import {
   ChangeDetectionStrategy,
   OnInit,
   OnDestroy,
-  OnChanges,
-  SimpleChanges,
   HostListener,
   ElementRef,
   inject,
   input,
   output,
-  signal
+  signal,
+  effect
 } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
 
@@ -29,7 +28,7 @@ import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from 
   styleUrl: './lateral-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LateralPanelComponent implements OnInit, OnDestroy, OnChanges {
+export class LateralPanelComponent implements OnInit, OnDestroy {
   private readonly el = inject(ElementRef);
 
   // Inputs
@@ -45,7 +44,22 @@ export class LateralPanelComponent implements OnInit, OnDestroy, OnChanges {
   readonly width = signal<number>(300);
   private grabbing = signal<boolean>(false);
   private oldX = 0;
-  private element!: HTMLElement;
+  private hostElement!: HTMLElement;
+  private panelElement!: HTMLElement;
+
+  constructor() {
+    // Watch for isOpen signal changes
+    effect(() => {
+      const open = this.isOpen();
+      if (this.panelElement) {
+        if (open) {
+          this.open();
+        } else {
+          this.close();
+        }
+      }
+    });
+  }
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
@@ -74,40 +88,36 @@ export class LateralPanelComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this.element = this.el.nativeElement;
+    this.hostElement = this.el.nativeElement;
+    this.panelElement = this.hostElement.querySelector('.lateral-panel') as HTMLElement;
     this.width.set(this.parseWidth(this.customWidth()));
     this.constrainWidth();
 
-    document.body.appendChild(this.element);
+    document.body.appendChild(this.hostElement);
 
-    this.element.addEventListener('click', (e: Event) => {
+    this.hostElement.addEventListener('click', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('lateral-panel__overlay')) {
         this.close();
       }
     });
-  }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['isOpen']) {
-      if (changes['isOpen'].currentValue) {
-        this.open();
-      } else {
-        this.close();
-      }
+    // Apply initial state if isOpen was already true
+    if (this.isOpen()) {
+      this.open();
     }
   }
 
   ngOnDestroy(): void {
-    this.element?.remove();
+    this.hostElement?.remove();
   }
 
   open(): void {
-    this.element?.classList.add('lateral-panel--open');
+    this.panelElement?.classList.add('lateral-panel--open');
   }
 
   close(): void {
-    this.element?.classList.remove('lateral-panel--open');
+    this.panelElement?.classList.remove('lateral-panel--open');
     this.panelClosed.emit();
   }
 

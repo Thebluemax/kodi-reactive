@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Tab1Page } from './tab1.page';
-import { AlbumComponent } from '../components/album/album.component';
+import { AlbumListComponent } from '@domains/music/album';
 import { ArtistsComponent } from '../components/artists/artists.component';
 import { GenresComponent } from '../components/genres/genres.component';
 
@@ -11,7 +11,7 @@ export const TAB1_ROUTES: Routes = [
     children: [
       {
         path: 'albums',
-        component: AlbumComponent,
+        component: AlbumListComponent,
       },
       {
         path: 'artists',

@@ -1,9 +1,11 @@
 import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, OnChanges, Output, EventEmitter, inject } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { SideBarService } from 'src/app/core/services/side-bar.service';
 
 @Component({
   selector: 'app-lateral-slide',
   standalone: true,
+  imports: [IonicModule],
   providers: [SideBarService],
   templateUrl: './lateral-slide.component.html',
   styleUrls: ['./lateral-slide.component.scss'],
@@ -46,9 +48,7 @@ export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   constructor() {
-    const el = this.el;
-
-    this.element = el.nativeElement;
+    this.element = this.el.nativeElement;
   }
 
   ngOnInit() {

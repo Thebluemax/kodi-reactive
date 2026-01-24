@@ -82,17 +82,21 @@ export class AlbumKodiRepository extends AlbumRepository {
       params: {
         albumid: albumId,
         properties: [
-          'title', 'description', 'artist', 'genre', 'theme', 'mood',
-          'style', 'type', 'albumlabel', 'rating', 'year', 'musicbrainzalbumid',
-          'musicbrainzalbumartistid', 'fanart', 'thumbnail', 'playcount',
-          'genreid', 'artistid', 'displayartist', 'dateadded'
+          'thumbnail', 'playcount', 'artistid', 'artist', 'genre',
+          'albumlabel', 'year', 'dateadded', 'style', 'fanart',
+          'mood', 'description', 'rating', 'type', 'theme'
         ]
       },
       id: this.getNextId()
     };
 
     return this.http.post<KodiAlbumDetailResponse>(KODI_API_URL, request).pipe(
-      map(response => AlbumFactory.fromKodiResponse(response.result.albumdetails))
+      map(response => {
+        if ((response as any).error) {
+          throw new Error((response as any).error.message || 'Unknown Kodi error');
+        }
+        return AlbumFactory.fromKodiResponse(response.result.albumdetails);
+      })
     );
   }
 

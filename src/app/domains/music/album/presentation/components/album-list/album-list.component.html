@@ -1,0 +1,39 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="album-list">
+  <ion-list class="album-list__grid">
+    @for (album of albums(); track album.albumId) {
+      <app-media-tile
+        [title]="album.title"
+        [subtitle]="album.artists.join(', ')"
+        [thumbnail]="album.thumbnail"
+        [year]="album.year"
+        [item]="album"
+        (itemSelected)="onAlbumSelected($event)"
+        (addToPlaylist)="onAddToPlaylist($event)"
+      />
+    }
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($any($event))">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" />
+  </ion-infinite-scroll>
+</ion-content>
+
+<app-lateral-panel
+  [panelId]="'album-detail'"
+  [isOpen]="isPanelOpen()"
+  [title]="selectedAlbum()?.title ?? ''"
+  [customWidth]="'60%'"
+  (panelClosed)="onPanelClosed()"
+>
+  @if (selectedAlbum()) {
+    <app-album-detail
+      [album]="selectedAlbum()!"
+      [tracks]="tracks()"
+      (trackSelected)="onTrackAddToPlaylist($event)"
+    />
+  }
+</app-lateral-panel>

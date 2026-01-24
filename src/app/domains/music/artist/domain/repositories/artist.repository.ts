@@ -32,4 +32,16 @@ export abstract class ArtistRepository {
    * @param playImmediately - If true, starts playing immediately
    */
   abstract addToPlaylist(artistId: number, playImmediately: boolean): Observable<void>;
+
+  /**
+   * Play a track immediately
+   * @param songId - Track/Song ID
+   */
+  abstract playTrack(songId: number): Observable<void>;
+
+  /**
+   * Add a track to the playlist
+   * @param songId - Track/Song ID
+   */
+  abstract addTrackToPlaylist(songId: number): Observable<void>;
 }

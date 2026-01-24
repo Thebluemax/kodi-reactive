@@ -2,13 +2,15 @@
 // PRESENTATION - Artist Detail Component
 // ==========================================================================
 
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { Component, inject, input, output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 
 import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
 import { AddArtistToPlaylistUseCase } from '../../../application/use-cases/add-artist-to-playlist.use-case';
+import { PlayTrackUseCase } from '../../../application/use-cases/play-track.use-case';
+import { AddTrackToPlaylistUseCase } from '../../../application/use-cases/add-track-to-playlist.use-case';
+import { AddAlbumToPlaylistUseCase } from '@domains/music/album';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
 import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
@@ -17,8 +19,6 @@ import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
   selector: 'app-artist-detail',
   standalone: true,
   imports: [
-    NgFor,
-    NgIf,
     IonicModule,
     AssetsPipe,
     ArrayToStringPipe,
@@ -29,52 +29,69 @@ import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
 })
 export class ArtistDetailComponent {
   private readonly addArtistToPlaylistUseCase = inject(AddArtistToPlaylistUseCase);
+  private readonly playTrackUseCase = inject(PlayTrackUseCase);
+  private readonly addTrackToPlaylistUseCase = inject(AddTrackToPlaylistUseCase);
+  private readonly addAlbumToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
 
-  @Input() artist: Artist | null = null;
-  @Input() albums: ArtistAlbumGroup[] = [];
+  // Inputs (signal-based)
+  artist = input<Artist | null>(null);
+  albums = input<ArtistAlbumGroup[]>([]);
 
-  @Output() closeDetail = new EventEmitter<void>();
-  @Output() trackSelected = new EventEmitter<Track>();
-  @Output() albumSelected = new EventEmitter<number>();
+  // Outputs (signal-based)
+  closeDetail = output<void>();
+  trackSelected = output<Track>();
+  albumSelected = output<number>();
 
   onClose(): void {
     this.closeDetail.emit();
   }
 
   onPlayTrack(track: Track): void {
-    this.trackSelected.emit(track);
+    this.playTrackUseCase.execute(track.songId).subscribe({
+      next: () => this.trackSelected.emit(track),
+      error: error => console.error('Error playing track:', error)
+    });
   }
 
   onAddTrackToPlaylist(track: Track): void {
-    // TODO: Implement add track to playlist via Track use case
-    console.log('Add track to playlist:', track);
+    this.addTrackToPlaylistUseCase.execute(track.songId).subscribe({
+      next: () => console.log('Track added to playlist:', track.title),
+      error: error => console.error('Error adding track to playlist:', error)
+    });
   }
 
   onPlayAlbum(albumId: number): void {
-    this.albumSelected.emit(albumId);
+    this.addAlbumToPlaylistUseCase.execute(albumId, true).subscribe({
+      next: () => this.albumSelected.emit(albumId),
+      error: error => console.error('Error playing album:', error)
+    });
   }
 
   onAddAlbumToPlaylist(albumId: number): void {
-    // TODO: Implement add album to playlist via Album use case
-    console.log('Add album to playlist:', albumId);
+    this.addAlbumToPlaylistUseCase.execute(albumId, false).subscribe({
+      next: () => console.log('Album added to playlist:', albumId),
+      error: error => console.error('Error adding album to playlist:', error)
+    });
   }
 
   onPlayArtist(): void {
-    if (!this.artist) return;
+    const artist = this.artist();
+    if (!artist) return;
     this.addArtistToPlaylistUseCase
-      .execute(this.artist.artistId, true)
+      .execute(artist.artistId, true)
       .subscribe({
-        next: () => console.log('Playing artist:', this.artist?.name),
+        next: () => console.log('Playing artist:', artist.name),
         error: error => console.error('Error playing artist:', error)
       });
   }
 
   onAddArtistToPlaylist(): void {
-    if (!this.artist) return;
+    const artist = this.artist();
+    if (!artist) return;
     this.addArtistToPlaylistUseCase
-      .execute(this.artist.artistId, false)
+      .execute(artist.artistId, false)
       .subscribe({
-        next: () => console.log('Added artist to playlist:', this.artist?.name),
+        next: () => console.log('Added artist to playlist:', artist.name),
         error: error => console.error('Error adding artist to playlist:', error)
       });
   }
