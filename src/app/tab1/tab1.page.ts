@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { PlayerService } from '../core/services/player.service';
-import { ItemPlaylist } from '../core/models/item-playlist';
 import { Methods } from '../core/enums/methods';
 import { CurrentPlayListComponent } from '../components/current-play-list/current-play-list.component';
 import { Subscription } from 'rxjs';
@@ -16,6 +15,7 @@ import {
   CurrentTrack,
   SetVolumeUseCase
 } from '@domains/music/player';
+import { PlaylistItem, GetPlaylistUseCase } from '@domains/music/playlist';
 
 @Component({
     selector: 'app-tab1',
@@ -27,6 +27,7 @@ export class Tab1Page implements OnInit {
   private plService = inject(PlayerService);
   private wsAdapter = inject(PlayerWebSocketAdapter);
   private setVolumeUseCase = inject(SetVolumeUseCase);
+  private getPlaylistUseCase = inject(GetPlaylistUseCase);
   private ref = inject(ChangeDetectorRef);
   private router = inject(Router);
   private sidebarService = inject(SideBarService);
@@ -34,7 +35,7 @@ export class Tab1Page implements OnInit {
   volume: number = 0;
   isMute: boolean = false;
   title: string = 'Volume Control';
-  playlist: ItemPlaylist[] = [];
+  playlist: PlaylistItem[] = [];
   pages: string[] = ['album', 'artist', 'genre'];
   playerState: PlayerState | null = null;
   playerInfo: CurrentTrack | null = null;
@@ -44,6 +45,7 @@ export class Tab1Page implements OnInit {
   statusSubcription: Subscription | null = null;
   stateSubscription: Subscription | null = null;
   trackSubscription: Subscription | null = null;
+  playlistSubscription: Subscription | null = null;
   @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null =
     null;
   ionViewDidEnter(): void {
@@ -60,6 +62,9 @@ export class Tab1Page implements OnInit {
     }
     if (this.trackSubscription) {
       this.trackSubscription.unsubscribe();
+    }
+    if (this.playlistSubscription) {
+      this.playlistSubscription.unsubscribe();
     }
     this.wsAdapter.disconnect();
   }
@@ -91,6 +96,10 @@ export class Tab1Page implements OnInit {
       this.playerInfo = track;
       this.ref.markForCheck();
     });
+
+    this.playlistSubscription = this.wsAdapter.getPlaylistChangedStream().subscribe((event) => {
+      this.getPlaylists();
+    });
   }
 
   updateVolume(event: number) {
@@ -104,11 +113,17 @@ export class Tab1Page implements OnInit {
   }
 
   getPlaylists() {
-    this.plService.getPlayList().subscribe((data: any) => {
-      this.playlist = data.result.items.map((item: any) => {
-        return item as ItemPlaylist;
-      });
+    this.getPlaylistUseCase.execute().subscribe({
+      next: (result) => {
+        this.playlist = result.items;
+        this.ref.markForCheck();
+      },
+      error: (err) => console.error('Failed to get playlist:', err)
     });
+  }
+
+  onPlaylistChanged() {
+    this.getPlaylists();
   }
 
   proceesMethod(data: any) {
@@ -137,7 +152,8 @@ export class Tab1Page implements OnInit {
   }
 
   toPlayList(event: any) {
-    this.playlistObject?.sendToPlaylist(event);
+    // TODO: Use AddTrackToPlaylistUseCase or AddAlbumToPlaylistUseCase
+    console.log('toPlayList event:', event);
   }
 
   segmentChanged(event: any) {

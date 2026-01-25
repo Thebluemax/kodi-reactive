@@ -9,6 +9,7 @@ import { ALBUM_PROVIDERS } from '@domains/music/album';
 import { ARTIST_PROVIDERS } from '@domains/music/artist';
 import { GENRE_PROVIDERS } from '@domains/music/genre';
 import { PLAYER_PROVIDERS } from '@domains/music/player';
+import { PLAYLIST_PROVIDERS } from '@domains/music/playlist';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
     ...TRACK_PROVIDERS,
     ...ARTIST_PROVIDERS,
     ...GENRE_PROVIDERS,
-    ...PLAYER_PROVIDERS
+    ...PLAYER_PROVIDERS,
+    ...PLAYLIST_PROVIDERS
   ]
 };

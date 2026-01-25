@@ -32,6 +32,8 @@ import {
   volumeLow,
   volumeOff,
   volumeMuteOutline,
+  bookmark,
+  reorderFour,
 } from 'ionicons/icons';
 
 // Register icons globally
@@ -63,6 +65,8 @@ addIcons({
   volumeLow,
   volumeOff,
   volumeMuteOutline,
+  bookmark,
+  reorderFour,
 });
 
 if (environment.production) {

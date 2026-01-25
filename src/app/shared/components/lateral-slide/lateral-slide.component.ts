@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, OnChanges, Output, EventEmitter, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, OnChanges, Output, EventEmitter, inject, input, output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { SideBarService } from 'src/app/core/services/side-bar.service';
 
@@ -17,11 +17,11 @@ export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
   public x = 100;
   public oldX = 0;
   public grabber = false;
-  @Input() id: string = '';
-  @Input() title: string | undefined = '';
-  @Input() customWidth: string = '300px';
-  @Input() openSlideBar: boolean = false;
-  @Output() closeSlideBar: EventEmitter<any> = new EventEmitter<any>();
+  id = input<string>();
+  title = input<string | undefined>();
+  customWidth = input<string>('300px');
+  openSlideBar = input<boolean>(false);
+  closeSlideBar = output<any>();
 
   private element: any;
 
@@ -58,7 +58,7 @@ export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this.width = this.parseCustomWidth(this.customWidth);
+    this.width = this.parseCustomWidth(this.customWidth());
     const browserWidth = Math.max(
       document.body.scrollWidth,
       document.documentElement.scrollWidth,
@@ -104,7 +104,7 @@ export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
   }
   public close(): void {
     this.element.classList.remove('sidebar__open');
-    this.closeSlideBar.emit();
+    this.closeSlideBar.emit(null);
   }
 
   parseCustomWidth(width: string): number {
