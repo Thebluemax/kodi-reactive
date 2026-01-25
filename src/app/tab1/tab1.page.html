@@ -7,6 +7,7 @@
       #playlistObject
       [playlist]="playlist"
       [currentTrackPosition]="playerState?.position ?? null"
+      (playlistChanged)="onPlaylistChanged()"
     ></app-current-play-list>
   </ion-content>
 </ion-menu>
