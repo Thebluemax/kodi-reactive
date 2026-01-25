@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { NgIf } from '@angular/common';
+import { ToggleMuteUseCase } from '@domains/music/player';
 
 @Component({
     selector: 'app-sound',
@@ -9,8 +10,8 @@ import { NgIf } from '@angular/common';
     imports: [IonicModule, NgIf]
 })
 export class SoundComponent  implements OnInit {
+  private readonly toggleMuteUseCase = inject(ToggleMuteUseCase);
 
-  constructor() { }
   @Input() isMute:boolean = false;
   @Input() volume:number = 0;
 
@@ -35,10 +36,7 @@ export class SoundComponent  implements OnInit {
   }
 
   muteVolume() {
-    this.isMute = !this.isMute;
-
-    console.log('updateVolume', this.isMute);
-   // this.updateVolume.emit(this.isMute ? 0 : this.volume);
+    this.toggleMuteUseCase.execute().subscribe();
   }
 
   calculateVolumeIcon() {
