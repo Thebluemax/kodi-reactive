@@ -45,6 +45,7 @@ export class Tab1Page implements OnInit {
   statusSubcription: Subscription | null = null;
   stateSubscription: Subscription | null = null;
   trackSubscription: Subscription | null = null;
+  playlistSubscription: Subscription | null = null;
   @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null =
     null;
   ionViewDidEnter(): void {
@@ -61,6 +62,9 @@ export class Tab1Page implements OnInit {
     }
     if (this.trackSubscription) {
       this.trackSubscription.unsubscribe();
+    }
+    if (this.playlistSubscription) {
+      this.playlistSubscription.unsubscribe();
     }
     this.wsAdapter.disconnect();
   }
@@ -91,6 +95,10 @@ export class Tab1Page implements OnInit {
     this.trackSubscription = this.wsAdapter.getCurrentTrackStream().subscribe((track) => {
       this.playerInfo = track;
       this.ref.markForCheck();
+    });
+
+    this.playlistSubscription = this.wsAdapter.getPlaylistChangedStream().subscribe((event) => {
+      this.getPlaylists();
     });
   }
 

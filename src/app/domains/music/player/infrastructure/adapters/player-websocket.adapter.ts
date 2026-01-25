@@ -44,6 +44,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
   private readonly currentTrackSubject = new BehaviorSubject<CurrentTrack | null>(null);
   private readonly connectionSubject = new BehaviorSubject<boolean>(false);
   private readonly errorSubject = new Subject<Error>();
+  private readonly playlistChangedSubject = new Subject<string>();
 
   private readonly wsUrl: string;
 
@@ -137,6 +138,14 @@ export class PlayerWebSocketAdapter implements OnDestroy {
    */
   getErrorStream(): Observable<Error> {
     return this.errorSubject.asObservable();
+  }
+
+  /**
+   * Get playlist changed stream
+   * Emits the event type: 'add', 'remove', 'clear'
+   */
+  getPlaylistChangedStream(): Observable<string> {
+    return this.playlistChangedSubject.asObservable();
   }
 
   /**
@@ -291,10 +300,22 @@ export class PlayerWebSocketAdapter implements OnDestroy {
       case 'Player.OnStop':
       case 'Player.OnSeek':
       case 'Player.OnPropertyChanged':
-      case 'Playlist.OnAdd':
-      case 'Playlist.OnRemove':
-      case 'Playlist.OnClear':
         // Trigger immediate status request
+        this.requestStatus();
+        break;
+
+      case 'Playlist.OnAdd':
+        this.playlistChangedSubject.next('add');
+        this.requestStatus();
+        break;
+
+      case 'Playlist.OnRemove':
+        this.playlistChangedSubject.next('remove');
+        this.requestStatus();
+        break;
+
+      case 'Playlist.OnClear':
+        this.playlistChangedSubject.next('clear');
         this.requestStatus();
         break;
     }
