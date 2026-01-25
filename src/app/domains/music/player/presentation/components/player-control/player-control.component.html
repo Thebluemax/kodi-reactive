@@ -1,0 +1,78 @@
+<div class="player-control">
+  <!-- Previous Track Button -->
+  <div class="control-btn">
+    <ion-button shape="round" (click)="onPrevious()">
+      <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Play/Pause Button -->
+  <div class="play-btn">
+    <ion-button shape="round" (click)="onPlayPause()">
+      <ion-icon
+        slot="icon-only"
+        [name]="isPlaying ? 'pause-outline' : 'play-outline'"
+      ></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Next Track Button -->
+  <div class="control-btn">
+    <ion-button shape="round" (click)="onNext()">
+      <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Current Time -->
+  <div class="time-div">
+    <span>{{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}</span>
+  </div>
+
+  <!-- Seek Bar -->
+  <div class="player-bar">
+    <ion-range
+      [value]="percentage"
+      (ionChange)="onSeekChange($event)"
+    ></ion-range>
+  </div>
+
+  <!-- Total Time -->
+  <div class="time-div">
+    <span>{{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}</span>
+  </div>
+
+  <!-- Shuffle Button -->
+  <div class="control-btn">
+    <ion-button
+      shape="round"
+      (click)="onShuffle()"
+      [color]="shuffled ? 'success' : 'dark'"
+      [disabled]="!canShuffle"
+    >
+      <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Repeat Button -->
+  <div class="control-btn">
+    <ion-button
+      shape="round"
+      (click)="onRepeat()"
+      [color]="getRepeatColor()"
+      [disabled]="!canRepeat"
+    >
+      <ion-icon slot="icon-only" [name]="getRepeatIcon()"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Party Mode Button -->
+  <div class="control-btn">
+    <ion-button
+      shape="round"
+      (click)="onPartyMode()"
+      [color]="partyMode ? 'success' : 'dark'"
+    >
+      <ion-icon slot="icon-only" name="beer-outline"></ion-icon>
+    </ion-button>
+  </div>
+</div>

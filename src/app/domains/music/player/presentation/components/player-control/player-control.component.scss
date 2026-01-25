@@ -1,0 +1,39 @@
+.player-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  width: 100%;
+
+  .player-bar {
+    flex: 1;
+    min-width: 200px;
+    max-width: 60%;
+    margin: 0 8px;
+  }
+
+  .play-btn {
+    ion-button {
+      --padding-start: 12px;
+      --padding-end: 12px;
+    }
+  }
+
+  .control-btn {
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+    }
+  }
+
+  .time-div {
+    min-width: 45px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+
+    span {
+      white-space: nowrap;
+    }
+  }
+}

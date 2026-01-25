@@ -6,7 +6,7 @@
     <app-current-play-list
       #playlistObject
       [playlist]="playlist"
-      [currentTrackPosition]="appInfo?.position ? appInfo?.position : null"
+      [currentTrackPosition]="playerState?.position ?? null"
     ></app-current-play-list>
   </ion-content>
 </ion-menu>
@@ -67,7 +67,6 @@
     <div class="control-nav">
       <player-current-track [currentTrack]="playerInfo"></player-current-track>
       <app-player-control
-        [appInfo]="appInfo"
         class="player-control"
       ></app-player-control>
       <app-sound

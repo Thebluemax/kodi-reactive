@@ -1,19 +1,21 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { PlayerService } from '../core/services/player.service';
-import { AppInfo, CurrentTrack } from '../core/models/app-info';
-import { WsPlayerService } from '../core/services/ws-player.service';
 import { ItemPlaylist } from '../core/models/item-playlist';
 import { Methods } from '../core/enums/methods';
-import { payloads } from '../core/payloads/payload';
-import { Album } from '../core/models/album';
 import { CurrentPlayListComponent } from '../components/current-play-list/current-play-list.component';
-import { Subscriber, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Router, RouterOutlet } from '@angular/router';
 import { SideBarService } from '../core/services/side-bar.service';
 import { IonicModule } from '@ionic/angular';
 import { CurrentTrackComponent } from '../components/current-track/current-track.component';
-import { PlayerControlComponent } from '../components/player-control/player-control.component';
 import { SoundComponent } from '../components/sound/sound.component';
+import {
+  PlayerControlComponent,
+  PlayerWebSocketAdapter,
+  PlayerState,
+  CurrentTrack,
+  SetVolumeUseCase
+} from '@domains/music/player';
 
 @Component({
     selector: 'app-tab1',
@@ -23,7 +25,8 @@ import { SoundComponent } from '../components/sound/sound.component';
 })
 export class Tab1Page implements OnInit {
   private plService = inject(PlayerService);
-  private wsService = inject(WsPlayerService);
+  private wsAdapter = inject(PlayerWebSocketAdapter);
+  private setVolumeUseCase = inject(SetVolumeUseCase);
   private ref = inject(ChangeDetectorRef);
   private router = inject(Router);
   private sidebarService = inject(SideBarService);
@@ -33,16 +36,18 @@ export class Tab1Page implements OnInit {
   title: string = 'Volume Control';
   playlist: ItemPlaylist[] = [];
   pages: string[] = ['album', 'artist', 'genre'];
-  appInfo: AppInfo | null = null;
+  playerState: PlayerState | null = null;
   playerInfo: CurrentTrack | null = null;
   showComponent: boolean = false;
   activeComponent: string = '';
   showLateral: boolean = false;
   statusSubcription: Subscription | null = null;
+  stateSubscription: Subscription | null = null;
+  trackSubscription: Subscription | null = null;
   @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null =
     null;
   ionViewDidEnter(): void {
-    this.wsService.run();
+    this.wsAdapter.connect();
     this.activeComponent = this.pages[0];
   }
 
@@ -50,12 +55,18 @@ export class Tab1Page implements OnInit {
     if (this.statusSubcription) {
       this.statusSubcription.unsubscribe();
     }
-    this.wsService.stop();
+    if (this.stateSubscription) {
+      this.stateSubscription.unsubscribe();
+    }
+    if (this.trackSubscription) {
+      this.trackSubscription.unsubscribe();
+    }
+    this.wsAdapter.disconnect();
   }
 
   ngOnInit(): void {
     this.statusSubcription = this.getPlayerStatus();
-    this.runSocket();
+    this.subscribeToPlayerState();
     this.getPlaylists();
   }
 
@@ -68,34 +79,28 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  runSocket() {
-    this.wsService.getSocket().subscribe((data) => {
-      if (data.method) {
-        this.proceesMethod(data);
-      } else if (Array.isArray(data)) {
-        this.appInfo = { ...data[0].result };
-        this.playerInfo = { ...data[1].result.item };
-        this.ref.markForCheck();
-      } else {
-        console.log('GET sOCKET .id', data);
-      }
+  subscribeToPlayerState(): void {
+    this.stateSubscription = this.wsAdapter.getStateStream().subscribe((state) => {
+      this.playerState = state;
+      this.volume = state.volume;
+      this.isMute = state.muted;
+      this.ref.markForCheck();
+    });
+
+    this.trackSubscription = this.wsAdapter.getCurrentTrackStream().subscribe((track) => {
+      this.playerInfo = track;
+      this.ref.markForCheck();
     });
   }
 
-  updateVolume(event: any) {
+  updateVolume(event: number) {
     this.volume = event;
-    const payload: any = payloads.volume;
-    payload.params.volume = this.volume;
-    this.wsService.send(payload);
+    this.setVolumeUseCase.execute(event).subscribe();
   }
 
   getMainInfo() {
-    this.plService.getMainInfo().subscribe((data) => {
-      const data_ = data as any[];
-      this.appInfo = { ...data_[0].result };
-      this.playerInfo = { ...data_[1].result.item };
-      console.log(this.appInfo, this.playerInfo);
-    });
+    // State is now managed by PlayerWebSocketAdapter
+    // This method is kept for backwards compatibility
   }
 
   getPlaylists() {

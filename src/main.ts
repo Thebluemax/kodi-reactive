@@ -26,6 +26,12 @@ import {
   trash,
   eyeOutline,
   share,
+  playSkipBackOutline,
+  playSkipForwardOutline,
+  volumeHigh,
+  volumeLow,
+  volumeOff,
+  volumeMuteOutline,
 } from 'ionicons/icons';
 
 // Register icons globally
@@ -50,7 +56,13 @@ addIcons({
   duplicateOutline,
   eyeOutline,
   share,
-  trash
+  trash,
+  playSkipBackOutline,
+  playSkipForwardOutline,
+  volumeHigh,
+  volumeLow,
+  volumeOff,
+  volumeMuteOutline,
 });
 
 if (environment.production) {
