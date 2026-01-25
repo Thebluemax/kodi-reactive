@@ -7,9 +7,8 @@ import { IonicModule } from '@ionic/angular';
 
 import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
+import { PlayTrackUseCase, AddTrackToPlaylistUseCase } from '@domains/music/track';
 import { AddArtistToPlaylistUseCase } from '../../../application/use-cases/add-artist-to-playlist.use-case';
-import { PlayTrackUseCase } from '../../../application/use-cases/play-track.use-case';
-import { AddTrackToPlaylistUseCase } from '../../../application/use-cases/add-track-to-playlist.use-case';
 import { AddAlbumToPlaylistUseCase } from '@domains/music/album';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
@@ -47,14 +46,19 @@ export class ArtistDetailComponent {
   }
 
   onPlayTrack(track: Track): void {
+    console.log('onPlayTrack called with track:', track);
+    console.log('songId:', track.songId);
     this.playTrackUseCase.execute(track.songId).subscribe({
-      next: () => this.trackSelected.emit(track),
+      next: () => {
+        console.log('Track play success:', track.title);
+        this.trackSelected.emit(track);
+      },
       error: error => console.error('Error playing track:', error)
     });
   }
 
   onAddTrackToPlaylist(track: Track): void {
-    this.addTrackToPlaylistUseCase.execute(track.songId).subscribe({
+    this.addTrackToPlaylistUseCase.execute(track.songId, false).subscribe({
       next: () => console.log('Track added to playlist:', track.title),
       error: error => console.error('Error adding track to playlist:', error)
     });

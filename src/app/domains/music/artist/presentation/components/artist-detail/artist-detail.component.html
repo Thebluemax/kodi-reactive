@@ -77,10 +77,10 @@
                         {{ track.title }}
                       </ion-label>
                       <ion-note>{{ track.duration | secondsToStr }}</ion-note>
-                      <ion-button fill="clear" size="small" (click)="onAddTrackToPlaylist(track)" title="Add to Playlist">
+                      <ion-button fill="clear" size="small" (click)="onAddTrackToPlaylist(track); $event.stopPropagation()" title="Add to Playlist">
                         <ion-icon slot="icon-only" name="add" />
                       </ion-button>
-                      <ion-button fill="clear" size="small" (click)="onPlayTrack(track)" title="Play Track">
+                      <ion-button fill="clear" size="small" (click)="onPlayTrack(track); $event.stopPropagation()" title="Play Track">
                         <ion-icon slot="icon-only" name="play" />
                       </ion-button>
                     </ion-item>
