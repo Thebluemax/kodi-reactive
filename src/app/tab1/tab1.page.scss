@@ -1,22 +1,33 @@
 .control-nav {
-  background-color: rgba(0, 0, 0, .4);
-  bottom: 0px;
+  background-color: rgba(0, 0, 0, .75);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-direction: row;
-  height: min-content;
+  height: 60px;
+  z-index: 100;
+  padding: 0 8px;
 
   .volume-control {
     width: 10%;
+    flex-shrink: 0;
   }
 
   .player-control {
-    align-content: center;
-    width: 60%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
 
   player-current-track {
-    width: 30%;
+    width: 25%;
+    flex-shrink: 0;
   }
 }
 
@@ -26,12 +37,13 @@
   background-position: left;
   height: 100%;
   width: 100%;
+  padding-bottom: 70px;
 
   .flex-div {
     display: flex;
     justify-content: start;
     flex-direction: row;
-    height: calc(100% - 65px);
+    height: 100%;
     width: 100%;
   }
 
