@@ -1,62 +1,55 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, inject } from '@angular/core';
-import { PlayerService } from '../core/services/player.service';
-import { Methods } from '../core/enums/methods';
-import { CurrentPlayListComponent } from '../components/current-play-list/current-play-list.component';
+import { CurrentPlayListComponent, PlaylistItem, GetPlaylistUseCase } from '@domains/music/playlist';
 import { Subscription } from 'rxjs';
 import { Router, RouterOutlet } from '@angular/router';
 import { SideBarService } from '../core/services/side-bar.service';
 import { IonicModule } from '@ionic/angular';
-import { CurrentTrackComponent } from '../components/current-track/current-track.component';
-import { SoundComponent } from '../components/sound/sound.component';
 import {
   PlayerControlComponent,
+  CurrentTrackComponent,
+  SoundComponent,
   PlayerWebSocketAdapter,
   PlayerState,
   CurrentTrack,
   SetVolumeUseCase
 } from '@domains/music/player';
-import { PlaylistItem, GetPlaylistUseCase } from '@domains/music/playlist';
 
 @Component({
-    selector: 'app-tab1',
-    templateUrl: 'tab1.page.html',
-    styleUrls: ['tab1.page.scss'],
-    imports: [IonicModule, CurrentPlayListComponent, RouterOutlet, CurrentTrackComponent, PlayerControlComponent, SoundComponent]
+  selector: 'app-tab1',
+  templateUrl: 'tab1.page.html',
+  styleUrls: ['tab1.page.scss'],
+  imports: [IonicModule, CurrentPlayListComponent, RouterOutlet, CurrentTrackComponent, PlayerControlComponent, SoundComponent]
 })
 export class Tab1Page implements OnInit {
-  private plService = inject(PlayerService);
-  private wsAdapter = inject(PlayerWebSocketAdapter);
-  private setVolumeUseCase = inject(SetVolumeUseCase);
-  private getPlaylistUseCase = inject(GetPlaylistUseCase);
-  private ref = inject(ChangeDetectorRef);
-  private router = inject(Router);
-  private sidebarService = inject(SideBarService);
+  private readonly wsAdapter = inject(PlayerWebSocketAdapter);
+  private readonly setVolumeUseCase = inject(SetVolumeUseCase);
+  private readonly getPlaylistUseCase = inject(GetPlaylistUseCase);
+  private readonly ref = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
+  private readonly sidebarService = inject(SideBarService);
 
-  volume: number = 0;
-  isMute: boolean = false;
-  title: string = 'Volume Control';
+  volume = 0;
+  isMute = false;
+  title = 'Kodi Remote';
   playlist: PlaylistItem[] = [];
   pages: string[] = ['album', 'artist', 'genre'];
   playerState: PlayerState | null = null;
   playerInfo: CurrentTrack | null = null;
-  showComponent: boolean = false;
-  activeComponent: string = '';
-  showLateral: boolean = false;
-  statusSubcription: Subscription | null = null;
+  showComponent = false;
+  activeComponent = '';
+  showLateral = false;
   stateSubscription: Subscription | null = null;
   trackSubscription: Subscription | null = null;
   playlistSubscription: Subscription | null = null;
-  @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null =
-    null;
+
+  @ViewChild('playlistObject') playlistObject: CurrentPlayListComponent | null = null;
+
   ionViewDidEnter(): void {
     this.wsAdapter.connect();
     this.activeComponent = this.pages[0];
   }
 
   ionViewDidLeave(): void {
-    if (this.statusSubcription) {
-      this.statusSubcription.unsubscribe();
-    }
     if (this.stateSubscription) {
       this.stateSubscription.unsubscribe();
     }
@@ -70,18 +63,8 @@ export class Tab1Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.statusSubcription = this.getPlayerStatus();
     this.subscribeToPlayerState();
     this.getPlaylists();
-  }
-
-  getPlayerStatus() {
-    return this.plService.getPlayerStatus().subscribe((data) => {
-      const _data = data as any[];
-      this.volume = _data[0].result.volume;
-      this.isMute = _data[0].result.muted;
-      this.title = `${_data[0].result.name} ${_data[0].result.version.major}.${_data[0].result.version.minor}.${_data[0].result.version.minor}`;
-    });
   }
 
   subscribeToPlayerState(): void {
@@ -97,22 +80,17 @@ export class Tab1Page implements OnInit {
       this.ref.markForCheck();
     });
 
-    this.playlistSubscription = this.wsAdapter.getPlaylistChangedStream().subscribe((event) => {
+    this.playlistSubscription = this.wsAdapter.getPlaylistChangedStream().subscribe(() => {
       this.getPlaylists();
     });
   }
 
-  updateVolume(event: number) {
+  updateVolume(event: number): void {
     this.volume = event;
     this.setVolumeUseCase.execute(event).subscribe();
   }
 
-  getMainInfo() {
-    // State is now managed by PlayerWebSocketAdapter
-    // This method is kept for backwards compatibility
-  }
-
-  getPlaylists() {
+  getPlaylists(): void {
     this.getPlaylistUseCase.execute().subscribe({
       next: (result) => {
         this.playlist = result.items;
@@ -122,28 +100,12 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  onPlaylistChanged() {
+  onPlaylistChanged(): void {
     this.getPlaylists();
   }
 
-  proceesMethod(data: any) {
-    switch (data.method) {
-      case Methods.PlaylistOnAdd:
-        this.getPlaylists();
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  processById(data: any) {
-    switch (data.id) {
-    }
-  }
-
-  change() {
-    let position = this.pages.indexOf(this.activeComponent);
+  change(): void {
+    const position = this.pages.indexOf(this.activeComponent);
     if (position < this.pages.length - 1) {
       this.activeComponent = this.pages[position + 1];
     } else {
@@ -151,14 +113,9 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  toPlayList(event: any) {
-    // TODO: Use AddTrackToPlaylistUseCase or AddAlbumToPlaylistUseCase
-    console.log('toPlayList event:', event);
-  }
-
-  segmentChanged(event: any) {
-    console.log('segmentChanged', event);
-    switch (event.detail.value) {
+  segmentChanged(event: Event): void {
+    const customEvent = event as CustomEvent;
+    switch (customEvent.detail.value) {
       case 'albums':
         this.router.navigate(['/collections/albums']);
         break;
@@ -169,9 +126,9 @@ export class Tab1Page implements OnInit {
         this.router.navigate(['/collections/genres']);
         break;
     }
-    //this.activeComponent = event.detail.value;
   }
-  toggleLateral() {
+
+  toggleLateral(): void {
     this.showLateral = !this.showLateral;
   }
 }

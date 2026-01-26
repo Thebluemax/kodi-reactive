@@ -1,0 +1,63 @@
+.component-holder {
+  height: 100%;
+
+  & > ion-card {
+    height: inherit;
+
+    ion-card-content {
+      height: 90%;
+    }
+  }
+}
+
+.current-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  ion-toolbar {
+    --min-height: 40px;
+
+    ion-title {
+      font-size: 0.9em;
+    }
+  }
+
+  ion-list {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  ion-item {
+    font-size: 0.8em;
+
+    ion-avatar {
+      width: 30px;
+      height: 30px;
+    }
+
+    ion-reorder {
+      margin-inline-end: 0;
+    }
+  }
+
+  .input-wrapper {
+    align-self: center !important;
+    text-overflow: unset !important;
+    overflow: inherit;
+  }
+
+  .empty-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+
+    p {
+      margin: 0;
+      font-size: 0.9em;
+    }
+  }
+}

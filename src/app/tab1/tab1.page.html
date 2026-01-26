@@ -73,7 +73,8 @@
       <app-sound
         class="volume-control"
         [volume]="volume"
-        (updateVolume)="updateVolume($event)"
+        [isMute]="isMute"
+        (volumeChange)="updateVolume($event)"
       ></app-sound>
     </div>
   </div>

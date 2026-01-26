@@ -1,0 +1,66 @@
+<ion-card
+  class="tile"
+  [style.backgroundImage]="'url(' + (thumbnail() | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
+  [style.backgroundSize]="'cover'"
+  appTileHover
+>
+  @if (headerActive()) {
+    <ion-card-header
+      (click)="onItemClick()"
+      [class.btn-active]="hoverActive()"
+    >
+      <ion-card-title>{{ title() }}</ion-card-title>
+      @if (subtitle()) {
+        <ion-card-subtitle>{{ subtitle() }}</ion-card-subtitle>
+      }
+    </ion-card-header>
+  }
+  <ion-card-content [class.hover-active]="hoverActive()">
+    @if (!headerActive()) {
+      <div>
+        <h4>{{ title() }}</h4>
+        <h5>{{ subtitle() }}</h5>
+        @if (year()) {
+          <h6>{{ year() }}</h6>
+        }
+      </div>
+    }
+    @if (showFavButtons()) {
+      <div class="fav-buttons">
+        <div class="fav-btn">
+          <ion-button
+            slot="end"
+            shape="round"
+            size="small"
+            color="dark"
+            (click)="onPlayClick()"
+          >
+            <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+          </ion-button>
+        </div>
+        <div class="fav-btn">
+          <ion-button
+            slot="end"
+            shape="round"
+            size="small"
+            color="dark"
+            (click)="onAddClick()"
+          >
+            <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+          </ion-button>
+        </div>
+        <div class="fav-btn">
+          <ion-button
+            slot="end"
+            shape="round"
+            size="small"
+            color="dark"
+            (click)="onItemClick()"
+          >
+            <ion-icon name="eye-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    }
+  </ion-card-content>
+</ion-card>
