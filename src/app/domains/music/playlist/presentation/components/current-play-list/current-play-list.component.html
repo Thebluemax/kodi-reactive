@@ -1,0 +1,43 @@
+<div class="current-list">
+  @if (playlist().length > 0) {
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="toggleReorder()" [color]="reorderEnabled() ? 'primary' : 'medium'">
+          <ion-icon slot="icon-only" name="reorder-four"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title size="small">{{ playlist().length }} tracks</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="savePlaylist()" color="primary">
+          <ion-icon slot="icon-only" name="bookmark"></ion-icon>
+        </ion-button>
+        <ion-button (click)="clearList()" color="danger">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  }
+
+  <ion-list lines="full">
+    <ion-reorder-group [disabled]="!reorderEnabled()" (ionItemReorder)="onReorder($event)">
+      @for (item of playlist(); track item.id; let idx = $index) {
+        <ion-item [color]="currentTrackPosition() === idx ? 'success' : 'light'">
+          <ion-avatar aria-hidden="true" slot="start" (click)="playItem(idx)">
+            <img alt="" [src]="item.thumbnail | assets" />
+          </ion-avatar>
+          <ion-label class="ion-text-nowrap" (click)="playItem(idx)">{{ item.label }}</ion-label>
+          <ion-button fill="clear" color="danger" slot="end" (click)="removeItem(idx, $event)">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+          <ion-reorder slot="end"></ion-reorder>
+        </ion-item>
+      }
+    </ion-reorder-group>
+  </ion-list>
+
+  @if (playlist().length === 0) {
+    <ion-text color="medium" class="empty-message">
+      <p>Playlist is empty</p>
+    </ion-text>
+  }
+</div>

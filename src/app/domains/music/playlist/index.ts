@@ -21,5 +21,8 @@ export * from './application/use-cases/delete-saved-playlist.use-case';
 export * from './infrastructure/repositories/playlist-kodi.repository';
 export * from './infrastructure/services/playlist-storage.service';
 
+// Presentation
+export * from './presentation/components/current-play-list/current-play-list.component';
+
 // Providers
 export * from './playlist.providers';

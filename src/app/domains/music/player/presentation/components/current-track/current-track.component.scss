@@ -1,0 +1,40 @@
+.current {
+  width: 100%;
+}
+
+.current-track {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: 7px;
+
+  & > img {
+    height: 50px;
+    width: 50px;
+  }
+
+  .track-info {
+    padding-left: 3%;
+    width: inherit;
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      padding: 0;
+    }
+
+    .song-name {
+      font-size: 0.8em;
+      font-weight: 900;
+    }
+
+    .album-name,
+    .artist-name {
+      color: #e0e0e0;
+      line-height: 1em;
+      font-size: 0.7em;
+      font-weight: 900;
+    }
+  }
+}

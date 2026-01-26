@@ -117,7 +117,7 @@ export const payloads = {
     },
     id: 84,
   },
-  albunDetail: {
+  albumDetail: {
     jsonrpc: '2.0',
     method: 'AudioLibrary.GetAlbumDetails',
     id: '1712437435620',
@@ -252,7 +252,7 @@ export const payloads = {
       id: 413,
     },
   ],
-  setSeeek: [
+  setSeek: [
     {
       jsonrpc: '2.0',
       method: 'Player.Seek',

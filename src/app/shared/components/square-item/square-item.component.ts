@@ -3,13 +3,13 @@ import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, 
 import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
-export interface MediaTileAction {
+export interface SquareItemAction {
   media: unknown;
   playMedia: boolean;
 }
 
 @Component({
-  selector: 'app-media-tile',
+  selector: 'app-square-item',
   standalone: true,
   imports: [
     IonCard,
@@ -22,14 +22,14 @@ export interface MediaTileAction {
     TileHoverDirective,
     AssetsPipe
   ],
-  templateUrl: './media-tile.component.html',
-  styleUrl: './media-tile.component.scss',
+  templateUrl: './square-item.component.html',
+  styleUrl: './square-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MediaTileComponent {
+export class SquareItemComponent {
   // Inputs using signals
   readonly headerActive = input<boolean>(false);
-  readonly showActionButtons = input<boolean>(true);
+  readonly showFavButtons = input<boolean>(true);
   readonly hoverActive = input<boolean>(true);
   readonly title = input<string>('');
   readonly subtitle = input<string>('');
@@ -39,7 +39,7 @@ export class MediaTileComponent {
 
   // Outputs using output()
   readonly itemSelected = output<unknown>();
-  readonly addToPlaylist = output<MediaTileAction>();
+  readonly addToPlaylist = output<SquareItemAction>();
 
   onItemClick(): void {
     this.itemSelected.emit(this.item());

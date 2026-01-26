@@ -5,10 +5,11 @@ import { ArrayToStringPipe } from './pipes/array-to-string.pipe';
 import { AssetsPipe } from './pipes/assets.pipe';
 import { ScapeStringPipe } from './pipes/scape-string.pipe';
 import { SecondsToStringPipe } from './pipes/seconds-to-string.pipe';
-import { ZeroPaddingPipe } from '../core/pipes/zero-padding.pipe';
+import { ZeroPaddingPipe } from './pipes/zero-padding.pipe';
 import { LateralSlideComponent } from './components/lateral-slide/lateral-slide.component';
+import { SquareItemComponent } from './components/square-item/square-item.component';
 
-const COMPONENTS = [LateralSlideComponent];
+const COMPONENTS = [LateralSlideComponent, SquareItemComponent];
 
 const DIRECTIVES = [TileHoverDirective];
 

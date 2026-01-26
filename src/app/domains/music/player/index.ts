@@ -37,6 +37,8 @@ export { PlayerWebSocketAdapter } from './infrastructure/adapters/player-websock
 
 // Presentation - Components
 export { PlayerControlComponent } from './presentation/components/player-control/player-control.component';
+export { CurrentTrackComponent } from './presentation/components/current-track/current-track.component';
+export { SoundComponent } from './presentation/components/sound/sound.component';
 
 // Infrastructure - Providers
 export { PLAYER_PROVIDERS } from './player.providers';
