@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { LateralSlideBarDirective } from './lateral-slide-bar.directive';
+import { LateralSlideBarDirective } from '../services/directives/lateral-slide-bar.directive';
 
 @Component({
     template: '<div appLateralSlideBar></div>',
@@ -11,7 +12,10 @@ class TestComponent {}
 describe('LateralSlideBarDirective', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TestComponent]
+      imports: [TestComponent],
+      providers: [
+        provideZonelessChangeDetection()
+      ]
     }).compileComponents();
   });
 

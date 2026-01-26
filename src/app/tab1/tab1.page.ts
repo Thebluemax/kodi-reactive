@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild, inject } from '@angula
 import { CurrentPlayListComponent, PlaylistItem, GetPlaylistUseCase } from '@domains/music/playlist';
 import { Subscription } from 'rxjs';
 import { Router, RouterOutlet } from '@angular/router';
-import { SideBarService } from '../core/services/side-bar.service';
+import { SideBarService } from '../shared/services/side-bar.service';
 import { IonicModule } from '@ionic/angular';
 import {
   PlayerControlComponent,
