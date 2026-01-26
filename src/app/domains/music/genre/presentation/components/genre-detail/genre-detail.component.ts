@@ -14,7 +14,7 @@ import { Track } from '@domains/music/track/domain/entities/track.entity';
 import { GetGenreDetailUseCase } from '../../../application/use-cases/get-genre-detail.use-case';
 import { GetAlbumDetailUseCase, AlbumDetailComponent } from '@domains/music/album';
 import { GetArtistDetailUseCase, ArtistDetailComponent, ArtistAlbumGroup } from '@domains/music/artist';
-import { LateralSlideComponent } from '@shared/services/lateral-slide.component';
+import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
 import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 

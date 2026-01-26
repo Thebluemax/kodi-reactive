@@ -10,7 +10,7 @@ import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity
 import { GetArtistsUseCase } from '../../../application/use-cases/get-artists.use-case';
 import { GetArtistDetailUseCase } from '../../../application/use-cases/get-artist-detail.use-case';
 import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
-import { LateralSlideComponent } from '@shared/services/lateral-slide.component';
+import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArtistDetailComponent } from '../artist-detail/artist-detail.component';
 
