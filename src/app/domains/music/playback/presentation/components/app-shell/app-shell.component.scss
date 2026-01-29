@@ -1,0 +1,157 @@
+.control-nav {
+    background-color: rgba(0, 0, 0, .75);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    height: 60px;
+    z-index: 100;
+    padding: 0 8px;
+
+    .volume-control {
+        width: 10%;
+        flex-shrink: 0;
+    }
+
+    .player-control {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    player-current-track {
+        width: 25%;
+        flex-shrink: 0;
+    }
+}
+
+.canvas-player {
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: left;
+    height: 100%;
+    width: 100%;
+    padding-bottom: 70px;
+
+    .flex-div {
+        display: flex;
+        justify-content: start;
+        flex-direction: row;
+        height: 100%;
+        width: 100%;
+    }
+
+    .flex-col {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+    }
+
+    .small-col {
+        width: 25%;
+    }
+}
+
+.flex-div {
+    display: flex;
+    justify-content: start;
+    flex-direction: row;
+    height: 85%;
+}
+
+.selector-category {
+    height: 100%;
+    width: 100%;
+
+    &>ion-card {
+        height: 85%;
+
+        ion-card-content {
+            height: 90%;
+        }
+    }
+}
+
+app-current-play-list {
+    height: 74%;
+    width: 100%;
+}
+
+app-album {
+    height: 75%;
+}
+
+/* 
+  ##Device = Desktops
+  ##Screen = 1281px to higher resolution desktops
+*/
+
+@media (min-width: 1281px) {
+
+
+    app-current-play-list {
+        height: 87%;
+    }
+}
+
+/* 
+    ##Device = Laptops, Desktops
+    ##Screen = B/w 1025px to 1280px
+  */
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+
+    /* CSS */
+
+}
+
+/* 
+    ##Device = Tablets, Ipads (portrait)
+    ##Screen = B/w 768px to 1024px
+  */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    /* CSS */
+
+}
+
+/* 
+    ##Device = Tablets, Ipads (landscape)
+    ##Screen = B/w 768px to 1024px
+  */
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+
+    /* CSS */
+
+}
+
+/* 
+    ##Device = Low Resolution Tablets, Mobiles (Landscape)
+    ##Screen = B/w 481px to 767px
+  */
+
+@media (min-width: 481px) and (max-width: 767px) {
+
+    /* CSS */
+
+}
+
+/* 
+    ##Device = Most of the Smartphones Mobiles (Portrait)
+    ##Screen = B/w 320px to 479px
+  */
+
+@media (min-width: 320px) and (max-width: 480px) {
+
+    /* CSS */
+
+}
