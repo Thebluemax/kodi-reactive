@@ -2,8 +2,8 @@
   <ion-content class="ion-padding">
     <app-current-play-list
       #playlistObject
-      [playlist]="playlist"
-      [currentTrackPosition]="playerState?.position ?? null"
+      [playlist]="playBackFacade.playlist().items"
+      [currentTrackPosition]="playBackFacade.playerState()?.position ?? null"
       (playlistChanged)="onPlaylistChanged()"
     ></app-current-play-list>
   </ion-content>
@@ -11,13 +11,13 @@
 
 <ion-header>
   <ion-toolbar>
-    <ion-buttons>
+    <ion-buttons slot="start">
       <ion-menu-toggle>
         <ion-button size="small">
           <ion-icon
             slot="icon-only"
-            ios="menu-outline"
-            md="menu-outline"
+            ios="musical-notes"
+            md="musical-notes"
           ></ion-icon>
         </ion-button>
       </ion-menu-toggle>
@@ -33,14 +33,14 @@
           ></ion-icon>
         </ion-button>
       </ion-menu-toggle>
-      <ion-button size="small">
+      <ion-button size="small" (click)="navigateTo('music')">
         <ion-icon
           slot="icon-only"
           ios="musical-notes"
           md="musical-notes"
         ></ion-icon>
       </ion-button>
-      <ion-button size="small">
+      <ion-button size="small" (click)="navigateTo('video')">
         <ion-icon slot="icon-only" ios="tv" md="tv"></ion-icon>
       </ion-button>
       <ion-button size="small">
@@ -57,32 +57,20 @@
 <ion-content id="main-content" [fullscreen]="true">
   <div class="canvas-player">
     <div class="flex-div">
-      <div class="selector-category" value="albums">
-        <ion-segment (ionChange)="segmentChanged($event)">
-          <ion-segment-button value="albums">
-            <ion-label>Albums</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="artists">
-            <ion-label>Artists</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="genres">
-            <ion-label>Genres</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <router-outlet></router-outlet>
-      </div>
+      <router-outlet></router-outlet>
     </div>
 
     <div class="control-nav">
-      <player-current-track [currentTrack]="playerInfo"></player-current-track>
+      <player-current-track
+        [currentTrack]="playBackFacade.playerInfo()"
+      ></player-current-track>
       <app-player-control class="player-control"></app-player-control>
       <app-sound
         class="volume-control"
-        [volume]="volume"
-        [isMute]="isMute"
+        [volume]="playBackFacade.volume()"
+        [isMute]="playBackFacade.isMute()"
         (volumeChange)="updateVolume($event)"
       ></app-sound>
     </div>
   </div>
-  <div></div>
 </ion-content>

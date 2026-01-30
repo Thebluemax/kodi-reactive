@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
-import { Tab1Page } from './tab1.page';
 import { AlbumListComponent } from '@domains/music/album';
 import { ArtistListComponent } from '@domains/music/artist';
 import { GenreListComponent, GenreDetailComponent } from '@domains/music/genre';
+import { MusicShellComponent } from './music-shell.component';
 
-export const TAB1_ROUTES: Routes = [
+export const MUSIC_ROUTES: Routes = [
   {
-    path: 'collections',
-    component: Tab1Page,
+    path: '',
+    component: MusicShellComponent,
     children: [
       {
         path: 'albums',
@@ -25,11 +25,11 @@ export const TAB1_ROUTES: Routes = [
         path: 'genres/:genreId',
         component: GenreDetailComponent,
       },
+      {
+        path: '',
+        redirectTo: 'albums',
+        pathMatch: 'full',
+      },
     ],
-  },
-  {
-    path: '',
-    redirectTo: 'collections/albums',
-    pathMatch: 'full',
   },
 ];

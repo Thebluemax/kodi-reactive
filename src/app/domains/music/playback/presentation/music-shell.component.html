@@ -1,0 +1,14 @@
+<div class="selector-category" value="albums">
+  <ion-segment (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="albums">
+      <ion-label>Albums</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="artists">
+      <ion-label>Artists</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="genres">
+      <ion-label>Genres</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <router-outlet></router-outlet>
+</div>

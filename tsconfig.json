@@ -8,7 +8,8 @@
       "@domains/*": ["src/app/domains/*"],
       "@shared/*": ["src/app/shared/*"],
       "@core/*": ["src/app/core/*"],
-      "@components/*": ["src/app/components/*"]
+      "@components/*": ["src/app/components/*"],
+      "@layout/*": ["src/app/layout/*"]
     },
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,

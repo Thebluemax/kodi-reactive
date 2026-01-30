@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./domains/music/playback/presentation/playback.routes').then((m) => m.PLAYBACK_ROUTES),
+    loadChildren: () =>
+      import('./layout/layout.routes').then((m) => m.LAYOUT_ROUTES),
   },
 ];
