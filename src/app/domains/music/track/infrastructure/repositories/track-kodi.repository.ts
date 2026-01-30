@@ -8,9 +8,10 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 import { TrackRepository } from '../../domain/repositories/track.repository';
+import { environment } from 'src/environments/environment';
 
 // TODO: Move to core/infrastructure/config
-const KODI_API_URL = 'http://localhost:8008/jsonrpc';
+const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';

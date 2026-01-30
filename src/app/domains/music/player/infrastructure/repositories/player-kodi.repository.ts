@@ -23,7 +23,7 @@ interface KodiJsonRpcRequest {
 export class PlayerKodiRepository extends PlayerRepository {
   private readonly http = inject(HttpClient);
   // Use proxy (serverApiUrl) to avoid CORS issues
-  private readonly apiUrl = `${environment.serverApiUrl}:8008/mediaplayer`;
+  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/mediaplayer`;
   private requestId = 1;
 
   // ========================================================================
