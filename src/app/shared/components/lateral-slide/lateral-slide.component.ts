@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, OnChanges, Output, EventEmitter, inject, input, output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { SideBarService } from 'src/app/core/services/side-bar.service';
+import { SideBarService } from '@shared/services/side-bar.service';
 
 @Component({
   selector: 'app-lateral-slide',

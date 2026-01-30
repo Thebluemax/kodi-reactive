@@ -3,6 +3,6 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./tab1/tab1.routes').then((m) => m.TAB1_ROUTES),
+    loadChildren: () => import('./domains/music/playback/presentation/playback.routes').then((m) => m.PLAYBACK_ROUTES),
   },
 ];

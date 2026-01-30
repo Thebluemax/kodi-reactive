@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
-import { AssetsPipe } from '@core/pipes/assets.pipe';
+import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 export interface MediaTileAction {
   media: unknown;

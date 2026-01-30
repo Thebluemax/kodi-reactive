@@ -16,7 +16,7 @@ import { PreviousTrackUseCase } from '../../../application/use-cases/previous-tr
 import { SetShuffleUseCase } from '../../../application/use-cases/set-shuffle.use-case';
 import { SetRepeatUseCase } from '../../../application/use-cases/set-repeat.use-case';
 import { TogglePartyModeUseCase } from '../../../application/use-cases/toggle-party-mode.use-case';
-import { ZeroPaddingPipe } from 'src/app/core/pipes/zero-padding.pipe';
+import { ZeroPaddingPipe } from '@shared/pipes/zero-padding.pipe';
 
 @Component({
   selector: 'app-player-control',

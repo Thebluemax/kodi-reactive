@@ -1,0 +1,78 @@
+.tile {
+  width: 140px;
+  height: 140px;
+  margin: 4px;
+
+  ion-card-header {
+    background-color: rgba(0, 0, 0, 0.6);
+    bottom: 0;
+    color: white;
+    font-size: 1em;
+    height: min-content;
+    left: 0;
+    position: absolute;
+    width: 100%;
+
+    ion-card-title {
+      font-size: 0.9em;
+      font-weight: 900;
+    }
+
+    &.btn-active {
+      cursor: pointer;
+    }
+  }
+
+  ion-card-content {
+    background-color: rgba(0, 0, 0, 0.65);
+    height: 100%;
+    opacity: 0;
+
+    h4 {
+      color: aliceblue;
+      font-size: 0.8em;
+      font-weight: 900;
+    }
+
+    h5,
+    h6 {
+      line-height: 1em;
+      color: #d6d6d6;
+      font-size: 0.7em;
+      font-weight: 900;
+    }
+
+    h5 {
+      font-size: 0.7em;
+      font-weight: 400;
+    }
+  }
+
+  .fav-buttons {
+    bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    position: absolute;
+    width: 85%;
+  }
+}
+
+// Desktops - 1281px and higher
+@media (min-width: 1281px) {
+  .tile {
+    width: 265px;
+    height: 265px;
+    margin: 7px;
+  }
+}
+
+// Laptops, Desktops - 1025px to 1280px
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .tile {
+    width: 240px;
+    height: 240px;
+    margin: 7px;
+  }
+}

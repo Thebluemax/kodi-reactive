@@ -16,12 +16,13 @@ import {
   KodiAlbumResponse
 } from '../../domain/entities/album.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
+import { environment } from 'src/environments/environment';
 
 // TODO: Move to core/infrastructure/config
-const KODI_API_URL = 'http://localhost:8008/jsonrpc';
+const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
 
 interface KodiJsonRpcRequest {
-  jsonrpc: '2.0';
+  jsonrpc: string;
   method: string;
   params?: Record<string, unknown>;
   id: number;
@@ -77,7 +78,7 @@ export class AlbumKodiRepository extends AlbumRepository {
 
   getAlbumById(albumId: number): Observable<Album> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'AudioLibrary.GetAlbumDetails',
       params: {
         albumid: albumId,
@@ -102,7 +103,7 @@ export class AlbumKodiRepository extends AlbumRepository {
 
   getAlbumTracks(albumId: number): Observable<Track[]> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'AudioLibrary.GetSongs',
       params: {
         filter: { albumid: albumId },
@@ -123,7 +124,7 @@ export class AlbumKodiRepository extends AlbumRepository {
 
   addToPlaylist(albumId: number, playImmediately: boolean): Observable<void> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: playImmediately ? 'Player.Open' : 'Playlist.Add',
       params: playImmediately
         ? { item: { albumid: albumId } }
@@ -138,7 +139,7 @@ export class AlbumKodiRepository extends AlbumRepository {
 
   private buildAlbumsRequest(params: AlbumSearchParams): KodiJsonRpcRequest {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'AudioLibrary.GetAlbums',
       params: {
         limits: {

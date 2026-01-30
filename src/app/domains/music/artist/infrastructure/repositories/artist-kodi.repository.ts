@@ -17,12 +17,13 @@ import {
   KodiArtistResponse
 } from '../../domain/entities/artist.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
+import { environment } from 'src/environments/environment';
 
 // TODO: Move to core/infrastructure/config
-const KODI_API_URL = 'http://localhost:8008/jsonrpc';
+const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
 
 interface KodiJsonRpcRequest {
-  jsonrpc: '2.0';
+  jsonrpc: string;
   method: string;
   params?: Record<string, unknown>;
   id: number;
@@ -78,7 +79,7 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   getArtistById(artistId: number): Observable<Artist> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'AudioLibrary.GetArtistDetails',
       params: {
         artistid: artistId,
@@ -98,7 +99,7 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   getArtistAlbums(artistId: number): Observable<ArtistAlbumGroup[]> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'AudioLibrary.GetSongs',
       params: {
         filter: { artistid: artistId },
@@ -119,7 +120,7 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   addToPlaylist(artistId: number, playImmediately: boolean): Observable<void> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: playImmediately ? 'Player.Open' : 'Playlist.Add',
       params: playImmediately
         ? { item: { artistid: artistId } }
@@ -134,7 +135,7 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   playTrack(songId: number): Observable<void> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'Player.Open',
       params: {
         item: { songid: songId }
@@ -149,7 +150,7 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   addTrackToPlaylist(songId: number): Observable<void> {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'Playlist.Add',
       params: {
         playlistid: 0,
@@ -165,7 +166,7 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   private buildArtistsRequest(params: ArtistSearchParams): KodiJsonRpcRequest {
     const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
+      jsonrpc: environment.jsonrpcVersion,
       method: 'AudioLibrary.GetArtists',
       params: {
         limits: {

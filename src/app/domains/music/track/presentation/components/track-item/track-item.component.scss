@@ -1,0 +1,15 @@
+.track-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--ion-color-light-shade, #ccc);
+
+  ion-label {
+    flex: 1;
+  }
+
+  ion-note {
+    margin-right: 8px;
+  }
+}

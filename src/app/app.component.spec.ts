@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
@@ -10,7 +10,7 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({
     imports: [AppComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    providers: [provideRouter([])]
+    providers: [provideZonelessChangeDetection(), provideRouter([])]
 }).compileComponents();
   });
 

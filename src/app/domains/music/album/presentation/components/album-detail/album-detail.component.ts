@@ -19,9 +19,9 @@ import {
 
 import { Album } from '../../../domain/entities/album.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
-import { AssetsPipe } from '@core/pipes/assets.pipe';
-import { ArrayToStringPipe } from '@core/pipes/array-to-string.pipe';
-import { SecondsToStringPipe } from '@core/pipes/seconds-to-string.pipe';
+import { AssetsPipe } from '@shared/pipes/assets.pipe';
+import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
+import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 import { AddTrackToPlaylistUseCase, PlayTrackUseCase } from '@domains/music/track';
 

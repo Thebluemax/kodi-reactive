@@ -1,8 +1,5 @@
 <ion-menu [type]="'overlay'" content-id="main-content">
   <ion-content class="ion-padding">
-    <ion-menu-toggle>
-      <ion-button>Click to close the menu</ion-button>
-    </ion-menu-toggle>
     <app-current-play-list
       #playlistObject
       [playlist]="playlist"
@@ -14,6 +11,17 @@
 
 <ion-header>
   <ion-toolbar>
+    <ion-buttons>
+      <ion-menu-toggle>
+        <ion-button size="small">
+          <ion-icon
+            slot="icon-only"
+            ios="menu-outline"
+            md="menu-outline"
+          ></ion-icon>
+        </ion-button>
+      </ion-menu-toggle>
+    </ion-buttons>
     <ion-searchbar></ion-searchbar>
     <ion-buttons slot="end">
       <ion-menu-toggle>
@@ -67,13 +75,12 @@
 
     <div class="control-nav">
       <player-current-track [currentTrack]="playerInfo"></player-current-track>
-      <app-player-control
-        class="player-control"
-      ></app-player-control>
+      <app-player-control class="player-control"></app-player-control>
       <app-sound
         class="volume-control"
         [volume]="volume"
-        (updateVolume)="updateVolume($event)"
+        [isMute]="isMute"
+        (volumeChange)="updateVolume($event)"
       ></app-sound>
     </div>
   </div>

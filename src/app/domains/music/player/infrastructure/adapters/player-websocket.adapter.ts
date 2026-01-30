@@ -57,8 +57,8 @@ export class PlayerWebSocketAdapter implements OnDestroy {
 
   constructor() {
     // Build WebSocket URL from environment
-    const serverHost = environment.serverUrl.replace(/^https?:\/\//, '').replace(/:\d+$/, '');
-    this.wsUrl = `ws://${serverHost}:${environment.socketPort}/jsonrpc?kodi`;
+    const serverHost = environment.socketServer; //environment.serverUrl.replace(/^https?:\/\//, '').replace(/:\d+$/, '');
+    this.wsUrl = `ws://${environment.socketServer}:${environment.socketPort}/jsonrpc?kodi`;
   }
 
   ngOnDestroy(): void {

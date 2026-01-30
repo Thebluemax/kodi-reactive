@@ -16,9 +16,10 @@ import {
 } from '../../domain/entities/genre.entity';
 import { Album, AlbumFactory, KodiAlbumResponse } from '@domains/music/album/domain/entities/album.entity';
 import { Artist, ArtistFactory, KodiArtistResponse } from '@domains/music/artist/domain/entities/artist.entity';
+import { environment } from 'src/environments/environment';
 
 // TODO: Move to core/infrastructure/config
-const KODI_API_URL = 'http://localhost:8008/jsonrpc';
+const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
