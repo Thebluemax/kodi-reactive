@@ -15,9 +15,9 @@ export const LAYOUT_ROUTES: Routes = [
       },
       {
         path: 'video',
-        loadComponent: () =>
-          import('./video-placeholder.component').then(
-            (m) => m.VideoPlaceholderComponent
+        loadChildren: () =>
+          import('../domains/video/presentation/video.routes').then(
+            (m) => m.VIDEO_ROUTES
           ),
       },
       {

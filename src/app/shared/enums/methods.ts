@@ -18,4 +18,13 @@ export enum Methods {
   PlayerOnPropertyChanged = 'Player.OnPropertyChanged',
   ApplicationSetVolume = 'Application.SetVolume',
   ApplicationGetProperties = 'Application.GetProperties',
+
+  // VideoLibrary
+  VideoLibraryGetMovies = 'VideoLibrary.GetMovies',
+  VideoLibraryGetMovieDetails = 'VideoLibrary.GetMovieDetails',
+  VideoLibraryGetTVShows = 'VideoLibrary.GetTVShows',
+  VideoLibraryGetTVShowDetails = 'VideoLibrary.GetTVShowDetails',
+  VideoLibraryGetSeasons = 'VideoLibrary.GetSeasons',
+  VideoLibraryGetEpisodes = 'VideoLibrary.GetEpisodes',
+  VideoLibraryGetGenres = 'VideoLibrary.GetGenres',
 }
