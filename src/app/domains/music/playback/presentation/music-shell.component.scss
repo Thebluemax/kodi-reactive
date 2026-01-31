@@ -1,0 +1,12 @@
+.selector-category {
+    height: 100%;
+    width: 100%;
+
+    &>ion-card {
+        height: 85%;
+
+        ion-card-content {
+            height: 90%;
+        }
+    }
+}
