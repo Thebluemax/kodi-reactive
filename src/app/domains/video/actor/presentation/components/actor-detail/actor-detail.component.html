@@ -1,0 +1,54 @@
+<ion-content class="actor-detail">
+  <div class="actor-detail__frame">
+    <div class="actor-detail__header">
+      @if (actor().thumbnail) {
+        <ion-img
+          class="actor-detail__photo"
+          [src]="actor().thumbnail | assets: 'scape'"
+          [alt]="actor().name"
+        />
+      } @else {
+        <div class="actor-detail__photo-placeholder">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+      }
+      <h2 class="actor-detail__name">{{ actor().name }}</h2>
+      <p class="actor-detail__roles-count">
+        {{ movies().length }} {{ movies().length === 1 ? 'película' : 'películas' }}
+      </p>
+    </div>
+
+    @if (movies().length) {
+      <div class="actor-detail__filmography">
+        <h3 class="actor-detail__section-title">Filmografía</h3>
+        <ion-list>
+          @for (movie of movies(); track movie.movieId) {
+            <ion-item
+              class="actor-detail__movie-item"
+              button
+              (click)="onMovieClick(movie)"
+            >
+              <ion-thumbnail slot="start" class="actor-detail__movie-thumb">
+                <ion-img
+                  [src]="movie.thumbnail | assets: 'scape'"
+                  [alt]="movie.title"
+                />
+              </ion-thumbnail>
+              <ion-label>
+                <h3>{{ movie.title }}</h3>
+                <p>{{ movie.year }} · {{ getRoleInMovie(movie) }}</p>
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                (click)="onPlayClick(movie.movieId); $event.stopPropagation()"
+              >
+                <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
+    }
+  </div>
+</ion-content>

@@ -65,6 +65,7 @@ Crear la estructura de carpetas DDD para el dominio de video y registrar los met
 **Tareas:**
 
 - Crear la estructura de carpetas bajo `src/app/domains/video/` siguiendo el patron existente en `domains/music/`:
+
   ```
   src/app/domains/video/
   ├── movie/
@@ -94,6 +95,7 @@ Crear la estructura de carpetas DDD para el dominio de video y registrar los met
   └── shared/
       └── components/
   ```
+
 - Agregar al enum `Methods` (`src/app/shared/enums/methods.ts`) los metodos de VideoLibrary de Kodi:
   - `VideoLibrary.GetMovies`
   - `VideoLibrary.GetMovieDetails`

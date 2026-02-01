@@ -1,14 +1,25 @@
+// ==========================================================================
+// Actor Domain - Public API
+// ==========================================================================
+
 // Domain - Entities
-// export { } from './domain/entities/actor.entity';
+export {
+  Actor,
+  ActorRole,
+  ActorListResult,
+  ActorFactory
+} from './domain/entities/actor.entity';
 
 // Domain - Repository (interface)
-// export { } from './domain/repositories/actor.repository';
+export { ActorRepository } from './domain/repositories/actor.repository';
 
 // Application - Use Cases
-// export { } from './application/use-cases/get-actors.use-case';
+export { GetActorsUseCase } from './application/use-cases/get-actors.use-case';
+export { GetMoviesByActorUseCase } from './application/use-cases/get-movies-by-actor.use-case';
 
 // Presentation - Components
-// export { } from './presentation/components/actor-list/actor-list.component';
+export { ActorListComponent } from './presentation/components/actor-list/actor-list.component';
+export { ActorDetailComponent } from './presentation/components/actor-detail/actor-detail.component';
 
 // Infrastructure - Providers
-// export { } from './actor.providers';
+export { ACTOR_PROVIDERS } from './actor.providers';

@@ -1,0 +1,104 @@
+// ==========================================================================
+// COMPONENT - Actor Detail (BEM)
+// ==========================================================================
+
+.actor-detail {
+  --background: transparent;
+
+  &__frame {
+    padding: 16px;
+  }
+
+  // Element: Header
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  // Element: Photo
+  &__photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  // Element: Photo placeholder
+  &__photo-placeholder {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+
+    ion-icon {
+      font-size: 64px;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  // Element: Name
+  &__name {
+    font-size: 1.4em;
+    font-weight: 600;
+    color: var(--ion-color-light);
+    margin: 0 0 4px 0;
+  }
+
+  // Element: Roles count
+  &__roles-count {
+    font-size: 0.9em;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+
+  // Element: Section Title
+  &__section-title {
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--ion-color-light);
+    margin: 0 0 8px 0;
+  }
+
+  // Element: Filmography
+  &__filmography {
+    ion-list {
+      background: transparent;
+    }
+  }
+
+  // Element: Movie item
+  &__movie-item {
+    --background: transparent;
+    --padding-start: 0;
+    cursor: pointer;
+
+    &:hover {
+      --background: rgba(255, 255, 255, 0.05);
+    }
+
+    h3 {
+      font-weight: 500;
+      color: var(--ion-color-light);
+    }
+
+    p {
+      font-size: 0.85em;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  // Element: Movie thumbnail
+  &__movie-thumb {
+    --size: 60px;
+    --border-radius: 4px;
+    margin-right: 12px;
+  }
+}

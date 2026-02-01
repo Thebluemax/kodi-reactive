@@ -1,0 +1,85 @@
+<ion-content class="movie-detail">
+  <div class="movie-detail__frame">
+    <div class="movie-detail__cover">
+      <ion-img
+        class="movie-detail__image"
+        [src]="movie().thumbnail | assets: 'scape'"
+        [alt]="movie().title"
+      />
+      <div class="movie-detail__meta">
+        <span class="movie-detail__year">{{ movie().year }}</span>
+        @if (movie().runtime) {
+          <span class="movie-detail__runtime">{{ formatRuntime(movie().runtime) }}</span>
+        }
+        @if (movie().rating) {
+          <span class="movie-detail__rating">{{ movie().rating | number: '1.1-1' }} / 10</span>
+        }
+      </div>
+    </div>
+
+    <div class="movie-detail__info">
+      @if (movie().tagline) {
+        <p class="movie-detail__tagline">{{ movie().tagline }}</p>
+      }
+
+      <div class="movie-detail__genres">
+        @for (genre of movie().genre; track genre) {
+          <ion-chip>{{ genre }}</ion-chip>
+        }
+      </div>
+
+      <div class="movie-detail__actions">
+        <ion-button fill="outline" (click)="onPlay()">
+          <ion-icon slot="start" name="play-outline"></ion-icon>
+          Reproducir
+        </ion-button>
+        <ion-button fill="outline" (click)="onAddToQueue()">
+          <ion-icon slot="start" name="duplicate-outline"></ion-icon>
+          Agregar a cola
+        </ion-button>
+      </div>
+
+      @if (movie().director.length) {
+        <div class="movie-detail__field">
+          <strong>Director:</strong> {{ movie().director | arrayToString }}
+        </div>
+      }
+
+      @if (movie().studio.length) {
+        <div class="movie-detail__field">
+          <strong>Estudio:</strong> {{ movie().studio | arrayToString }}
+        </div>
+      }
+
+      @if (movie().country.length) {
+        <div class="movie-detail__field">
+          <strong>País:</strong> {{ movie().country | arrayToString }}
+        </div>
+      }
+    </div>
+
+    @if (movie().plot) {
+      <div class="movie-detail__plot">
+        <p>{{ movie().plot }}</p>
+      </div>
+    }
+
+    @if (movie().cast.length) {
+      <div class="movie-detail__cast">
+        <h3 class="movie-detail__cast-title">Reparto</h3>
+        <ion-list>
+          @for (actor of movie().cast; track actor.order) {
+            <ion-item
+              class="movie-detail__cast-item"
+              button
+              (click)="onActorClick(actor.name)"
+            >
+              <ion-label>{{ actor.name }}</ion-label>
+              <ion-note slot="end">{{ actor.role }}</ion-note>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
+    }
+  </div>
+</ion-content>

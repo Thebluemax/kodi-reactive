@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { VideoShellComponent } from './video-shell/video-shell.component';
 import { VideoPlaceholderSectionComponent } from './video-placeholder-section.component';
+import { MovieListComponent } from '@domains/video/movie';
+import { ActorListComponent } from '@domains/video/actor';
 
 export const VIDEO_ROUTES: Routes = [
   {
@@ -9,8 +11,7 @@ export const VIDEO_ROUTES: Routes = [
     children: [
       {
         path: 'movies',
-        component: VideoPlaceholderSectionComponent,
-        data: { title: 'Movies' },
+        component: MovieListComponent,
       },
       {
         path: 'tvshows',
@@ -19,8 +20,7 @@ export const VIDEO_ROUTES: Routes = [
       },
       {
         path: 'actors',
-        component: VideoPlaceholderSectionComponent,
-        data: { title: 'Actors' },
+        component: ActorListComponent,
       },
       {
         path: 'genres',
