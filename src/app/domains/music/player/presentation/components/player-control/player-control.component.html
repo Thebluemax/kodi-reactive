@@ -25,20 +25,21 @@
 
   <!-- Current Time -->
   <div class="time-div">
-    <span>{{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}</span>
+    <span>@if (showHours) {{{ currentHours }}:}{{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}</span>
   </div>
 
   <!-- Seek Bar -->
   <div class="player-bar">
     <ion-range
-      [value]="percentage"
-      (ionChange)="onSeekChange($event)"
+      [value]="seekDisplayPercentage"
+      (ionKnobMoveStart)="onSeekStart()"
+      (ionKnobMoveEnd)="onSeekEnd($event)"
     ></ion-range>
   </div>
 
   <!-- Total Time -->
   <div class="time-div">
-    <span>{{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}</span>
+    <span>@if (showHours) {{{ totalHours }}:}{{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}</span>
   </div>
 
   <!-- Shuffle Button -->

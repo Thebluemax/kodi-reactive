@@ -1,0 +1,31 @@
+// ==========================================================================
+// COMPONENT - VideoGenre Detail (BEM)
+// ==========================================================================
+
+.genre-detail {
+  --background: transparent;
+
+  // Element: List
+  &__list {
+    background: transparent;
+  }
+
+  // Element: Item
+  &__item {
+    --background: transparent;
+    --padding-start: 0;
+
+    &:hover {
+      --background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  // Element: Thumbnail
+  &__thumb {
+    width: 80px;
+    height: 45px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-right: 12px;
+  }
+}

@@ -12,6 +12,8 @@ import { PLAYER_PROVIDERS } from '@domains/music/player';
 import { PLAYLIST_PROVIDERS } from '@domains/music/playlist';
 import { MOVIE_PROVIDERS } from '@domains/video/movie';
 import { ACTOR_PROVIDERS } from '@domains/video/actor';
+import { TVSHOW_PROVIDERS } from '@domains/video/tvshow';
+import { VIDEO_GENRE_PROVIDERS } from '@domains/video/genre';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,6 +29,8 @@ export const appConfig: ApplicationConfig = {
     ...PLAYER_PROVIDERS,
     ...PLAYLIST_PROVIDERS,
     ...MOVIE_PROVIDERS,
-    ...ACTOR_PROVIDERS
+    ...ACTOR_PROVIDERS,
+    ...TVSHOW_PROVIDERS,
+    ...VIDEO_GENRE_PROVIDERS
   ]
 };

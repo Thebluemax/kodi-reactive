@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { PlayerRepository } from '../../domain/repositories/player.repository';
+import { PlayerWebSocketAdapter } from '../adapters/player-websocket.adapter';
 import { environment } from 'src/environments/environment';
 
 interface KodiJsonRpcRequest {
@@ -22,36 +23,41 @@ interface KodiJsonRpcRequest {
 })
 export class PlayerKodiRepository extends PlayerRepository {
   private readonly http = inject(HttpClient);
+  private readonly wsAdapter = inject(PlayerWebSocketAdapter);
   // Use proxy (serverApiUrl) to avoid CORS issues
   private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/mediaplayer`;
   private requestId = 1;
+
+  private get playerId(): number {
+    return this.wsAdapter.activePlayerId;
+  }
 
   // ========================================================================
   // Playback Control
   // ========================================================================
 
   playPause(): Observable<void> {
-    const request = this.buildRequest('Player.PlayPause', [0, 'toggle']);
+    const request = this.buildRequest('Player.PlayPause', [this.playerId, 'toggle']);
     return this.executeCommand(request);
   }
 
   stop(): Observable<void> {
-    const request = this.buildRequest('Player.Stop', [0]);
+    const request = this.buildRequest('Player.Stop', [this.playerId]);
     return this.executeCommand(request);
   }
 
   nextTrack(): Observable<void> {
-    const request = this.buildRequest('Player.GoTo', [0, 'next']);
+    const request = this.buildRequest('Player.GoTo', [this.playerId, 'next']);
     return this.executeCommand(request);
   }
 
   previousTrack(): Observable<void> {
-    const request = this.buildRequest('Player.GoTo', [0, 'previous']);
+    const request = this.buildRequest('Player.GoTo', [this.playerId, 'previous']);
     return this.executeCommand(request);
   }
 
   seek(percentage: number): Observable<void> {
-    const request = this.buildRequest('Player.Seek', [0, { percentage }]);
+    const request = this.buildRequest('Player.Seek', [this.playerId, { percentage }]);
     return this.executeCommand(request);
   }
 
@@ -60,17 +66,17 @@ export class PlayerKodiRepository extends PlayerRepository {
   // ========================================================================
 
   toggleShuffle(): Observable<void> {
-    const request = this.buildRequest('Player.SetShuffle', [0, 'toggle']);
+    const request = this.buildRequest('Player.SetShuffle', [this.playerId, 'toggle']);
     return this.executeCommand(request);
   }
 
   cycleRepeat(): Observable<void> {
-    const request = this.buildRequest('Player.SetRepeat', [0, 'cycle']);
+    const request = this.buildRequest('Player.SetRepeat', [this.playerId, 'cycle']);
     return this.executeCommand(request);
   }
 
   togglePartyMode(): Observable<void> {
-    const request = this.buildRequest('Player.SetPartymode', [0, 'toggle']);
+    const request = this.buildRequest('Player.SetPartymode', [this.playerId, 'toggle']);
     return this.executeCommand(request);
   }
 

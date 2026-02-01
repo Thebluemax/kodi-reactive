@@ -1,0 +1,31 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="genre-list">
+  <ion-list class="genre-list__grid">
+    @for (genre of genres(); track genre.genreId) {
+      <app-media-tile
+        [title]="genre.title"
+        [thumbnail]="genre.thumbnail"
+        [item]="genre"
+        [showActionButtons]="false"
+        (itemSelected)="onGenreSelected($event)"
+      />
+    }
+  </ion-list>
+</ion-content>
+
+<app-lateral-panel
+  [panelId]="'genre-detail'"
+  [isOpen]="isPanelOpen()"
+  [title]="panelTitle()"
+  [customWidth]="'60%'"
+  (panelClosed)="onPanelClosed()"
+>
+  @if (selectedGenre()) {
+    <app-video-genre-detail
+      [genre]="selectedGenre()!"
+    />
+  }
+</app-lateral-panel>
