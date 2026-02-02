@@ -2,8 +2,9 @@
 ADDON_ID   := webinterface.reactive
 DIST_DIR   := ./dist
 BUILD_DIR  := ./www
-PACKAGE_DIR := ./$(ADDON_ID)
-ZIP_FILE   := $(ADDON_ID).zip
+ADDON_DIR  := ./build
+PACKAGE_DIR := ./${ADDON_DIR}/$(ADDON_ID)
+ZIP_FILE   := ./${ADDON_DIR}/$(ADDON_ID).zip
 
 .PHONY: package
 package: clean-package ## Prepara el contenido y genera el archivo .zip para Kodi
@@ -12,6 +13,7 @@ package: clean-package ## Prepara el contenido y genera el archivo .zip para Kod
 	
 	@echo "Copiando archivos de build y addon.xml..."
 	cp -r $(BUILD_DIR)/* $(PACKAGE_DIR)/
+	cp ./logo.png $(PACKAGE_DIR)/icon.png
 	cp addon.xml $(PACKAGE_DIR)/
 	
 	@echo "Comprimiendo en $(ZIP_FILE)..."

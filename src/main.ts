@@ -35,6 +35,10 @@ import {
   volumeMuteOutline,
   bookmark,
   reorderFour,
+  reorderThreeOutline,
+  listOutline,
+  settingsSharp,
+  logoApple,
 } from 'ionicons/icons';
 
 // Register icons globally
@@ -69,6 +73,10 @@ addIcons({
   volumeMuteOutline,
   bookmark,
   reorderFour,
+  reorderThreeOutline,
+  listOutline,
+  settingsSharp,
+  logoApple,
 });
 
 if (environment.production) {
