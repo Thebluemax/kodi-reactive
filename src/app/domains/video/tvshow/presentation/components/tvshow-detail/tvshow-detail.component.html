@@ -1,0 +1,82 @@
+<ion-content class="tvshow-detail">
+  <div class="tvshow-detail__frame">
+    <div class="tvshow-detail__cover">
+      <ion-img
+        class="tvshow-detail__image"
+        [src]="tvshow().thumbnail | assets: 'scape'"
+        [alt]="tvshow().title"
+      />
+      <div class="tvshow-detail__meta">
+        <span class="tvshow-detail__year">{{ tvshow().year }}</span>
+        @if (tvshow().rating) {
+          <span class="tvshow-detail__rating">{{ tvshow().rating | number: '1.1-1' }} / 10</span>
+        }
+        <span class="tvshow-detail__stats">
+          {{ tvshow().season }} temporadas, {{ tvshow().episode }} episodios
+        </span>
+      </div>
+    </div>
+
+    <div class="tvshow-detail__info">
+      <div class="tvshow-detail__genres">
+        @for (genre of tvshow().genre; track genre) {
+          <ion-chip>{{ genre }}</ion-chip>
+        }
+      </div>
+
+      @if (tvshow().studio.length) {
+        <div class="tvshow-detail__field">
+          <strong>Estudio:</strong> {{ tvshow().studio | arrayToString }}
+        </div>
+      }
+    </div>
+
+    @if (tvshow().plot) {
+      <div class="tvshow-detail__plot">
+        <p>{{ tvshow().plot }}</p>
+      </div>
+    }
+
+    <div class="tvshow-detail__seasons">
+      <h3 class="tvshow-detail__section-title">Temporadas</h3>
+      <div class="tvshow-detail__season-chips">
+        @for (season of seasons(); track season.seasonId) {
+          <ion-chip
+            [class.tvshow-detail__season-chip--active]="selectedSeasonNumber() === season.season"
+            (click)="onSeasonClick(season)"
+          >
+            {{ season.label }}
+          </ion-chip>
+        }
+      </div>
+    </div>
+
+    <div class="tvshow-detail__episodes">
+      <h3 class="tvshow-detail__section-title">Episodios</h3>
+      <ion-list>
+        @for (ep of episodes(); track ep.episodeId) {
+          <ion-item class="tvshow-detail__episode-item">
+            <ion-img
+              class="tvshow-detail__episode-thumb"
+              [src]="ep.thumbnail | assets: 'scape'"
+              [alt]="ep.title"
+              slot="start"
+            />
+            <ion-label>
+              <h3>{{ ep.episode }}. {{ ep.title }}</h3>
+              @if (ep.runtime) {
+                <p>{{ formatRuntime(ep.runtime) }}</p>
+              }
+            </ion-label>
+            <ion-button fill="clear" (click)="onPlayEpisode(ep.episodeId)" slot="end">
+              <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="onAddToQueue(ep.episodeId)" slot="end">
+              <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

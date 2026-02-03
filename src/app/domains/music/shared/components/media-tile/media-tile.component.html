@@ -22,7 +22,7 @@
     [class.media-tile__content--hoverable]="hoverActive()"
   >
     @if (!headerActive()) {
-      <div class="media-tile__info">
+      <div class="media-tile__info" (click)="onItemClick()">
         <h4>{{ title() }}</h4>
         <h5>{{ subtitle() }}</h5>
         @if (year()) {

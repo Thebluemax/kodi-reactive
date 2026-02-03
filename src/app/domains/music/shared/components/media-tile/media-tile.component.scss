@@ -57,6 +57,8 @@
 
   // Element: Info
   &__info {
+    cursor: pointer;
+
     h4 {
       color: $media-tile-info-color;
       font-size: $media-tile-info-font-size;

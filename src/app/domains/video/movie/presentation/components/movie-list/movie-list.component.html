@@ -25,11 +25,11 @@
 <app-lateral-panel
   [panelId]="'movie-detail'"
   [isOpen]="isPanelOpen()"
-  [title]="selectedMovie()?.title ?? ''"
+  [title]="panelTitle()"
   [customWidth]="'60%'"
   (panelClosed)="onPanelClosed()"
 >
-  @if (selectedMovie()) {
+  @if (panelType() === 'movie' && selectedMovie()) {
     <app-movie-detail
       [movie]="selectedMovie()!"
       (playMovie)="
@@ -38,6 +38,16 @@
       (addToQueue)="
         onAddToPlaylist({ media: selectedMovie()!, playMedia: false })
       "
+      (actorSelected)="onActorSelectedFromMovie($event)"
+    />
+  }
+
+  @if (panelType() === 'actor' && selectedActor()) {
+    <app-actor-detail
+      [actor]="selectedActor()!"
+      [movies]="actorMovies()"
+      (movieSelected)="onMovieSelectedFromActor($event)"
+      (playMovie)="onPlayMovieFromActor($event)"
     />
   }
 </app-lateral-panel>

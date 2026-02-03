@@ -12,28 +12,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-toggle>
-        <ion-button size="small">
-          <ion-icon
-            slot="icon-only"
-            ios="musical-notes"
-            md="musical-notes"
-          ></ion-icon>
-        </ion-button>
-      </ion-menu-toggle>
+      <img class="app-logo" src="assets/site/logo.png" alt="Kodi Reactive" />
     </ion-buttons>
     <ion-searchbar></ion-searchbar>
     <ion-buttons slot="end">
-      <ion-menu-toggle>
-        <ion-button size="small">
-          <ion-icon
-            slot="icon-only"
-            ios="list-outline"
-            md="list-outline"
-          ></ion-icon>
-        </ion-button>
-      </ion-menu-toggle>
-      <ion-button size="small" (click)="navigateTo('music')">
+      <ion-button size="small" color="dark" (click)="navigateTo('music')">
         <ion-icon
           slot="icon-only"
           ios="musical-notes"
@@ -46,7 +29,14 @@
       <ion-button size="small">
         <ion-icon
           slot="icon-only"
-          ios="logo-apple"
+          ios="list-outline"
+          md="list-outline"
+        ></ion-icon>
+      </ion-button>
+      <ion-button size="small">
+        <ion-icon
+          slot="icon-only"
+          ios="settings-sharp"
           md="settings-sharp"
         ></ion-icon>
       </ion-button>
@@ -54,13 +44,22 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content id="main-content" [fullscreen]="true">
+<ion-content id="main-content" class="ion-padding">
   <div class="canvas-player">
     <div class="flex-div">
-      <router-outlet></router-outlet>
+      <ion-router-outlet></ion-router-outlet>
     </div>
 
     <div class="control-nav">
+      <ion-menu-toggle>
+        <ion-button size="small" shape="round">
+          <ion-icon
+            slot="icon-only"
+            ios="reorder-three-outline"
+            md="reorder-three-outline"
+          ></ion-icon>
+        </ion-button>
+      </ion-menu-toggle>
       <player-current-track
         [currentTrack]="playBackFacade.playerInfo()"
       ></player-current-track>

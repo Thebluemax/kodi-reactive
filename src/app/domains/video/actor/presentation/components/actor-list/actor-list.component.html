@@ -1,0 +1,48 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="actor-list">
+  <ion-list class="actor-list__grid">
+    @for (actor of actors(); track actor.name) {
+      <app-media-tile
+        [title]="actor.name"
+        [subtitle]="actor.roles.length + ' películas'"
+        [thumbnail]="actor.thumbnail"
+        [item]="actor"
+        [showActionButtons]="false"
+        (itemSelected)="onActorSelected($event)"
+      />
+    }
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($any($event))">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" />
+  </ion-infinite-scroll>
+</ion-content>
+
+<app-lateral-panel
+  [panelId]="'actor-detail'"
+  [isOpen]="isPanelOpen()"
+  [title]="panelTitle()"
+  [customWidth]="'60%'"
+  (panelClosed)="onPanelClosed()"
+>
+  @if (panelType() === 'actor' && selectedActor()) {
+    <app-actor-detail
+      [actor]="selectedActor()!"
+      [movies]="actorMovies()"
+      (movieSelected)="onMovieSelectedFromActor($event)"
+      (playMovie)="onPlayMovieFromActor($event)"
+    />
+  }
+
+  @if (panelType() === 'movie' && selectedMovie()) {
+    <app-movie-detail
+      [movie]="selectedMovie()!"
+      (playMovie)="onPlayMovieFromActor(selectedMovie()!.movieId)"
+      (addToQueue)="onAddToPlaylist({ media: selectedMovie()!, playMedia: false })"
+      (actorSelected)="onActorSelectedFromMovie($event)"
+    />
+  }
+</app-lateral-panel>

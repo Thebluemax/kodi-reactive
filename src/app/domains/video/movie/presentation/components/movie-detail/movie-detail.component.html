@@ -69,7 +69,11 @@
         <h3 class="movie-detail__cast-title">Reparto</h3>
         <ion-list>
           @for (actor of movie().cast; track actor.order) {
-            <ion-item class="movie-detail__cast-item">
+            <ion-item
+              class="movie-detail__cast-item"
+              button
+              (click)="onActorClick(actor.name)"
+            >
               <ion-label>{{ actor.name }}</ion-label>
               <ion-note slot="end">{{ actor.role }}</ion-note>
             </ion-item>

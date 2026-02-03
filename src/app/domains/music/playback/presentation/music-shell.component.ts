@@ -1,12 +1,18 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { IonRouterOutlet, IonLabel, IonSegment, IonSegmentButton, IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-music-shell',
   templateUrl: './music-shell.component.html',
   styleUrls: ['./music-shell.component.scss'],
-  imports: [IonicModule, RouterOutlet],
+  imports: [
+    IonRouterOutlet,
+    IonLabel,
+    IonSegment,
+    IonSegmentButton,
+    IonContent
+],
 })
 export class MusicShellComponent {
   private readonly router = inject(Router);

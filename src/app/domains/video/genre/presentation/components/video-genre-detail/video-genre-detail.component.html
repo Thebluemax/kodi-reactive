@@ -1,0 +1,32 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="genre-detail">
+  <ion-list class="genre-detail__list">
+    @for (movie of movies(); track movie.movieId) {
+      <ion-item class="genre-detail__item">
+        <ion-img
+          class="genre-detail__thumb"
+          [src]="movie.thumbnail | assets: 'scape'"
+          [alt]="movie.title"
+          slot="start"
+        />
+        <ion-label>
+          <h3>{{ movie.title }}</h3>
+          <p>{{ movie.year }} @if (movie.rating) { &middot; {{ movie.rating | number: '1.1-1' }} / 10 }</p>
+        </ion-label>
+        <ion-button fill="clear" (click)="onPlayMovie(movie.movieId)" slot="end">
+          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" (click)="onAddToQueue(movie.movieId)" slot="end">
+          <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($any($event))">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" />
+  </ion-infinite-scroll>
+</ion-content>

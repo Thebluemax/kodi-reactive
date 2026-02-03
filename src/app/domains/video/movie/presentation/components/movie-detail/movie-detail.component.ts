@@ -49,6 +49,7 @@ export class MovieDetailComponent {
   // Outputs
   readonly playMovie = output<void>();
   readonly addToQueue = output<void>();
+  readonly actorSelected = output<string>();
 
   onPlay(): void {
     this.playMovie.emit();
@@ -56,6 +57,10 @@ export class MovieDetailComponent {
 
   onAddToQueue(): void {
     this.addToQueue.emit();
+  }
+
+  onActorClick(actorName: string): void {
+    this.actorSelected.emit(actorName);
   }
 
   formatRuntime(minutes: number): string {

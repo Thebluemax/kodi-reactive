@@ -1,0 +1,16 @@
+// ==========================================================================
+// COMPONENT - Actor List (BEM)
+// ==========================================================================
+
+.actor-list {
+  --background: transparent;
+
+  // Element: Grid
+  &__grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 8px;
+    background: transparent;
+  }
+}

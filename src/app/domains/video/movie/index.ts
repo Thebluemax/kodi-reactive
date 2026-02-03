@@ -10,7 +10,9 @@ export {
   MovieSearchField,
   MovieSearchOperator,
   MovieFactory,
-  CastMember
+  CastMember,
+  KodiMovieResponse,
+  KodiCastResponse
 } from './domain/entities/movie.entity';
 
 // Domain - Repository (interface)

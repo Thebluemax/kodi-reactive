@@ -21,7 +21,7 @@ import {
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
   method: string;
-  params: unknown[];
+  params?: unknown[];
   id: number;
 }
 
@@ -52,8 +52,17 @@ export class PlayerWebSocketAdapter implements OnDestroy {
   private readonly PLAYER_PROPERTIES_ID = 67;
   private readonly PLAYER_ITEM_ID = 68;
   private readonly APP_PROPERTIES_ID = 69;
+  private readonly ACTIVE_PLAYERS_ID = 70;
 
   private lastAppProps: KodiApplicationPropertiesResponse = { volume: 100, muted: false };
+  private _activePlayerId = 0;
+
+  /**
+   * Current active player ID (0 = audio, 1 = video)
+   */
+  get activePlayerId(): number {
+    return this._activePlayerId;
+  }
 
   constructor() {
     // Build WebSocket URL from environment
@@ -189,12 +198,19 @@ export class PlayerWebSocketAdapter implements OnDestroy {
       return;
     }
 
+    const playerId = this._activePlayerId;
+
     const requests: KodiJsonRpcRequest[] = [
+      {
+        jsonrpc: '2.0',
+        method: 'Player.GetActivePlayers',
+        id: this.ACTIVE_PLAYERS_ID
+      },
       {
         jsonrpc: '2.0',
         method: 'Player.GetProperties',
         params: [
-          0,
+          playerId,
           [
             'playlistid',
             'speed',
@@ -216,7 +232,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
         jsonrpc: '2.0',
         method: 'Player.GetItem',
         params: [
-          0,
+          playerId,
           [
             'title',
             'thumbnail',
@@ -265,6 +281,15 @@ export class PlayerWebSocketAdapter implements OnDestroy {
 
     // Handle query responses
     switch (response.id) {
+      case this.ACTIVE_PLAYERS_ID:
+        if (response.result && Array.isArray(response.result)) {
+          const players = response.result as { playerid: number; type: string }[];
+          if (players.length > 0) {
+            this._activePlayerId = players[0].playerid;
+          }
+        }
+        break;
+
       case this.APP_PROPERTIES_ID:
         if (response.result) {
           this.lastAppProps = response.result as KodiApplicationPropertiesResponse;

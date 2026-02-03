@@ -1,3 +1,15 @@
+.app-logo {
+    height: 32px;
+    width: auto;
+    margin-inline-start: 12px;
+    margin-inline-end: 8px;
+}
+
+ion-searchbar {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
 .control-nav {
     background-color: rgba(0, 0, 0, .75);
     position: fixed;

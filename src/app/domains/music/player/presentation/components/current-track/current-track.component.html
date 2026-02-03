@@ -3,13 +3,20 @@
     @if (currentTrack(); as track) {
       <img
         class="current-thumb"
-        alt="Album artwork"
+        [alt]="track.title"
         [src]="track.thumbnail | assets"
       />
       <div class="track-info">
         <h1 class="song-name">{{ track.title }}</h1>
-        <h2 class="album-name">{{ track.album }}</h2>
-        <h3 class="artist-name">{{ track.artist | arrayToString }}</h3>
+        @if (track.type === 'song') {
+          <h2 class="album-name">{{ track.album }}</h2>
+          <h3 class="artist-name">{{ track.artist | arrayToString }}</h3>
+        } @else {
+          <h2 class="album-name">{{ track.genre | arrayToString }}</h2>
+          @if (track.year) {
+            <h3 class="artist-name">{{ track.year }}</h3>
+          }
+        }
       </div>
     }
   </div>

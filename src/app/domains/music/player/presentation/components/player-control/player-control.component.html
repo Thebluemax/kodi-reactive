@@ -1,14 +1,14 @@
 <div class="player-control">
   <!-- Previous Track Button -->
   <div class="control-btn">
-    <ion-button shape="round" (click)="onPrevious()">
+    <ion-button shape="round" (click)="onPrevious()" color="dark">
       <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
     </ion-button>
   </div>
 
   <!-- Play/Pause Button -->
   <div class="play-btn">
-    <ion-button shape="round" (click)="onPlayPause()">
+    <ion-button shape="round" (click)="onPlayPause()" color="dark">
       <ion-icon
         slot="icon-only"
         [name]="isPlaying ? 'pause-outline' : 'play-outline'"
@@ -18,27 +18,40 @@
 
   <!-- Next Track Button -->
   <div class="control-btn">
-    <ion-button shape="round" (click)="onNext()">
+    <ion-button shape="round" (click)="onNext()" color="dark">
       <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
     </ion-button>
   </div>
 
   <!-- Current Time -->
   <div class="time-div">
-    <span>{{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}</span>
+    <span>
+      @if (showHours) {
+        {{ currentHours }}:
+      }
+      {{ currentMinutes | zeroPadding }}:{{
+        currentSeconds | zeroPadding
+      }}</span
+    >
   </div>
 
   <!-- Seek Bar -->
   <div class="player-bar">
     <ion-range
-      [value]="percentage"
-      (ionChange)="onSeekChange($event)"
+      [value]="seekDisplayPercentage"
+      (ionKnobMoveStart)="onSeekStart()"
+      (ionKnobMoveEnd)="onSeekEnd($event)"
     ></ion-range>
   </div>
 
   <!-- Total Time -->
   <div class="time-div">
-    <span>{{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}</span>
+    <span>
+      @if (showHours) {
+        {{ totalHours }}:
+      }
+      {{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}</span
+    >
   </div>
 
   <!-- Shuffle Button -->

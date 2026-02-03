@@ -1,0 +1,42 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="tvshow-list">
+  <ion-list class="tvshow-list__grid">
+    @for (tvshow of tvshows(); track tvshow.tvshowId) {
+      <app-media-tile
+        [title]="tvshow.title"
+        [subtitle]="tvshow.genre.join(', ')"
+        [thumbnail]="tvshow.fanart"
+        [year]="tvshow.year"
+        [item]="tvshow"
+        [showActionButtons]="false"
+        (itemSelected)="onTVShowSelected($event)"
+      />
+    }
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($any($event))">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" />
+  </ion-infinite-scroll>
+</ion-content>
+
+<app-lateral-panel
+  [panelId]="'tvshow-detail'"
+  [isOpen]="isPanelOpen()"
+  [title]="panelTitle()"
+  [customWidth]="'60%'"
+  (panelClosed)="onPanelClosed()"
+>
+  @if (selectedTVShow()) {
+    <app-tvshow-detail
+      [tvshow]="selectedTVShow()!"
+      [seasons]="seasons()"
+      [episodes]="episodes()"
+      (seasonSelected)="onSeasonSelected($event)"
+      (playEpisode)="onPlayEpisode($event)"
+      (addEpisodeToQueue)="onAddEpisodeToQueue($event)"
+    />
+  }
+</app-lateral-panel>

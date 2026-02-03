@@ -37,6 +37,8 @@ export class PlayerControlComponent implements OnInit, OnDestroy {
   private readonly togglePartyModeUseCase = inject(TogglePartyModeUseCase);
 
   private readonly destroy$ = new Subject<void>();
+  private isSeeking = false;
+  private frozenPercentage = 0;
 
   state: PlayerState | null = null;
 
@@ -70,10 +72,16 @@ export class PlayerControlComponent implements OnInit, OnDestroy {
     this.nextTrackUseCase.execute().subscribe();
   }
 
-  onSeekChange(event: Event): void {
+  onSeekStart(): void {
+    this.isSeeking = true;
+    this.frozenPercentage = this.state?.percentage ?? 0;
+  }
+
+  onSeekEnd(event: Event): void {
     const rangeEvent = event as RangeCustomEvent;
     const value = rangeEvent.detail.value as number;
     this.seekUseCase.execute(value).subscribe();
+    this.isSeeking = false;
   }
 
   // ========================================================================
@@ -120,8 +128,13 @@ export class PlayerControlComponent implements OnInit, OnDestroy {
     return this.state?.partyMode ?? false;
   }
 
-  get percentage(): number {
+  get seekDisplayPercentage(): number {
+    if (this.isSeeking) return this.frozenPercentage;
     return this.state?.percentage ?? 0;
+  }
+
+  get currentHours(): number {
+    return this.state?.currentTime?.hours ?? 0;
   }
 
   get currentMinutes(): number {
@@ -132,12 +145,20 @@ export class PlayerControlComponent implements OnInit, OnDestroy {
     return this.state?.currentTime?.seconds ?? 0;
   }
 
+  get totalHours(): number {
+    return this.state?.totalTime?.hours ?? 0;
+  }
+
   get totalMinutes(): number {
     return this.state?.totalTime?.minutes ?? 0;
   }
 
   get totalSeconds(): number {
     return this.state?.totalTime?.seconds ?? 0;
+  }
+
+  get showHours(): boolean {
+    return this.totalHours > 0;
   }
 
   getRepeatColor(): string {
