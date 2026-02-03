@@ -21,6 +21,13 @@ export const LAYOUT_ROUTES: Routes = [
           ),
       },
       {
+        path: 'remote',
+        loadChildren: () =>
+          import('../domains/remote/presentation/remote.routes').then(
+            (m) => m.REMOTE_ROUTES
+          ),
+      },
+      {
         path: '',
         redirectTo: 'music',
         pathMatch: 'full',
