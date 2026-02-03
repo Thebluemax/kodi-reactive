@@ -1,0 +1,144 @@
+.remote-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  gap: 20px;
+}
+
+// ========================================================================
+// Auxiliary Controls (Back, Home, Info, Menu)
+// ========================================================================
+
+.auxiliary-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+
+  ion-button {
+    --color: var(--ion-color-medium);
+
+    &:hover {
+      --color: var(--ion-color-primary);
+    }
+  }
+}
+
+.top-row {
+  ion-button {
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+}
+
+.menu-row {
+  ion-button {
+    --color: var(--ion-color-medium);
+    font-size: 14px;
+  }
+}
+
+// ========================================================================
+// D-Pad Navigation
+// ========================================================================
+
+.dpad-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: 60px 70px 60px;
+  grid-template-rows: 60px 70px 60px;
+  grid-template-areas:
+    ".    up    ."
+    "left ok    right"
+    ".    down  .";
+  gap: 4px;
+}
+
+.dpad-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-light);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--ion-color-dark);
+
+  &:hover {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+  }
+
+  &:active {
+    transform: scale(0.95);
+    background: var(--ion-color-primary-shade);
+  }
+
+  ion-icon {
+    font-size: 28px;
+  }
+}
+
+.dpad-up {
+  grid-area: up;
+  border-radius: 12px 12px 4px 4px;
+}
+
+.dpad-down {
+  grid-area: down;
+  border-radius: 4px 4px 12px 12px;
+}
+
+.dpad-left {
+  grid-area: left;
+  border-radius: 12px 4px 4px 12px;
+}
+
+.dpad-right {
+  grid-area: right;
+  border-radius: 4px 12px 12px 4px;
+}
+
+.dpad-ok {
+  grid-area: ok;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-weight: 600;
+  font-size: 16px;
+
+  &:hover {
+    background: var(--ion-color-primary-shade);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+// ========================================================================
+// Playback Controls
+// ========================================================================
+
+.playback-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ion-color-light);
+  width: 100%;
+
+  ion-button {
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+}
