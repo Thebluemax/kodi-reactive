@@ -25,7 +25,7 @@ export class PlayerKodiRepository extends PlayerRepository {
   private readonly http = inject(HttpClient);
   private readonly wsAdapter = inject(PlayerWebSocketAdapter);
   // Use proxy (serverApiUrl) to avoid CORS issues
-  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/mediaplayer`;
+  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
   private requestId = 1;
 
   private get playerId(): number {

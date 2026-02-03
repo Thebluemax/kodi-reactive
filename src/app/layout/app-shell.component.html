@@ -16,7 +16,7 @@
     </ion-buttons>
     <ion-searchbar></ion-searchbar>
     <ion-buttons slot="end">
-      <ion-button size="small" (click)="navigateTo('music')">
+      <ion-button size="small" color="dark" (click)="navigateTo('music')">
         <ion-icon
           slot="icon-only"
           ios="musical-notes"
@@ -44,15 +44,15 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content id="main-content" [fullscreen]="true">
+<ion-content id="main-content" class="ion-padding">
   <div class="canvas-player">
     <div class="flex-div">
-      <router-outlet></router-outlet>
+      <ion-router-outlet></ion-router-outlet>
     </div>
 
     <div class="control-nav">
       <ion-menu-toggle>
-        <ion-button size="small">
+        <ion-button size="small" shape="round">
           <ion-icon
             slot="icon-only"
             ios="reorder-three-outline"

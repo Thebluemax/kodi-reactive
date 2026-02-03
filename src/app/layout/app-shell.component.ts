@@ -1,22 +1,30 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
-import { IonicModule } from '@ionic/angular';
-import { CurrentPlayListComponent, PlaylistItem } from '@domains/music/playlist';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
+import { IonRouterOutlet, IonHeader, IonIcon, IonToolbar, IonMenu, IonButton, IonButtons, IonSearchbar, IonContent, IonMenuToggle } from '@ionic/angular/standalone';
+import { CurrentPlayListComponent } from '@domains/music/playlist';
 import { CurrentTrackComponent, PlayerControlComponent, SoundComponent } from '@domains/music/player';
+import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
 
 @Component({
   selector: 'app-shell',
   templateUrl: './app-shell.component.html',
   styleUrls: ['./app-shell.component.scss'],
   imports: [
-    IonicModule,
     CurrentPlayListComponent,
-    RouterOutlet,
+    IonRouterOutlet,
     CurrentTrackComponent,
     PlayerControlComponent,
     SoundComponent,
-  ],
+    IonHeader,
+    IonIcon,
+    IonToolbar,
+    IonMenu,
+    IonButton,
+    IonButtons,
+    IonSearchbar,
+    IonContent,
+    IonMenuToggle
+  ]
 })
 export class AppShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);

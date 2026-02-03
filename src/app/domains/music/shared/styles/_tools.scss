@@ -6,21 +6,35 @@
 
 // Responsive breakpoint mixin
 @mixin respond-to($breakpoint) {
-  @if $breakpoint == 'sm' {
-    @media (max-width: $breakpoint-sm) { @content; }
-  } @else if $breakpoint == 'md' {
-    @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) { @content; }
-  } @else if $breakpoint == 'lg' {
-    @media (min-width: $breakpoint-lg + 1) and (max-width: $breakpoint-xl) { @content; }
-  } @else if $breakpoint == 'xl' {
-    @media (min-width: $breakpoint-xl + 1) { @content; }
+  @if $breakpoint =='sm' {
+    @media (max-width: $breakpoint-sm) {
+      @content;
+    }
+  }
+
+  @else if $breakpoint =='md' {
+    @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) {
+      @content;
+    }
+  }
+
+  @else if $breakpoint =='lg' {
+    @media (min-width: $breakpoint-lg + 1) and (max-width: $breakpoint-xl) {
+      @content;
+    }
+  }
+
+  @else if $breakpoint =='xl' {
+    @media (min-width: $breakpoint-xl + 1) {
+      @content;
+    }
   }
 }
 
 // Media tile size mixin
 @mixin media-tile-size($size, $margin) {
-  width: $size;
-  height: $size;
+  width: calc(100vw / 4 - #{$margin} * 2 + 4px);
+  height: calc(100vw / 4 - #{$margin} * 2 + 4px);
   margin: $margin;
 }
 
