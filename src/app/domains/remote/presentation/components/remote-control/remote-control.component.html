@@ -1,0 +1,95 @@
+<div class="remote-control">
+  <!-- Top Row: Back, Home, Info -->
+  <div class="auxiliary-controls top-row">
+    <ion-button fill="clear" (click)="onBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <ion-button fill="clear" (click)="onGoHome()">
+      <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+    </ion-button>
+    <ion-button fill="clear" (click)="onShowInfo()">
+      <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- D-Pad Navigation -->
+  <div class="dpad-container">
+    <div class="dpad">
+      <!-- Up Button -->
+      <button class="dpad-btn dpad-up" (click)="onNavigateUp()">
+        <ion-icon name="chevron-up-outline"></ion-icon>
+      </button>
+
+      <!-- Left Button -->
+      <button class="dpad-btn dpad-left" (click)="onNavigateLeft()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+
+      <!-- OK Button (Center) -->
+      <button class="dpad-btn dpad-ok" (click)="onSelect()">
+        OK
+      </button>
+
+      <!-- Right Button -->
+      <button class="dpad-btn dpad-right" (click)="onNavigateRight()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      <!-- Down Button -->
+      <button class="dpad-btn dpad-down" (click)="onNavigateDown()">
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div class="auxiliary-controls menu-row">
+    <ion-button fill="clear" (click)="onContextMenu()">
+      <ion-icon slot="start" name="menu-outline"></ion-icon>
+      Menu
+    </ion-button>
+  </div>
+
+  <!-- Playback Controls -->
+  <div class="playback-controls">
+    <ion-button shape="round" (click)="onPrevious()">
+      <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
+    </ion-button>
+    <ion-button shape="round" (click)="onPlayPause()">
+      <ion-icon slot="icon-only" [name]="isPlaying ? 'pause-outline' : 'play-outline'"></ion-icon>
+    </ion-button>
+    <ion-button shape="round" (click)="onStop()">
+      <ion-icon slot="icon-only" name="stop-outline"></ion-icon>
+    </ion-button>
+    <ion-button shape="round" (click)="onNext()">
+      <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Mode Controls -->
+  <div class="mode-controls">
+    <ion-button
+      shape="round"
+      (click)="onRepeat()"
+      [color]="getRepeatColor()"
+      [disabled]="!canRepeat"
+    >
+      <ion-icon slot="icon-only" [name]="getRepeatIcon()"></ion-icon>
+    </ion-button>
+    <ion-button
+      shape="round"
+      (click)="onShuffle()"
+      [color]="shuffled ? 'success' : 'dark'"
+      [disabled]="!canShuffle"
+    >
+      <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
+    </ion-button>
+    <ion-button
+      shape="round"
+      (click)="onPartyMode()"
+      [color]="partyMode ? 'success' : 'dark'"
+    >
+      <ion-icon slot="icon-only" name="beer-outline"></ion-icon>
+    </ion-button>
+  </div>
+</div>
