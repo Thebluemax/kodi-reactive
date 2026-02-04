@@ -160,6 +160,10 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
   // UI Helpers
   // ========================================================================
 
+  get isPlaying(): boolean {
+    return this.state?.isPlaying ?? false;
+  }
+
   get canShuffle(): boolean {
     return this.state?.canShuffle ?? false;
   }

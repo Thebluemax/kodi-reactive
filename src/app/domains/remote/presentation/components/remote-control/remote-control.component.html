@@ -56,7 +56,7 @@
       <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
     </ion-button>
     <ion-button shape="round" (click)="onPlayPause()">
-      <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+      <ion-icon slot="icon-only" [name]="isPlaying ? 'pause-outline' : 'play-outline'"></ion-icon>
     </ion-button>
     <ion-button shape="round" (click)="onStop()">
       <ion-icon slot="icon-only" name="stop-outline"></ion-icon>
