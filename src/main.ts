@@ -39,6 +39,15 @@ import {
   listOutline,
   settingsSharp,
   logoApple,
+  // Remote control icons
+  arrowBackOutline,
+  homeOutline,
+  informationCircleOutline,
+  chevronUpOutline,
+  chevronDownOutline,
+  menuOutline,
+  stopOutline,
+  gameControllerOutline,
 } from 'ionicons/icons';
 
 // Register icons globally
@@ -77,6 +86,15 @@ addIcons({
   listOutline,
   settingsSharp,
   logoApple,
+  // Remote control icons
+  arrowBackOutline,
+  homeOutline,
+  informationCircleOutline,
+  chevronUpOutline,
+  chevronDownOutline,
+  menuOutline,
+  stopOutline,
+  gameControllerOutline,
 });
 
 if (environment.production) {

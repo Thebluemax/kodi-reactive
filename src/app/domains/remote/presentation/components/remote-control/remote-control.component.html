@@ -65,4 +65,31 @@
       <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
     </ion-button>
   </div>
+
+  <!-- Mode Controls -->
+  <div class="mode-controls">
+    <ion-button
+      shape="round"
+      (click)="onRepeat()"
+      [color]="getRepeatColor()"
+      [disabled]="!canRepeat"
+    >
+      <ion-icon slot="icon-only" [name]="getRepeatIcon()"></ion-icon>
+    </ion-button>
+    <ion-button
+      shape="round"
+      (click)="onShuffle()"
+      [color]="shuffled ? 'success' : 'dark'"
+      [disabled]="!canShuffle"
+    >
+      <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
+    </ion-button>
+    <ion-button
+      shape="round"
+      (click)="onPartyMode()"
+      [color]="partyMode ? 'success' : 'dark'"
+    >
+      <ion-icon slot="icon-only" name="beer-outline"></ion-icon>
+    </ion-button>
+  </div>
 </div>
