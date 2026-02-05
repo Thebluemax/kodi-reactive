@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
@@ -13,6 +13,7 @@ import { IonicModule } from '@ionic/angular';
     </ion-content>
   `,
   imports: [IonicModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VideoPlaceholderSectionComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

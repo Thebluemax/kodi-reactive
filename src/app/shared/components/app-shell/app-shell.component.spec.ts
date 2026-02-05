@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { AppShellComponent } from './app-shell.component';
@@ -7,9 +7,9 @@ describe('AppShellComponent', () => {
   let component: AppShellComponent;
   let fixture: ComponentFixture<AppShellComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach((() => {
     TestBed.configureTestingModule({
-      declarations: [ AppShellComponent ],
+      declarations: [AppShellComponent],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 

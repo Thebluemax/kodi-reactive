@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonRouterOutlet, IonHeader, IonIcon, IonToolbar, IonMenu, IonButton, IonButtons, IonSearchbar, IonContent, IonMenuToggle } from '@ionic/angular/standalone';
 import { CurrentPlayListComponent } from '@domains/music/playlist';
@@ -25,7 +25,8 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
     IonSearchbar,
     IonContent,
     IonMenuToggle
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);

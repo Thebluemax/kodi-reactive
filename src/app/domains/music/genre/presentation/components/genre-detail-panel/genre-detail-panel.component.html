@@ -22,10 +22,10 @@
             <p>{{ album.artists.join(', ') }} @if (album.year) { &middot; {{ album.year }} }</p>
           </ion-label>
           <ion-button fill="clear" (click)="onPlayAlbum(album.albumId); $event.stopPropagation()" slot="end">
-            <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+            <ion-icon slot="icon-only" name="play-outline" />
           </ion-button>
           <ion-button fill="clear" (click)="onAddAlbumToQueue(album.albumId); $event.stopPropagation()" slot="end">
-            <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+            <ion-icon slot="icon-only" name="duplicate-outline" />
           </ion-button>
         </ion-item>
       }
@@ -57,7 +57,7 @@
   <!-- Empty state -->
   @if (albums().length === 0 && artists().length === 0) {
     <div class="genre-detail-panel__empty">
-      <ion-icon name="musical-notes-outline"></ion-icon>
+      <ion-icon name="musical-notes-outline" />
       <p>No hay contenido para este género</p>
     </div>
   }

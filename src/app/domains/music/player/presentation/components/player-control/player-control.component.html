@@ -2,7 +2,7 @@
   <!-- Previous Track Button -->
   <div class="control-btn">
     <ion-button shape="round" (click)="onPrevious()" color="dark">
-      <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
+      <ion-icon slot="icon-only" name="play-skip-back-outline" />
     </ion-button>
   </div>
 
@@ -12,14 +12,14 @@
       <ion-icon
         slot="icon-only"
         [name]="isPlaying ? 'pause-outline' : 'play-outline'"
-      ></ion-icon>
+      />
     </ion-button>
   </div>
 
   <!-- Next Track Button -->
   <div class="control-btn">
     <ion-button shape="round" (click)="onNext()" color="dark">
-      <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
+      <ion-icon slot="icon-only" name="play-skip-forward-outline" />
     </ion-button>
   </div>
 
@@ -41,7 +41,7 @@
       [value]="seekDisplayPercentage"
       (ionKnobMoveStart)="onSeekStart()"
       (ionKnobMoveEnd)="onSeekEnd($event)"
-    ></ion-range>
+    />
   </div>
 
   <!-- Total Time -->
@@ -62,7 +62,7 @@
       [color]="shuffled ? 'success' : 'dark'"
       [disabled]="!canShuffle"
     >
-      <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
+      <ion-icon slot="icon-only" name="shuffle-outline" />
     </ion-button>
   </div>
 
@@ -74,7 +74,7 @@
       [color]="getRepeatColor()"
       [disabled]="!canRepeat"
     >
-      <ion-icon slot="icon-only" [name]="getRepeatIcon()"></ion-icon>
+      <ion-icon slot="icon-only" [name]="getRepeatIcon()" />
     </ion-button>
   </div>
 
@@ -85,7 +85,7 @@
       (click)="onPartyMode()"
       [color]="partyMode ? 'success' : 'dark'"
     >
-      <ion-icon slot="icon-only" name="beer-outline"></ion-icon>
+      <ion-icon slot="icon-only" name="beer-outline" />
     </ion-button>
   </div>
 </div>

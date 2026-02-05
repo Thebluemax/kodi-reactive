@@ -1,6 +1,6 @@
 <div class="sound-container">
   <ion-button shape="round" (click)="togglePopup()" color="dark">
-    <ion-icon [name]="volumeIcon()" slot="icon-only"></ion-icon>
+    <ion-icon [name]="volumeIcon()" slot="icon-only" />
   </ion-button>
 
   @if (isOpen()) {
@@ -16,7 +16,7 @@
             name="volume-mute-outline"
             [color]="isMute() ? 'danger' : 'medium'"
             slot="icon-only"
-          ></ion-icon>
+          />
         </ion-button>
 
         <div class="volume-slider">
@@ -25,7 +25,7 @@
             (ionChange)="setVolume($event)"
             [min]="0"
             [max]="100"
-          ></ion-range>
+          />
         </div>
 
         <span class="volume-value">{{ volume() }}</span>

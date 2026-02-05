@@ -2,7 +2,7 @@
 // PRESENTATION - Genre List Component
 // ==========================================================================
 
-import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import {
   IonContent,
@@ -32,7 +32,8 @@ import { GenreDetailPanelComponent } from '../genre-detail-panel/genre-detail-pa
     GenreDetailPanelComponent
   ],
   templateUrl: './genre-list.component.html',
-  styleUrls: ['./genre-list.component.scss']
+  styleUrls: ['./genre-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GenreListComponent implements OnInit, OnDestroy {
   private readonly getGenresUseCase = inject(GetGenresUseCase);

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonRouterOutlet, IonLabel, IonSegment, IonSegmentButton, IonContent } from '@ionic/angular/standalone';
 
@@ -12,7 +12,8 @@ import { IonRouterOutlet, IonLabel, IonSegment, IonSegmentButton, IonContent } f
     IonSegment,
     IonSegmentButton,
     IonContent
-],
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MusicShellComponent {
   private readonly router = inject(Router);

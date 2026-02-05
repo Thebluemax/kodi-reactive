@@ -2,7 +2,7 @@
 // PRESENTATION - Artist List Component
 // ==========================================================================
 
-import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -28,7 +28,8 @@ const PAGE_SIZE = 40;
     AssetsPipe
   ],
   templateUrl: './artist-list.component.html',
-  styleUrls: ['./artist-list.component.scss']
+  styleUrls: ['./artist-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArtistListComponent implements OnInit, OnDestroy {
   private readonly getArtistsUseCase = inject(GetArtistsUseCase);

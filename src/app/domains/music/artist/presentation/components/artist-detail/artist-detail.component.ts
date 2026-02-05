@@ -2,7 +2,7 @@
 // PRESENTATION - Artist Detail Component
 // ==========================================================================
 
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 
 import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity';
@@ -24,7 +24,8 @@ import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
     SecondsToStringPipe
   ],
   templateUrl: './artist-detail.component.html',
-  styleUrls: ['./artist-detail.component.scss']
+  styleUrls: ['./artist-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArtistDetailComponent {
   private readonly addArtistToPlaylistUseCase = inject(AddArtistToPlaylistUseCase);

@@ -37,19 +37,19 @@
             "style": "camelCase"
           }
         ],
-        "@angular-eslint/prefer-standalone": "warn",
-        "@angular-eslint/prefer-on-push-component-change-detection": "warn",
-        "@angular-eslint/no-empty-lifecycle-method": "warn",
-        "@angular-eslint/use-lifecycle-interface": "warn",
-        "@angular-eslint/prefer-inject": "warn"
+        "@angular-eslint/prefer-standalone": "error",
+        "@angular-eslint/prefer-on-push-component-change-detection": "error",
+        "@angular-eslint/no-empty-lifecycle-method": "error",
+        "@angular-eslint/use-lifecycle-interface": "error",
+        "@angular-eslint/prefer-inject": "error"
       }
     },
     {
       "files": ["*.html"],
       "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {
-        "@angular-eslint/template/prefer-control-flow": "warn",
-        "@angular-eslint/template/prefer-self-closing-tags": "warn"
+        "@angular-eslint/template/prefer-control-flow": "error",
+        "@angular-eslint/template/prefer-self-closing-tags": "error"
       }
     }
   ]

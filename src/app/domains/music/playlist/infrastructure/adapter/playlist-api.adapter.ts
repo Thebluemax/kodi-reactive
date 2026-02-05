@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseApiService } from '@core/infrastructure/base/base-api.service';
@@ -48,9 +48,8 @@ interface KodiPlaylistResponse {
   providedIn: 'root'
 })
 export class PlaylistApiAdapter {
+  private readonly baseApiService = inject(BaseApiService);
   private requestId = 1;
-
-  constructor(private baseApiService: BaseApiService) {}
 
   /**
    * Get current audio playlist from Kodi

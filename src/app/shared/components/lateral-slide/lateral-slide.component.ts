@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, SimpleChanges, OnChanges, Output, EventEmitter, inject, input, output } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, SimpleChanges, OnChanges, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { SideBarService } from '@shared/services/side-bar.service';
 
@@ -9,6 +9,7 @@ import { SideBarService } from '@shared/services/side-bar.service';
   providers: [SideBarService],
   templateUrl: './lateral-slide.component.html',
   styleUrls: ['./lateral-slide.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LateralSlideComponent implements OnInit, OnDestroy, OnChanges {
   private el = inject(ElementRef);

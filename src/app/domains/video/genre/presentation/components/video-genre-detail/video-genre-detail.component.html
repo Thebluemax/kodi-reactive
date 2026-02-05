@@ -17,10 +17,10 @@
           <p>{{ movie.year }} @if (movie.rating) { &middot; {{ movie.rating | number: '1.1-1' }} / 10 }</p>
         </ion-label>
         <ion-button fill="clear" (click)="onPlayMovie(movie.movieId)" slot="end">
-          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+          <ion-icon slot="icon-only" name="play-outline" />
         </ion-button>
         <ion-button fill="clear" (click)="onAddToQueue(movie.movieId)" slot="end">
-          <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+          <ion-icon slot="icon-only" name="duplicate-outline" />
         </ion-button>
       </ion-item>
     }

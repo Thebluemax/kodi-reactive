@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonSegment, IonSegmentButton, IonLabel, IonContent, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -7,6 +7,7 @@ import { IonSegment, IonSegmentButton, IonLabel, IonContent, IonRouterOutlet } f
   templateUrl: './video-shell.component.html',
   styleUrls: ['./video-shell.component.scss'],
   imports: [IonSegment, IonSegmentButton, IonLabel, IonContent, IonRouterOutlet],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VideoShellComponent {
   private readonly router = inject(Router);

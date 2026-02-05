@@ -2,7 +2,7 @@
 // PRESENTATION - Genre Detail Component
 // ==========================================================================
 
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, takeUntil } from 'rxjs';
@@ -30,7 +30,8 @@ import { AssetsPipe } from '@shared/pipes/assets.pipe';
     AssetsPipe
   ],
   templateUrl: './genre-detail.component.html',
-  styleUrls: ['./genre-detail.component.scss']
+  styleUrls: ['./genre-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GenreDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);

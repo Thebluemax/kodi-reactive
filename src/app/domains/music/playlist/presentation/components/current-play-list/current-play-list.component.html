@@ -3,16 +3,16 @@
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-button (click)="toggleReorder()" [color]="reorderEnabled() ? 'primary' : 'medium'">
-          <ion-icon slot="icon-only" name="reorder-four"></ion-icon>
+          <ion-icon slot="icon-only" name="reorder-four" />
         </ion-button>
       </ion-buttons>
       <ion-title size="small">{{ playlist().length }} tracks</ion-title>
       <ion-buttons slot="end">
         <ion-button (click)="savePlaylist()" color="primary">
-          <ion-icon slot="icon-only" name="bookmark"></ion-icon>
+          <ion-icon slot="icon-only" name="bookmark" />
         </ion-button>
         <ion-button (click)="clearList()" color="danger">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
+          <ion-icon slot="icon-only" name="trash" />
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
@@ -27,9 +27,9 @@
           </ion-avatar>
           <ion-label class="ion-text-nowrap" (click)="playItem(idx)">{{ item.label }}</ion-label>
           <ion-button fill="clear" color="danger" slot="end" (click)="removeItem(idx, $event)">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
+            <ion-icon slot="icon-only" name="close" />
           </ion-button>
-          <ion-reorder slot="end"></ion-reorder>
+          <ion-reorder slot="end" />
         </ion-item>
       }
     </ion-reorder-group>
