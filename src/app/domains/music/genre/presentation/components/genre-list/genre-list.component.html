@@ -14,3 +14,19 @@
     }
   </div>
 </ion-content>
+
+<app-lateral-panel
+  [panelId]="'genre-detail'"
+  [isOpen]="isPanelOpen()"
+  [title]="panelTitle()"
+  [customWidth]="'60%'"
+  (panelClosed)="onPanelClosed()"
+>
+  @if (selectedGenre()) {
+    <app-genre-detail-panel
+      [genre]="selectedGenre()!"
+      [albums]="albums()"
+      [artists]="artists()"
+    />
+  }
+</app-lateral-panel>
