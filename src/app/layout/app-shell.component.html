@@ -61,25 +61,43 @@
     </div>
 
     <div class="control-nav">
-      <ion-menu-toggle>
-        <ion-button size="small" shape="round">
-          <ion-icon
-            slot="icon-only"
-            ios="reorder-three-outline"
-            md="reorder-three-outline"
-          />
+      <!-- Sección 1: Track Info -->
+      <div class="control-nav__info">
+        <player-current-track
+          [currentTrack]="playBackFacade.playerInfo()"
+        />
+      </div>
+
+      <!-- Sección 2: Playback Controls + Seekbar -->
+      <div class="control-nav__playback">
+        <app-player-control class="player-control" />
+      </div>
+
+      <!-- Sección 3: Extras (party, playlist, volume) -->
+      <div class="control-nav__extras">
+        <ion-button
+          size="small"
+          shape="round"
+          (click)="playBackFacade.togglePartyMode()"
+          [color]="playBackFacade.playerState()?.partyMode ? 'success' : 'dark'"
+        >
+          <ion-icon slot="icon-only" name="beer-outline" />
         </ion-button>
-      </ion-menu-toggle>
-      <player-current-track
-        [currentTrack]="playBackFacade.playerInfo()"
-      />
-      <app-player-control class="player-control" />
-      <app-sound
-        class="volume-control"
-        [volume]="playBackFacade.volume()"
-        [isMute]="playBackFacade.isMute()"
-        (volumeChange)="updateVolume($event)"
-      />
+        <ion-menu-toggle>
+          <ion-button size="small" shape="round" color="dark">
+            <ion-icon
+              slot="icon-only"
+              ios="reorder-three-outline"
+              md="reorder-three-outline"
+            />
+          </ion-button>
+        </ion-menu-toggle>
+        <app-sound
+          [volume]="playBackFacade.volume()"
+          [isMute]="playBackFacade.isMute()"
+          (volumeChange)="updateVolume($event)"
+        />
+      </div>
     </div>
   </div>
 </ion-content>

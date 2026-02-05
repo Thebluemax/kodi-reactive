@@ -1,23 +1,21 @@
-<div class="current">
-  <div class="current-track">
-    @if (currentTrack(); as track) {
-      <img
-        class="current-thumb"
-        [alt]="track.title"
-        [src]="track.thumbnail | assets"
-      />
-      <div class="track-info">
-        <h1 class="song-name">{{ track.title }}</h1>
-        @if (track.type === 'song') {
-          <h2 class="album-name">{{ track.album }}</h2>
-          <h3 class="artist-name">{{ track.artist | arrayToString }}</h3>
-        } @else {
-          <h2 class="album-name">{{ track.genre | arrayToString }}</h2>
-          @if (track.year) {
-            <h3 class="artist-name">{{ track.year }}</h3>
-          }
+<div class="current-track">
+  @if (currentTrack(); as track) {
+    <img
+      class="current-track__thumbnail"
+      [alt]="track.title"
+      [src]="track.thumbnail | assets"
+    />
+    <div class="current-track__info">
+      <span class="current-track__title">{{ track.title }}</span>
+      @if (track.type === 'song') {
+        <span class="current-track__artist">{{ track.artist | arrayToString }}</span>
+        <span class="current-track__album">{{ track.album }}</span>
+      } @else {
+        <span class="current-track__artist">{{ track.genre | arrayToString }}</span>
+        @if (track.year) {
+          <span class="current-track__album">{{ track.year }}</span>
         }
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 </div>

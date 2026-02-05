@@ -20,26 +20,74 @@ ion-searchbar {
     justify-content: space-between;
     align-items: center;
     flex-direction: row;
-    height: 60px;
+    height: 90px;
     z-index: 100;
-    padding: 0 8px;
+    padding: 12px 32px;
+    gap: 48px;
 
-    .volume-control {
-        width: 10%;
-        flex-shrink: 0;
-    }
-
-    .player-control {
-        flex: 1;
+    // Sección 1: Track Info
+    &__info {
         display: flex;
         align-items: center;
-        justify-content: center;
-        overflow: hidden;
+        flex: 0 0 auto;
+        min-width: 200px;
+        max-width: 300px;
+
+        player-current-track {
+            width: 100%;
+        }
     }
 
-    player-current-track {
-        width: 25%;
-        flex-shrink: 0;
+    // Sección 2: Playback Controls + Seekbar
+    &__playback {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        justify-content: center;
+        overflow: hidden;
+
+        .player-control {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    // Sección 3: Extras (party, playlist, volume)
+    &__extras {
+        display: flex;
+        align-items: center;
+        flex: 0 0 auto;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+}
+
+// Responsive: Mobile layout
+@media (max-width: 768px) {
+    .control-nav {
+        flex-direction: column;
+        height: auto;
+        padding: 12px 16px;
+        gap: 8px;
+
+        &__info {
+            width: 100%;
+            justify-content: center;
+            order: 1;
+        }
+
+        &__playback {
+            width: 100%;
+            order: 2;
+        }
+
+        &__extras {
+            width: 100%;
+            justify-content: center;
+            order: 3;
+        }
     }
 }
 
@@ -49,7 +97,11 @@ ion-searchbar {
     background-position: left;
     height: 100%;
     width: 100%;
-    padding-bottom: 70px;
+    padding-bottom: 120px;
+
+    @media (max-width: 768px) {
+        padding-bottom: 280px;
+    }
 
     .flex-div {
         display: flex;

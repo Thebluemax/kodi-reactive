@@ -1,75 +1,34 @@
 <div class="player-control">
-  <!-- Previous Track Button -->
-  <div class="control-btn">
-    <ion-button shape="round" (click)="onPrevious()" color="dark">
-      <ion-icon slot="icon-only" name="play-skip-back-outline" />
-    </ion-button>
-  </div>
-
-  <!-- Play/Pause Button -->
-  <div class="play-btn">
-    <ion-button shape="round" (click)="onPlayPause()" color="dark">
-      <ion-icon
-        slot="icon-only"
-        [name]="isPlaying ? 'pause-outline' : 'play-outline'"
-      />
-    </ion-button>
-  </div>
-
-  <!-- Next Track Button -->
-  <div class="control-btn">
-    <ion-button shape="round" (click)="onNext()" color="dark">
-      <ion-icon slot="icon-only" name="play-skip-forward-outline" />
-    </ion-button>
-  </div>
-
-  <!-- Current Time -->
-  <div class="time-div">
-    <span>
-      @if (showHours) {
-        {{ currentHours }}:
-      }
-      {{ currentMinutes | zeroPadding }}:{{
-        currentSeconds | zeroPadding
-      }}</span
-    >
-  </div>
-
-  <!-- Seek Bar -->
-  <div class="player-bar">
-    <ion-range
-      [value]="seekDisplayPercentage"
-      (ionKnobMoveStart)="onSeekStart()"
-      (ionKnobMoveEnd)="onSeekEnd($event)"
-    />
-  </div>
-
-  <!-- Total Time -->
-  <div class="time-div">
-    <span>
-      @if (showHours) {
-        {{ totalHours }}:
-      }
-      {{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}</span
-    >
-  </div>
-
-  <!-- Shuffle Button -->
-  <div class="control-btn">
+  <!-- Transport: [🔀][⏮][⏯][⏭][🔁] -->
+  <div class="player-control__transport">
     <ion-button
       shape="round"
+      size="small"
       (click)="onShuffle()"
       [color]="shuffled ? 'success' : 'dark'"
       [disabled]="!canShuffle"
     >
       <ion-icon slot="icon-only" name="shuffle-outline" />
     </ion-button>
-  </div>
 
-  <!-- Repeat Button -->
-  <div class="control-btn">
+    <ion-button shape="round" size="small" (click)="onPrevious()" color="dark">
+      <ion-icon slot="icon-only" name="play-skip-back-outline" />
+    </ion-button>
+
+    <ion-button shape="round" (click)="onPlayPause()" color="dark">
+      <ion-icon
+        slot="icon-only"
+        [name]="isPlaying ? 'pause-outline' : 'play-outline'"
+      />
+    </ion-button>
+
+    <ion-button shape="round" size="small" (click)="onNext()" color="dark">
+      <ion-icon slot="icon-only" name="play-skip-forward-outline" />
+    </ion-button>
+
     <ion-button
       shape="round"
+      size="small"
       (click)="onRepeat()"
       [color]="getRepeatColor()"
       [disabled]="!canRepeat"
@@ -78,14 +37,27 @@
     </ion-button>
   </div>
 
-  <!-- Party Mode Button -->
-  <div class="control-btn">
-    <ion-button
-      shape="round"
-      (click)="onPartyMode()"
-      [color]="partyMode ? 'success' : 'dark'"
-    >
-      <ion-icon slot="icon-only" name="beer-outline" />
-    </ion-button>
+  <!-- Seekbar: [0:00][════════][3:45] -->
+  <div class="player-control__seekbar">
+    <span class="player-control__time">
+      @if (showHours) {
+        {{ currentHours }}:
+      }
+      {{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}
+    </span>
+
+    <ion-range
+      class="player-control__range"
+      [value]="seekDisplayPercentage"
+      (ionKnobMoveStart)="onSeekStart()"
+      (ionKnobMoveEnd)="onSeekEnd($event)"
+    />
+
+    <span class="player-control__time">
+      @if (showHours) {
+        {{ totalHours }}:
+      }
+      {{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}
+    </span>
   </div>
 </div>
