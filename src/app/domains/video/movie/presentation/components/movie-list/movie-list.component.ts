@@ -4,8 +4,11 @@ import {
   OnInit,
   inject,
   signal,
-  computed
+  computed,
+  effect,
+  DestroyRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonContent,
   IonList,
@@ -24,6 +27,7 @@ import { MovieDetailComponent } from '../movie-detail/movie-detail.component';
 import { Actor } from '@domains/video/actor/domain/entities/actor.entity';
 import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '@domains/video/actor/presentation/components/actor-detail/actor-detail.component';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 @Component({
   selector: 'app-movie-list',
@@ -49,6 +53,8 @@ export class MovieListComponent implements OnInit {
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
+  private readonly globalSearch = inject(GlobalSearchService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // State
   readonly movies = signal<Movie[]>([]);
@@ -66,7 +72,7 @@ export class MovieListComponent implements OnInit {
   private readonly limit = 40;
   private start = 0;
   private end = this.limit;
-  private searchTerm = '';
+  private currentSearchTerm = '';
 
   // Computed
   readonly hasMoreMovies = computed(() => this.start < this.totalMovies());
@@ -77,23 +83,48 @@ export class MovieListComponent implements OnInit {
     return this.selectedMovie()?.title ?? '';
   });
 
+  constructor() {
+    effect(() => {
+      const term = this.globalSearch.debouncedSearchTerm();
+      if (this.currentSearchTerm !== term) {
+        this.currentSearchTerm = term;
+        this.resetPagination();
+        this.loadMovies();
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.loadMovies();
   }
 
+  private resetPagination(): void {
+    this.start = 0;
+    this.end = this.limit;
+    this.movies.set([]);
+  }
+
   loadMovies(): void {
+    this.isLoading.set(true);
+
     const params: MovieSearchParams = {
       start: this.start,
       end: this.end,
-      searchTerm: this.searchTerm || undefined
+      searchTerm: this.currentSearchTerm || undefined
     };
 
-    this.getMoviesUseCase.execute(params).subscribe({
+    this.getMoviesUseCase.execute(params).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (result) => {
         this.totalMovies.set(result.total);
         this.movies.update(current => [...current, ...result.movies]);
+        this.isLoading.set(false);
       },
-      error: (err) => console.error('Error loading movies:', err)
+      error: (err) => {
+        console.error('Error loading movies:', err);
+        this.isLoading.set(false);
+      }
     });
   }
 

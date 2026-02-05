@@ -4,7 +4,8 @@ import {
   OnInit,
   inject,
   signal,
-  computed
+  computed,
+  effect
 } from '@angular/core';
 import {
   IonContent,
@@ -16,6 +17,7 @@ import { MediaTileComponent, LateralPanelComponent } from '@domains/music/shared
 import { VideoGenre } from '../../../domain/entities/video-genre.entity';
 import { GetVideoGenresUseCase } from '../../../application/use-cases/get-video-genres.use-case';
 import { VideoGenreDetailComponent } from '../video-genre-detail/video-genre-detail.component';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 @Component({
   selector: 'app-video-genre-list',
@@ -35,14 +37,23 @@ import { VideoGenreDetailComponent } from '../video-genre-detail/video-genre-det
 export class VideoGenreListComponent implements OnInit {
   // Use Cases
   private readonly getVideoGenresUseCase = inject(GetVideoGenresUseCase);
+  private readonly globalSearch = inject(GlobalSearchService);
 
   // State
-  readonly genres = signal<VideoGenre[]>([]);
+  private readonly allGenres = signal<VideoGenre[]>([]);
   readonly selectedGenre = signal<VideoGenre | null>(null);
   readonly isLoading = signal<boolean>(false);
   readonly isPanelOpen = signal<boolean>(false);
 
   // Computed
+  readonly genres = computed(() => {
+    const term = this.globalSearch.debouncedSearchTerm().toLowerCase();
+    if (!term) return this.allGenres();
+    return this.allGenres().filter(genre =>
+      genre.title.toLowerCase().includes(term)
+    );
+  });
+
   readonly panelTitle = computed(() => this.selectedGenre()?.title ?? '');
 
   ngOnInit(): void {
@@ -65,7 +76,7 @@ export class VideoGenreListComponent implements OnInit {
 
     this.getVideoGenresUseCase.execute().subscribe({
       next: (result) => {
-        this.genres.set(result.genres);
+        this.allGenres.set(result.genres);
         this.isLoading.set(false);
       },
       error: (err) => {

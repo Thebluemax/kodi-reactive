@@ -4,7 +4,8 @@ import {
   OnInit,
   inject,
   signal,
-  computed
+  computed,
+  effect
 } from '@angular/core';
 import {
   IonContent,
@@ -24,6 +25,7 @@ import { MovieDetailComponent } from '@domains/video/movie/presentation/componen
 import { GetActorsUseCase } from '../../../application/use-cases/get-actors.use-case';
 import { GetMoviesByActorUseCase } from '../../../application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '../actor-detail/actor-detail.component';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 @Component({
   selector: 'app-actor-list',
@@ -48,6 +50,7 @@ export class ActorListComponent implements OnInit {
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
+  private readonly globalSearch = inject(GlobalSearchService);
 
   // All actors (full load)
   private readonly allActors = signal<Actor[]>([]);
@@ -56,10 +59,27 @@ export class ActorListComponent implements OnInit {
   private readonly pageSize = 40;
   private displayCount = this.pageSize;
 
-  // Displayed actors (sliced from allActors)
-  readonly actors = computed(() => this.allActors().slice(0, this.displayCount));
-  readonly totalActors = computed(() => this.allActors().length);
+  // Filtered actors based on search term
+  private readonly filteredActors = computed(() => {
+    const term = this.globalSearch.debouncedSearchTerm().toLowerCase();
+    if (!term) return this.allActors();
+    return this.allActors().filter(actor =>
+      actor.name.toLowerCase().includes(term)
+    );
+  });
+
+  // Displayed actors (sliced from filtered actors)
+  readonly actors = computed(() => this.filteredActors().slice(0, this.displayCount));
+  readonly totalActors = computed(() => this.filteredActors().length);
   readonly hasMoreActors = computed(() => this.displayCount < this.totalActors());
+
+  constructor() {
+    // Reset pagination when search term changes
+    effect(() => {
+      this.globalSearch.debouncedSearchTerm();
+      this.displayCount = this.pageSize;
+    });
+  }
 
   // State
   readonly isLoading = signal<boolean>(false);
