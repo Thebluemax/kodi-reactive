@@ -1,0 +1,79 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="genre-detail-panel">
+  <!-- Albums Section -->
+  @if (albums().length > 0) {
+    <ion-list-header>
+      <ion-label>Álbumes</ion-label>
+    </ion-list-header>
+    <ion-list class="genre-detail-panel__list">
+      @for (album of albums(); track album.albumId) {
+        <ion-item class="genre-detail-panel__item" (click)="onAlbumClick(album)">
+          <ion-img
+            class="genre-detail-panel__thumb"
+            [src]="album.thumbnail | assets: 'scape'"
+            [alt]="album.title"
+            slot="start"
+          />
+          <ion-label>
+            <h3>{{ album.title }}</h3>
+            <p>{{ album.artists.join(', ') }} @if (album.year) { &middot; {{ album.year }} }</p>
+          </ion-label>
+          <ion-button fill="clear" (click)="onPlayAlbum(album.albumId); $event.stopPropagation()" slot="end">
+            <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" (click)="onAddAlbumToQueue(album.albumId); $event.stopPropagation()" slot="end">
+            <ion-icon slot="icon-only" name="duplicate-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <!-- Artists Section -->
+  @if (artists().length > 0) {
+    <ion-list-header>
+      <ion-label>Artistas</ion-label>
+    </ion-list-header>
+    <ion-list class="genre-detail-panel__list">
+      @for (artist of artists(); track artist.artistId) {
+        <ion-item class="genre-detail-panel__item">
+          <ion-img
+            class="genre-detail-panel__thumb genre-detail-panel__thumb--round"
+            [src]="artist.thumbnail | assets: 'scape'"
+            [alt]="artist.name"
+            slot="start"
+          />
+          <ion-label>
+            <h3>{{ artist.name }}</h3>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <!-- Empty state -->
+  @if (albums().length === 0 && artists().length === 0) {
+    <div class="genre-detail-panel__empty">
+      <ion-icon name="musical-notes-outline"></ion-icon>
+      <p>No hay contenido para este género</p>
+    </div>
+  }
+</ion-content>
+
+<!-- Album Detail Nested Panel -->
+<app-lateral-slide
+  [id]="'genreAlbumDetailNested'"
+  [openSlideBar]="isAlbumPanelOpen()"
+  [customWidth]="'50%'"
+  (closeSlideBar)="onCloseAlbumPanel()"
+>
+  @if (selectedAlbum()) {
+    <app-album-detail
+      [album]="selectedAlbum()!"
+      [tracks]="albumTracks()"
+    />
+  }
+</app-lateral-slide>
