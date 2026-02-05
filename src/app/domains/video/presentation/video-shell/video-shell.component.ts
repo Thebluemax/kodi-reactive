@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { IonSegment, IonSegmentButton, IonLabel, IonContent, IonRouterOutlet } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-video-shell',
   templateUrl: './video-shell.component.html',
   styleUrls: ['./video-shell.component.scss'],
-  imports: [IonicModule, RouterOutlet],
+  imports: [IonSegment, IonSegmentButton, IonLabel, IonContent, IonRouterOutlet],
 })
 export class VideoShellComponent {
   private readonly router = inject(Router);
