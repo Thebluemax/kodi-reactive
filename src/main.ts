@@ -4,98 +4,7 @@ import { environment } from './environments/environment';
 import { enableProdMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { addIcons } from 'ionicons';
-import {
-  play,
-  pause,
-  add,
-  close,
-  closeOutline,
-  playOutline,
-  pauseOutline,
-  shuffleOutline,
-  repeatOutline,
-  beerOutline,
-  chevronForward,
-  chevronBack,
-  search,
-  musicalNotes,
-  duplicateOutline,
-  disc,
-  people,
-  albums,
-  trash,
-  eyeOutline,
-  share,
-  playSkipBackOutline,
-  playSkipForwardOutline,
-  tv,
-  volumeHigh,
-  volumeLow,
-  volumeOff,
-  volumeMuteOutline,
-  bookmark,
-  reorderFour,
-  reorderThreeOutline,
-  listOutline,
-  settingsSharp,
-  logoApple,
-  // Remote control icons
-  arrowBackOutline,
-  homeOutline,
-  informationCircleOutline,
-  chevronUpOutline,
-  chevronDownOutline,
-  menuOutline,
-  stopOutline,
-  gameControllerOutline,
-} from 'ionicons/icons';
-
-// Register icons globally
-addIcons({
-  play,
-  pause,
-  add,
-  close,
-  closeOutline,
-  playOutline,
-  pauseOutline,
-  shuffleOutline,
-  repeatOutline,
-  beerOutline,
-  chevronForward,
-  chevronBack,
-  search,
-  musicalNotes,
-  disc,
-  people,
-  albums,
-  duplicateOutline,
-  eyeOutline,
-  share,
-  trash,
-  playSkipBackOutline,
-  playSkipForwardOutline,
-  tv,
-  volumeHigh,
-  volumeLow,
-  volumeOff,
-  volumeMuteOutline,
-  bookmark,
-  reorderFour,
-  reorderThreeOutline,
-  listOutline,
-  settingsSharp,
-  logoApple,
-  // Remote control icons
-  arrowBackOutline,
-  homeOutline,
-  informationCircleOutline,
-  chevronUpOutline,
-  chevronDownOutline,
-  menuOutline,
-  stopOutline,
-  gameControllerOutline,
-});
+import { ION_ICONS } from './icons';
 
 if (environment.production) {
   enableProdMode();
@@ -103,14 +12,7 @@ if (environment.production) {
 
 // Register all icons globally
 addIcons({
-  playOutline,
-  duplicateOutline,
-  eyeOutline,
-  share,
-  trash,
-  add,
-  play,
-  closeOutline
+  ...ION_ICONS
 });
 
 bootstrapApplication(AppComponent, appConfig)

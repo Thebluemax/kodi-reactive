@@ -4,8 +4,11 @@ import {
   OnInit,
   inject,
   signal,
-  computed
+  computed,
+  effect,
+  DestroyRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonContent,
   IonList,
@@ -24,6 +27,7 @@ import { GetSeasonsUseCase } from '../../../application/use-cases/get-seasons.us
 import { GetEpisodesUseCase } from '../../../application/use-cases/get-episodes.use-case';
 import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-episode-to-playlist.use-case';
 import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 @Component({
   selector: 'app-tvshow-list',
@@ -49,6 +53,8 @@ export class TVShowListComponent implements OnInit {
   private readonly getSeasonsUseCase = inject(GetSeasonsUseCase);
   private readonly getEpisodesUseCase = inject(GetEpisodesUseCase);
   private readonly addEpisodeToPlaylistUseCase = inject(AddEpisodeToPlaylistUseCase);
+  private readonly globalSearch = inject(GlobalSearchService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // State
   readonly tvshows = signal<TVShow[]>([]);
@@ -63,27 +69,54 @@ export class TVShowListComponent implements OnInit {
   private readonly limit = 40;
   private start = 0;
   private end = this.limit;
+  private currentSearchTerm = '';
 
   // Computed
   readonly hasMoreTVShows = computed(() => this.start < this.totalTVShows());
   readonly panelTitle = computed(() => this.selectedTVShow()?.title ?? '');
 
+  constructor() {
+    effect(() => {
+      const term = this.globalSearch.debouncedSearchTerm();
+      if (this.currentSearchTerm !== term) {
+        this.currentSearchTerm = term;
+        this.resetPagination();
+        this.loadTVShows();
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.loadTVShows();
   }
 
+  private resetPagination(): void {
+    this.start = 0;
+    this.end = this.limit;
+    this.tvshows.set([]);
+  }
+
   loadTVShows(): void {
+    this.isLoading.set(true);
+
     const params: TVShowSearchParams = {
       start: this.start,
-      end: this.end
+      end: this.end,
+      searchTerm: this.currentSearchTerm || undefined
     };
 
-    this.getTVShowsUseCase.execute(params).subscribe({
+    this.getTVShowsUseCase.execute(params).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (result) => {
         this.totalTVShows.set(result.total);
         this.tvshows.update(current => [...current, ...result.tvshows]);
+        this.isLoading.set(false);
       },
-      error: (err) => console.error('Error loading TV shows:', err)
+      error: (err) => {
+        console.error('Error loading TV shows:', err);
+        this.isLoading.set(false);
+      }
     });
   }
 

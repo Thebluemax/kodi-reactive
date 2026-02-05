@@ -4,9 +4,11 @@ import {
   OnInit,
   inject,
   signal,
-  computed
+  computed,
+  effect,
+  DestroyRef
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonContent,
   IonList,
@@ -23,6 +25,7 @@ import { GetAlbumsUseCase } from '../../../application/use-cases/get-albums.use-
 import { GetAlbumDetailUseCase } from '../../../application/use-cases/get-album-detail.use-case';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 import { AlbumDetailComponent } from '../album-detail/album-detail.component';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 @Component({
   selector: 'app-album-list',
@@ -46,6 +49,8 @@ export class AlbumListComponent implements OnInit {
   private readonly getAlbumsUseCase = inject(GetAlbumsUseCase);
   private readonly getAlbumDetailUseCase = inject(GetAlbumDetailUseCase);
   private readonly addToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
+  private readonly globalSearch = inject(GlobalSearchService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // State
   readonly albums = signal<Album[]>([]);
@@ -59,28 +64,53 @@ export class AlbumListComponent implements OnInit {
   private readonly limit = 40;
   private start = 0;
   private end = this.limit;
-  private searchTerm = '';
+  private currentSearchTerm = '';
 
   // Computed
   readonly hasMoreAlbums = computed(() => this.start < this.totalAlbums());
+
+  constructor() {
+    effect(() => {
+      const term = this.globalSearch.debouncedSearchTerm();
+      if (this.currentSearchTerm !== term) {
+        this.currentSearchTerm = term;
+        this.resetPagination();
+        this.loadAlbums();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadAlbums();
   }
 
+  private resetPagination(): void {
+    this.start = 0;
+    this.end = this.limit;
+    this.albums.set([]);
+  }
+
   loadAlbums(): void {
+    this.isLoading.set(true);
+
     const params: AlbumSearchParams = {
       start: this.start,
       end: this.end,
-      searchTerm: this.searchTerm || undefined
+      searchTerm: this.currentSearchTerm || undefined
     };
 
-    this.getAlbumsUseCase.execute(params).subscribe({
+    this.getAlbumsUseCase.execute(params).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (result) => {
         this.totalAlbums.set(result.total);
         this.albums.update(current => [...current, ...result.albums]);
+        this.isLoading.set(false);
       },
-      error: (err) => console.error('Error loading albums:', err)
+      error: (err) => {
+        console.error('Error loading albums:', err);
+        this.isLoading.set(false);
+      }
     });
   }
 

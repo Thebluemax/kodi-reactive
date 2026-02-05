@@ -14,7 +14,14 @@
     <ion-buttons slot="start">
       <img class="app-logo" src="assets/site/logo.png" alt="Kodi Reactive" />
     </ion-buttons>
-    <ion-searchbar></ion-searchbar>
+    @if (globalSearch.isSearchVisible()) {
+      <ion-searchbar
+        [value]="globalSearch.searchTerm()"
+        (ionInput)="onSearch($event)"
+        placeholder="Buscar..."
+        [debounce]="0"
+      ></ion-searchbar>
+    }
     <ion-buttons slot="end">
       <ion-button size="small" color="dark" (click)="navigateTo('music')">
         <ion-icon

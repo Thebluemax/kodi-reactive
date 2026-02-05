@@ -4,6 +4,7 @@ import { IonRouterOutlet, IonHeader, IonIcon, IonToolbar, IonMenu, IonButton, Io
 import { CurrentPlayListComponent } from '@domains/music/playlist';
 import { CurrentTrackComponent, PlayerControlComponent, SoundComponent } from '@domains/music/player';
 import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 @Component({
   selector: 'app-shell',
@@ -28,7 +29,8 @@ import { PlaybackFacade } from '@domains/music/playback/application/playback.fac
 })
 export class AppShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
-  playBackFacade = inject(PlaybackFacade);
+  readonly playBackFacade = inject(PlaybackFacade);
+  readonly globalSearch = inject(GlobalSearchService);
 
   ngOnInit(): void {
     this.playBackFacade.connect();
@@ -49,5 +51,10 @@ export class AppShellComponent implements OnInit, OnDestroy {
 
   onPlaylistChanged(): void {
     this.playBackFacade.getPlaylist();
+  }
+
+  onSearch(event: CustomEvent): void {
+    const value = (event.detail.value as string) || '';
+    this.globalSearch.setSearchTerm(value);
   }
 }
