@@ -1,40 +1,48 @@
-.current {
-  width: 100%;
-}
-
 .current-track {
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  margin: 7px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 
-  & > img {
-    height: 50px;
-    width: 50px;
+  &__thumbnail {
+    height: 70px;
+    width: 70px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
   }
 
-  .track-info {
-    padding-left: 3%;
-    width: inherit;
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+  }
 
-    h1,
-    h2,
-    h3 {
-      margin: 0;
-      padding: 0;
-    }
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .song-name {
-      font-size: 0.8em;
-      font-weight: 900;
-    }
+  &__artist {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #e0e0e0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .album-name,
-    .artist-name {
-      color: #e0e0e0;
-      line-height: 1em;
-      font-size: 0.7em;
-      font-weight: 900;
-    }
+  &__album {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #b0b0b0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

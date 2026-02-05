@@ -1,6 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CurrentTrack, PlayerState, PlayerWebSocketAdapter, SetVolumeUseCase } from '@domains/music/player';
+import { CurrentTrack, PlayerState, PlayerWebSocketAdapter, SetVolumeUseCase, TogglePartyModeUseCase } from '@domains/music/player';
 import { GetPlaylistUseCase, PlaylistItem, PlaylistResult } from '@domains/music/playlist';
 import { startWith, Subscription, switchMap } from 'rxjs';
 
@@ -8,9 +8,10 @@ import { startWith, Subscription, switchMap } from 'rxjs';
   providedIn: 'root',
 })
 export class PlaybackFacade {
-   private readonly wsAdapter = inject(PlayerWebSocketAdapter);
+  private readonly wsAdapter = inject(PlayerWebSocketAdapter);
   private readonly setVolumeUseCase = inject(SetVolumeUseCase);
   private readonly getPlaylistUseCase = inject(GetPlaylistUseCase);
+  private readonly togglePartyModeUseCase = inject(TogglePartyModeUseCase);
    getPlaylist = computed(() => {
     return this.playlist().items;
   });
@@ -75,8 +76,10 @@ export class PlaybackFacade {
   }
 
   updateVolume(event: number): void {
-   // this.volume = event;
     this.setVolumeUseCase.execute(event).subscribe();
   }
 
+  togglePartyMode(): void {
+    this.togglePartyModeUseCase.execute().subscribe();
+  }
 }
