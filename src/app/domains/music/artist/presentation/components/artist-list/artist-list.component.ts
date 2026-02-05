@@ -2,9 +2,9 @@
 // PRESENTATION - Artist List Component
 // ==========================================================================
 
-import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
 import { IonicModule, InfiniteScrollCustomEvent } from '@ionic/angular';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity';
 import { GetArtistsUseCase } from '../../../application/use-cases/get-artists.use-case';
@@ -13,6 +13,7 @@ import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
 import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArtistDetailComponent } from '../artist-detail/artist-detail.component';
+import { GlobalSearchService } from '@shared/services/global-search.service';
 
 const PAGE_SIZE = 40;
 
@@ -32,8 +33,8 @@ const PAGE_SIZE = 40;
 export class ArtistListComponent implements OnInit, OnDestroy {
   private readonly getArtistsUseCase = inject(GetArtistsUseCase);
   private readonly getArtistDetailUseCase = inject(GetArtistDetailUseCase);
+  private readonly globalSearch = inject(GlobalSearchService);
   private readonly destroy$ = new Subject<void>();
-  private readonly searchSubject$ = new Subject<string>();
 
   // Signals for reactive state
   readonly artists = signal<Artist[]>([]);
@@ -41,8 +42,9 @@ export class ArtistListComponent implements OnInit, OnDestroy {
   readonly albums = signal<ArtistAlbumGroup[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly isPanelOpen = signal<boolean>(false);
-  readonly searchTerm = signal<string>('');
   readonly totalArtists = signal<number>(0);
+
+  private currentSearchTerm = '';
 
   // Computed values
   readonly hasMoreArtists = computed(() =>
@@ -52,28 +54,24 @@ export class ArtistListComponent implements OnInit, OnDestroy {
   private start = 0;
   private end = PAGE_SIZE;
 
+  constructor() {
+    effect(() => {
+      const term = this.globalSearch.debouncedSearchTerm();
+      if (this.currentSearchTerm !== term) {
+        this.currentSearchTerm = term;
+        this.resetPagination();
+        this.loadArtists();
+      }
+    });
+  }
+
   ngOnInit(): void {
-    this.setupSearch();
     this.loadArtists();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private setupSearch(): void {
-    this.searchSubject$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(term => {
-        this.searchTerm.set(term);
-        this.resetPagination();
-        this.loadArtists();
-      });
   }
 
   private resetPagination(): void {
@@ -89,7 +87,7 @@ export class ArtistListComponent implements OnInit, OnDestroy {
       .execute({
         start: this.start,
         end: this.end,
-        searchTerm: this.searchTerm() || undefined
+        searchTerm: this.currentSearchTerm || undefined
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -105,11 +103,6 @@ export class ArtistListComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSearch(event: CustomEvent): void {
-    const value = (event.detail.value as string) || '';
-    this.searchSubject$.next(value);
-  }
-
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
     if (!this.hasMoreArtists()) {
       event.target.complete();
@@ -123,7 +116,7 @@ export class ArtistListComponent implements OnInit, OnDestroy {
       .execute({
         start: this.start,
         end: this.end,
-        searchTerm: this.searchTerm() || undefined
+        searchTerm: this.currentSearchTerm || undefined
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
