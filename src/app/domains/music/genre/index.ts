@@ -19,6 +19,7 @@ export { GetGenreDetailUseCase, GenreDetailResult } from './application/use-case
 // Presentation - Components
 export { GenreListComponent } from './presentation/components/genre-list/genre-list.component';
 export { GenreDetailComponent } from './presentation/components/genre-detail/genre-detail.component';
+export { GenreDetailPanelComponent } from './presentation/components/genre-detail-panel/genre-detail-panel.component';
 
 // Infrastructure - Providers
 export { GENRE_PROVIDERS } from './genre.providers';
