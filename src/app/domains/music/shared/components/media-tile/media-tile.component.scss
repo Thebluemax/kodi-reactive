@@ -6,11 +6,13 @@
 
 // Block
 .media-tile {
-  @include media-tile-size($media-tile-size-sm, $media-tile-margin-sm);
+  width: 100%;
+  aspect-ratio: 1;
   position: relative;
   overflow: hidden;
+  margin: 0;
 
-  // Element: Header
+  // Element: Header (always visible at bottom)
   &__header {
     @include absolute-bottom;
     @include overlay($media-tile-header-bg);
@@ -18,11 +20,8 @@
     font-size: 1em;
     height: min-content;
     padding: 8px;
-
-    // Modifier: Clickable
-    &--clickable {
-      cursor: pointer;
-    }
+    cursor: pointer;
+    z-index: 2;
   }
 
   // Element: Title
@@ -42,83 +41,38 @@
     @include text-ellipsis;
   }
 
-  // Element: Content
-  &__content {
-    @include overlay($media-tile-overlay-bg, 0);
-    @include transition(opacity);
-    height: 100%;
-    padding: 12px;
-
-    // Modifier: Hoverable
-    &--hoverable {
-      @include card-hover-effect;
-    }
-  }
-
-  // Element: Info
-  &__info {
-    cursor: pointer;
-
-    h4 {
-      color: $media-tile-info-color;
-      font-size: $media-tile-info-font-size;
-      font-weight: 900;
-      margin: 0 0 4px 0;
-      @include text-ellipsis;
-    }
-
-    h5,
-    h6 {
-      line-height: 1.2em;
-      color: $media-tile-subtitle-color;
-      font-size: $media-tile-subtitle-font-size;
-      font-weight: 400;
-      margin: 0;
-    }
-  }
-
-  // Element: Actions
+  // Element: Actions (overlay on hover for desktop, always visible on touch)
   &__actions {
-    @include flex-row-wrap;
-    justify-content: space-around;
-    position: absolute;
-    bottom: 10px;
-    width: 85%;
-    left: 50%;
-    transform: translateX(-50%);
+    @include absolute-fill;
+    @include flex-center;
+    gap: 12px;
+    background-color: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    @include transition(opacity);
+    z-index: 1;
+
+    @media (hover: none) {
+      opacity: 1;
+    }
+  }
+
+  &:hover &__actions {
+    opacity: 1;
   }
 
   // Element: Action Button
   &__action-btn {
-    --padding-start: 8px;
-    --padding-end: 8px;
+    --color: #{$media-tile-title-color};
+    font-size: 1.6em;
+    transform: scale(0.8);
+    @include transition(transform, $transition-fast);
+
+    @media (hover: none) {
+      transform: scale(1);
+    }
   }
-}
 
-// ==========================================================================
-// RESPONSIVE - Breakpoints
-// ==========================================================================
-
-@include respond-to('xl') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-xl, $media-tile-margin-lg);
-  }
-}
-
-@include respond-to('lg') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-lg, $media-tile-margin-lg);
-  }
-}
-
-@include respond-to('md') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-md, $media-tile-margin-md);
-  }
-}
-
-@include respond-to('sm') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-sm, $media-tile-margin-sm);
+  &:hover &__action-btn {
+    transform: scale(1);
   }
 }

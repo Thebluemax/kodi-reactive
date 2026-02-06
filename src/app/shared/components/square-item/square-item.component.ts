@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
+
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 export interface SquareItemAction {
@@ -19,7 +19,7 @@ export interface SquareItemAction {
     IonCardContent,
     IonButton,
     IonIcon,
-    TileHoverDirective,
+
     AssetsPipe
   ],
   templateUrl: './square-item.component.html',
