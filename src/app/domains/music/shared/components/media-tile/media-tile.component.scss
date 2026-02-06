@@ -56,8 +56,8 @@
 
   // Element: Action Button
   &__action-btn {
-    --padding-start: 8px;
-    --padding-end: 8px;
+    --color: #{$media-tile-title-color};
+    font-size: 1.6em;
     transform: scale(0.8);
     @include transition(transform, $transition-fast);
   }
