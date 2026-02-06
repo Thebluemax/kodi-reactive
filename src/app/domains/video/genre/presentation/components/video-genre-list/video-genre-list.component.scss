@@ -7,10 +7,20 @@
 
   // Element: Grid
   &__grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
     padding: 8px;
     background: transparent;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 1281px) {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
   }
 }

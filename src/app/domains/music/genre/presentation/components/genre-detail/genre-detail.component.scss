@@ -12,20 +12,31 @@ ion-list-header {
 }
 
 .tiles-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding: 8px 0;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  @media (min-width: 1281px) {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
 }
 
 .tile {
   background-attachment: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 180px;
+  width: 100%;
+  aspect-ratio: 1;
   margin: 0;
   position: relative;
-  width: 180px;
+  overflow: hidden;
   cursor: pointer;
 
   ion-card-header {
@@ -71,21 +82,5 @@ ion-list-header {
 
   p {
     font-size: 1.1em;
-  }
-}
-
-/* Desktop - 1281px and up */
-@media (min-width: 1281px) {
-  .tile {
-    width: 220px;
-    height: 220px;
-  }
-}
-
-/* Laptops, Desktops - 1025px to 1280px */
-@media (min-width: 1025px) and (max-width: 1280px) {
-  .tile {
-    width: 200px;
-    height: 200px;
   }
 }

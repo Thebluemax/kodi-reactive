@@ -6,9 +6,11 @@
 
 // Block
 .media-tile {
-  @include media-tile-size($media-tile-size-sm, $media-tile-margin-sm);
+  width: 100%;
+  aspect-ratio: 1;
   position: relative;
   overflow: hidden;
+  margin: 0;
 
   // Element: Header (always visible at bottom)
   &__header {
@@ -39,15 +41,19 @@
     @include text-ellipsis;
   }
 
-  // Element: Actions (overlay on hover)
+  // Element: Actions (overlay on hover for desktop, always visible on touch)
   &__actions {
     @include absolute-fill;
     @include flex-center;
     gap: 12px;
-    background-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.45);
     opacity: 0;
     @include transition(opacity);
     z-index: 1;
+
+    @media (hover: none) {
+      opacity: 1;
+    }
   }
 
   &:hover &__actions {
@@ -60,37 +66,13 @@
     font-size: 1.6em;
     transform: scale(0.8);
     @include transition(transform, $transition-fast);
+
+    @media (hover: none) {
+      transform: scale(1);
+    }
   }
 
   &:hover &__action-btn {
     transform: scale(1);
-  }
-}
-
-// ==========================================================================
-// RESPONSIVE - Breakpoints
-// ==========================================================================
-
-@include respond-to('xl') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-xl, $media-tile-margin-lg);
-  }
-}
-
-@include respond-to('lg') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-lg, $media-tile-margin-lg);
-  }
-}
-
-@include respond-to('md') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-md, $media-tile-margin-md);
-  }
-}
-
-@include respond-to('sm') {
-  .media-tile {
-    @include media-tile-size($media-tile-size-sm, $media-tile-margin-sm);
   }
 }
