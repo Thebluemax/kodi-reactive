@@ -1,15 +1,18 @@
 <ion-card
   class="media-tile"
-  [style.backgroundImage]="'url(' + (thumbnail() | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
+  [style.backgroundImage]="
+    'url(' +
+    (thumbnail() | assets: 'scape') +
+    '), url(assets/site/no_cover.webp)'
+  "
   [style.backgroundSize]="'cover'"
 >
   @if (showActionButtons()) {
     <div class="media-tile__actions">
       <ion-button
         class="media-tile__action-btn"
+        fill="clear"
         shape="round"
-        size="small"
-        color="dark"
         (click)="onPlayClick()"
       >
         <ion-icon slot="icon-only" name="play-outline" />
@@ -17,9 +20,8 @@
 
       <ion-button
         class="media-tile__action-btn"
+        fill="clear"
         shape="round"
-        size="small"
-        color="dark"
         (click)="onAddClick()"
       >
         <ion-icon slot="icon-only" name="duplicate-outline" />
@@ -27,14 +29,17 @@
     </div>
   }
 
-  <ion-card-header
-    class="media-tile__header"
-    (click)="onItemClick()"
-  >
+  <ion-card-header class="media-tile__header" (click)="onItemClick()">
     <ion-card-title class="media-tile__title">{{ title() }}</ion-card-title>
     @if (subtitle() || year()) {
       <ion-card-subtitle class="media-tile__subtitle">
-        {{ subtitle() }}@if (subtitle() && year()) { · }@if (year()) { {{ year() }} }
+        {{ subtitle() }}
+        @if (subtitle() && year()) {
+          ·
+        }
+        @if (year()) {
+          {{ year() }}
+        }
       </ion-card-subtitle>
     }
   </ion-card-header>
