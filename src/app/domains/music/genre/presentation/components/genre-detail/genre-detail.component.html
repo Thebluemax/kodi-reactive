@@ -22,7 +22,7 @@
         <ion-card
           class="tile"
           [style.backgroundImage]="'url(' + (album.thumbnail | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
-          appTileHover
+
           (click)="onAlbumClick(album)"
         >
           <ion-card-header>
@@ -46,7 +46,7 @@
           [style.backgroundImage]="'url(' + (artist.thumbnail | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
           [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
           [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"
-          appTileHover
+
           (click)="onArtistClick(artist)"
         >
           <ion-card-header>

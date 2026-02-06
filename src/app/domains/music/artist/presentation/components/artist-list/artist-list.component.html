@@ -10,7 +10,7 @@
         [style.backgroundImage]="'url(' + (artist.thumbnail | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
         [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
         [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"
-        appTileHover
+
       >
         <ion-card-header (click)="onArtistClick(artist)">
           <ion-card-title>{{ artist.name }}</ion-card-title>

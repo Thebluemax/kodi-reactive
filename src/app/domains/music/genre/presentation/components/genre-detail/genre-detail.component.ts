@@ -15,7 +15,7 @@ import { GetGenreDetailUseCase } from '../../../application/use-cases/get-genre-
 import { GetAlbumDetailUseCase, AlbumDetailComponent } from '@domains/music/album';
 import { GetArtistDetailUseCase, ArtistDetailComponent, ArtistAlbumGroup } from '@domains/music/artist';
 import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
-import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
+
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 @Component({
@@ -26,7 +26,7 @@ import { AssetsPipe } from '@shared/pipes/assets.pipe';
     LateralSlideComponent,
     AlbumDetailComponent,
     ArtistDetailComponent,
-    TileHoverDirective,
+
     AssetsPipe
   ],
   templateUrl: './genre-detail.component.html',
