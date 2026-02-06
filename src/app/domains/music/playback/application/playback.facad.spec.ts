@@ -3,7 +3,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { of, EMPTY } from 'rxjs';
 
 import { PlaybackFacade } from './playback.facade';
-import { PlayerWebSocketAdapter, SetVolumeUseCase } from '@domains/music/player';
+import { PlayerWebSocketAdapter, SetVolumeUseCase, TogglePartyModeUseCase } from '@domains/music/player';
 import { GetPlaylistUseCase } from '@domains/music/playlist';
 
 describe('PlaybackFacadeService', () => {
@@ -25,13 +25,18 @@ describe('PlaybackFacadeService', () => {
     execute: jasmine.createSpy('execute').and.returnValue(of({ items: [], total: 0 }))
   };
 
+  const mockTogglePartyModeUseCase = {
+    execute: jasmine.createSpy('execute').and.returnValue(of(void 0))
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
         { provide: PlayerWebSocketAdapter, useValue: mockPlayerWebSocketAdapter },
         { provide: SetVolumeUseCase, useValue: mockSetVolumeUseCase },
-        { provide: GetPlaylistUseCase, useValue: mockGetPlaylistUseCase }
+        { provide: GetPlaylistUseCase, useValue: mockGetPlaylistUseCase },
+        { provide: TogglePartyModeUseCase, useValue: mockTogglePartyModeUseCase }
       ]
     });
     service = TestBed.inject(PlaybackFacade);
