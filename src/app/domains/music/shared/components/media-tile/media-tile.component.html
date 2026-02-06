@@ -2,67 +2,40 @@
   class="media-tile"
   [style.backgroundImage]="'url(' + (thumbnail() | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
   [style.backgroundSize]="'cover'"
-  appTileHover
 >
-  @if (headerActive()) {
-    <ion-card-header
-      class="media-tile__header"
-      [class.media-tile__header--clickable]="hoverActive()"
-      (click)="onItemClick()"
-    >
-      <ion-card-title class="media-tile__title">{{ title() }}</ion-card-title>
-      @if (subtitle()) {
-        <ion-card-subtitle class="media-tile__subtitle">{{ subtitle() }}</ion-card-subtitle>
-      }
-    </ion-card-header>
+  @if (showActionButtons()) {
+    <div class="media-tile__actions">
+      <ion-button
+        class="media-tile__action-btn"
+        shape="round"
+        size="small"
+        color="dark"
+        (click)="onPlayClick()"
+      >
+        <ion-icon slot="icon-only" name="play-outline" />
+      </ion-button>
+
+      <ion-button
+        class="media-tile__action-btn"
+        shape="round"
+        size="small"
+        color="dark"
+        (click)="onAddClick()"
+      >
+        <ion-icon slot="icon-only" name="duplicate-outline" />
+      </ion-button>
+    </div>
   }
 
-  <ion-card-content
-    class="media-tile__content"
-    [class.media-tile__content--hoverable]="hoverActive()"
+  <ion-card-header
+    class="media-tile__header"
+    (click)="onItemClick()"
   >
-    @if (!headerActive()) {
-      <div class="media-tile__info" (click)="onItemClick()">
-        <h4>{{ title() }}</h4>
-        <h5>{{ subtitle() }}</h5>
-        @if (year()) {
-          <h6>{{ year() }}</h6>
-        }
-      </div>
+    <ion-card-title class="media-tile__title">{{ title() }}</ion-card-title>
+    @if (subtitle() || year()) {
+      <ion-card-subtitle class="media-tile__subtitle">
+        {{ subtitle() }}@if (subtitle() && year()) { · }@if (year()) { {{ year() }} }
+      </ion-card-subtitle>
     }
-
-    @if (showActionButtons()) {
-      <div class="media-tile__actions">
-        <ion-button
-          class="media-tile__action-btn"
-          shape="round"
-          size="small"
-          color="dark"
-          (click)="onPlayClick()"
-        >
-          <ion-icon slot="icon-only" name="play-outline" />
-        </ion-button>
-
-        <ion-button
-          class="media-tile__action-btn"
-          shape="round"
-          size="small"
-          color="dark"
-          (click)="onAddClick()"
-        >
-          <ion-icon slot="icon-only" name="duplicate-outline" />
-        </ion-button>
-
-        <ion-button
-          class="media-tile__action-btn"
-          shape="round"
-          size="small"
-          color="dark"
-          (click)="onItemClick()"
-        >
-          <ion-icon slot="icon-only" name="eye-outline" />
-        </ion-button>
-      </div>
-    }
-  </ion-card-content>
+  </ion-card-header>
 </ion-card>

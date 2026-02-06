@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { TileHoverDirective } from '@shared/directives/tile-hover.directive';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 export interface MediaTileAction {
@@ -16,10 +15,8 @@ export interface MediaTileAction {
     IonCardHeader,
     IonCardTitle,
     IonCardSubtitle,
-    IonCardContent,
     IonButton,
     IonIcon,
-    TileHoverDirective,
     AssetsPipe
   ],
   templateUrl: './media-tile.component.html',
@@ -28,9 +25,7 @@ export interface MediaTileAction {
 })
 export class MediaTileComponent {
   // Inputs using signals
-  readonly headerActive = input<boolean>(false);
-  readonly showActionButtons = input<boolean>(true);
-  readonly hoverActive = input<boolean>(true);
+  readonly showActionButtons = input<boolean>(false);
   readonly title = input<string>('');
   readonly subtitle = input<string>('');
   readonly thumbnail = input<string>('');
