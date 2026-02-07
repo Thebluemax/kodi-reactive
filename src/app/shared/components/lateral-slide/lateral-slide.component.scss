@@ -52,6 +52,11 @@
         background: inherit;
         overflow-y: hidden;
         height: 100%;
+
+        ion-title {
+            text-align: left;
+            font-size: 1.1rem;
+        }
     }
 
     &__spacer {
