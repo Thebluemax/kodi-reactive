@@ -46,7 +46,7 @@
       <div class="albums-section">
         <ion-list>
           @for (album of albums(); track album.albumId) {
-            <ion-item class="album-item">
+            <div class="album-item">
               <div class="album-cover">
                 <ion-img
                   class="img-canvas"
@@ -82,7 +82,7 @@
                   }
                 </ion-list>
               </div>
-            </ion-item>
+            </div>
           }
         </ion-list>
       </div>
