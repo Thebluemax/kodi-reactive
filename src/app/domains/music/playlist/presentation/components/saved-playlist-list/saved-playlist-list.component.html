@@ -43,6 +43,15 @@
           <ion-button
             fill="clear"
             slot="end"
+            (click)="renamePlaylist(playlist, $event)"
+            color="medium"
+            title="Renombrar"
+          >
+            <ion-icon slot="icon-only" name="create" />
+          </ion-button>
+          <ion-button
+            fill="clear"
+            slot="end"
             (click)="playPlaylist(playlist, $event)"
             color="primary"
             title="Reproducir playlist"

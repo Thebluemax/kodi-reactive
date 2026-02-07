@@ -25,6 +25,7 @@ import { GetSavedPlaylistsUseCase } from '../../../application/use-cases/get-sav
 import { DeleteSavedPlaylistUseCase } from '../../../application/use-cases/delete-saved-playlist.use-case';
 import { LoadSavedPlaylistUseCase } from '../../../application/use-cases/load-saved-playlist.use-case';
 import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-playlist-item.use-case';
+import { UpdateSavedPlaylistUseCase } from '../../../application/use-cases/update-saved-playlist.use-case';
 import { SavedPlaylistDetailComponent } from '../saved-playlist-detail/saved-playlist-detail.component';
 
 @Component({
@@ -54,6 +55,7 @@ export class SavedPlaylistListComponent implements OnInit {
   private readonly deletePlaylistUseCase = inject(DeleteSavedPlaylistUseCase);
   private readonly loadPlaylistUseCase = inject(LoadSavedPlaylistUseCase);
   private readonly playItemUseCase = inject(PlayPlaylistItemUseCase);
+  private readonly updatePlaylistUseCase = inject(UpdateSavedPlaylistUseCase);
   private readonly alertController = inject(AlertController);
 
   // State
@@ -87,6 +89,34 @@ export class SavedPlaylistListComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  async renamePlaylist(playlist: SavedPlaylist, event: Event): Promise<void> {
+    event.stopPropagation();
+    const alert = await this.alertController.create({
+      header: 'Renombrar Playlist',
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          value: playlist.name,
+          placeholder: 'Nombre de la playlist'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Guardar',
+          handler: (data) => {
+            if (data.name?.trim()) {
+              this.updatePlaylistUseCase.execute(playlist.id, data.name.trim());
+              this.loadPlaylists();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   async deletePlaylist(playlist: SavedPlaylist, event: Event): Promise<void> {
