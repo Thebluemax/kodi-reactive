@@ -6,7 +6,7 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .artist-col {
@@ -39,7 +39,6 @@
     }
 
     .artist-actions {
-      margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
@@ -52,6 +51,8 @@
       overflow-y: auto;
 
       p {
+        margin: 0;
+        padding: 0;
         font-size: 0.8em;
         line-height: 1.6;
         color: var(--ion-text-color);

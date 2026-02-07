@@ -5,7 +5,7 @@
         <div class="artist-col col-30 image-col">
           <ion-img
             class="img-canvas"
-            [src]="artist.thumbnail | assets : 'scape'"
+            [src]="artist.thumbnail | assets: 'scape'"
             [alt]="artist.name"
           />
           <div class="artist-meta">
@@ -13,21 +13,11 @@
               <span>{{ artist.yearsActive | arrayToString }}</span>
             }
             @if (artist.styles.length) {
-              <span>{{ artist.styles | arrayToString }}</span>
+              <!--<span>{{ artist.styles | arrayToString }}</span>-->
             }
             @if (artist.genres.length) {
               <span>{{ artist.genres | arrayToString }}</span>
             }
-          </div>
-          <div class="artist-actions">
-            <ion-button fill="outline" size="small" (click)="onPlayArtist()" title="Play Artist">
-              <ion-icon slot="start" name="play" />
-              Play Artist
-            </ion-button>
-            <ion-button fill="outline" size="small" (click)="onAddArtistToPlaylist()" title="Add to Playlist">
-              <ion-icon slot="start" name="add" />
-              Add to Playlist
-            </ion-button>
           </div>
         </div>
         <div class="artist-col col-70">
@@ -42,6 +32,26 @@
           </div>
         </div>
       </div>
+      <div class="artist-actions-placeholder">
+        <div class="artist-actions">
+          <ion-button
+            fill="outline"
+            (click)="onPlayArtist()"
+            title="Play Artist"
+          >
+            <ion-icon slot="start" name="play" />
+            Play Artist
+          </ion-button>
+          <ion-button
+            fill="outline"
+            (click)="onAddArtistToPlaylist()"
+            title="Add to Playlist"
+          >
+            <ion-icon slot="start" name="add" />
+            Add to Playlist
+          </ion-button>
+        </div>
+      </div>
 
       <div class="albums-section">
         <ion-list>
@@ -50,16 +60,32 @@
               <div class="album-cover">
                 <ion-img
                   class="img-canvas"
-                  [src]="album.albumThumbnail | assets : 'scape'"
+                  [src]="album.albumThumbnail | assets: 'scape'"
                   [alt]="album.albumLabel"
                 />
                 <p class="album-title">{{ album.albumLabel }}</p>
                 <ion-buttons>
-                  <ion-button (click)="onPlayAlbum(album.albumId)" title="Play Album">
-                    <ion-icon slot="icon-only" size="small" name="play" />
+                  <ion-button
+                    (click)="onPlayAlbum(album.albumId)"
+                    title="Play Album"
+                  >
+                    <ion-icon
+                      slot="icon-only"
+                      color="dark"
+                      size="large"
+                      name="play"
+                    />
                   </ion-button>
-                  <ion-button (click)="onAddAlbumToPlaylist(album.albumId)" title="Add Album to Playlist">
-                    <ion-icon slot="icon-only" size="small" name="add" />
+                  <ion-button
+                    (click)="onAddAlbumToPlaylist(album.albumId)"
+                    title="Add Album to Playlist"
+                  >
+                    <ion-icon
+                      slot="icon-only"
+                      color="dark"
+                      size="large"
+                      name="add"
+                    />
                   </ion-button>
                 </ion-buttons>
               </div>
@@ -68,15 +94,27 @@
                   @for (track of album.tracks; track track.songId) {
                     <ion-item class="track-item">
                       <ion-label>
-                        <span class="track-number">{{ track.trackNumber }}.</span>
+                        <span class="track-number"
+                          >{{ track.trackNumber }}.</span
+                        >
                         {{ track.title }}
                       </ion-label>
                       <ion-note>{{ track.duration | secondsToStr }}</ion-note>
-                      <ion-button fill="clear" size="small" (click)="onAddTrackToPlaylist(track); $event.stopPropagation()" title="Add to Playlist">
-                        <ion-icon slot="icon-only" name="add" />
+                      <ion-button
+                        fill="clear"
+                        (click)="onPlayTrack(track); $event.stopPropagation()"
+                        title="Play Track"
+                      >
+                        <ion-icon slot="icon-only" color="dark" name="play" />
                       </ion-button>
-                      <ion-button fill="clear" size="small" (click)="onPlayTrack(track); $event.stopPropagation()" title="Play Track">
-                        <ion-icon slot="icon-only" name="play" />
+                      <ion-button
+                        fill="clear"
+                        (click)="
+                          onAddTrackToPlaylist(track); $event.stopPropagation()
+                        "
+                        title="Add to Playlist"
+                      >
+                        <ion-icon slot="icon-only" color="dark" name="add" />
                       </ion-button>
                     </ion-item>
                   }
