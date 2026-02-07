@@ -1,5 +1,62 @@
-<div class="remote-control">
-  <!-- Top Row: Back, Home, Info -->
+<div
+  class="remote-control"
+  [style.background-image]="backgroundImage ? 'url(' + backgroundImage + ')' : 'none'"
+>
+  <!-- Now Playing -->
+  @if (currentTrack) {
+    <div class="now-playing">
+      <div class="now-playing__overlay">
+        <div class="now-playing__info">
+          @if (currentTrack.thumbnail) {
+            <img
+              class="now-playing__thumb"
+              [src]="currentTrack.thumbnail | assets"
+              [alt]="currentTrack.title"
+            />
+          }
+          <div class="now-playing__text">
+            <h3 class="now-playing__title">{{ currentTrack.title }}</h3>
+            @if (currentTrack.type === 'song') {
+              <p class="now-playing__subtitle">
+                {{ currentTrack.artist | arrayToString }}
+                @if (currentTrack.album) {
+                  <span> · {{ currentTrack.album }}</span>
+                }
+              </p>
+            } @else {
+              <p class="now-playing__subtitle">{{ currentTrack.genre | arrayToString }}</p>
+            }
+          </div>
+        </div>
+
+        <!-- Seekbar -->
+        <div class="now-playing__seekbar">
+          <span class="now-playing__time">
+            @if (showHours) {
+              {{ currentHours }}:
+            }
+            {{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}
+          </span>
+
+          <ion-range
+            class="now-playing__range"
+            [value]="seekDisplayPercentage"
+            (ionKnobMoveStart)="onSeekStart()"
+            (ionKnobMoveEnd)="onSeekEnd($event)"
+          />
+
+          <span class="now-playing__time">
+            @if (showHours) {
+              {{ totalHours }}:
+            }
+            {{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Top Row: Back, Home, Info, Context Menu, Playlist -->
   <div class="auxiliary-controls top-row">
     <ion-button fill="clear" (click)="onBack()">
       <ion-icon slot="icon-only" name="arrow-back-outline" />
@@ -10,6 +67,14 @@
     <ion-button fill="clear" (click)="onShowInfo()">
       <ion-icon slot="icon-only" name="information-circle-outline" />
     </ion-button>
+    <ion-button fill="clear" (click)="onContextMenu()">
+      <ion-icon slot="icon-only" name="ellipsis-horizontal" />
+    </ion-button>
+    <ion-menu-toggle>
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="reorder-three-outline" />
+      </ion-button>
+    </ion-menu-toggle>
   </div>
 
   <!-- D-Pad Navigation -->
@@ -42,26 +107,18 @@
     </div>
   </div>
 
-  <!-- Context Menu -->
-  <div class="auxiliary-controls menu-row">
-    <ion-button fill="clear" (click)="onContextMenu()">
-      <ion-icon slot="start" name="menu-outline" />
-      Menu
-    </ion-button>
-  </div>
-
   <!-- Playback Controls -->
   <div class="playback-controls">
-    <ion-button shape="round" (click)="onPrevious()">
+    <ion-button fill="clear" (click)="onPrevious()">
       <ion-icon slot="icon-only" name="play-skip-back-outline" />
     </ion-button>
-    <ion-button shape="round" (click)="onPlayPause()">
+    <ion-button fill="clear" (click)="onPlayPause()">
       <ion-icon slot="icon-only" [name]="isPlaying ? 'pause-outline' : 'play-outline'" />
     </ion-button>
-    <ion-button shape="round" (click)="onStop()">
+    <ion-button fill="clear" (click)="onStop()">
       <ion-icon slot="icon-only" name="stop-outline" />
     </ion-button>
-    <ion-button shape="round" (click)="onNext()">
+    <ion-button fill="clear" (click)="onNext()">
       <ion-icon slot="icon-only" name="play-skip-forward-outline" />
     </ion-button>
   </div>
@@ -69,7 +126,7 @@
   <!-- Mode Controls -->
   <div class="mode-controls">
     <ion-button
-      shape="round"
+      fill="clear"
       (click)="onRepeat()"
       [color]="getRepeatColor()"
       [disabled]="!canRepeat"
@@ -77,7 +134,7 @@
       <ion-icon slot="icon-only" [name]="getRepeatIcon()" />
     </ion-button>
     <ion-button
-      shape="round"
+      fill="clear"
       (click)="onShuffle()"
       [color]="shuffled ? 'success' : 'dark'"
       [disabled]="!canShuffle"
@@ -85,7 +142,7 @@
       <ion-icon slot="icon-only" name="shuffle-outline" />
     </ion-button>
     <ion-button
-      shape="round"
+      fill="clear"
       (click)="onPartyMode()"
       [color]="partyMode ? 'success' : 'dark'"
     >
