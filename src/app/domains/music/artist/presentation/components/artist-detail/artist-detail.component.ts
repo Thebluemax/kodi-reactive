@@ -38,13 +38,8 @@ export class ArtistDetailComponent {
   albums = input<ArtistAlbumGroup[]>([]);
 
   // Outputs (signal-based)
-  closeDetail = output<void>();
   trackSelected = output<Track>();
   albumSelected = output<number>();
-
-  onClose(): void {
-    this.closeDetail.emit();
-  }
 
   onPlayTrack(track: Track): void {
     console.log('onPlayTrack called with track:', track);
