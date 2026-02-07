@@ -28,6 +28,13 @@ export const LAYOUT_ROUTES: Routes = [
           ),
       },
       {
+        path: 'playlists',
+        loadComponent: () =>
+          import('../domains/music/playlist/presentation/components/saved-playlist-list/saved-playlist-list.component').then(
+            (m) => m.SavedPlaylistListComponent
+          ),
+      },
+      {
         path: '',
         redirectTo: 'music',
         pathMatch: 'full',

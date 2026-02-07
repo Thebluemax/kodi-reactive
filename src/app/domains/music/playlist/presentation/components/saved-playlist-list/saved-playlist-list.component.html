@@ -1,0 +1,87 @@
+@if (isLoading()) {
+  <ion-progress-bar type="indeterminate" />
+}
+
+<ion-content class="saved-playlist-list">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button
+        [disabled]="true"
+        color="medium"
+        title="Importar (próximamente)"
+      >
+        <ion-icon slot="start" name="cloud-upload" />
+        Importar
+      </ion-button>
+      <ion-button
+        [disabled]="true"
+        color="medium"
+        title="Exportar (próximamente)"
+      >
+        <ion-icon slot="start" name="cloud-download" />
+        Exportar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  @if (savedPlaylists().length > 0) {
+    <ion-list lines="full">
+      @for (playlist of savedPlaylists(); track playlist.id) {
+        <ion-item
+          button
+          (click)="selectPlaylist(playlist)"
+          [color]="selectedPlaylist()?.id === playlist.id ? 'light' : ''"
+        >
+          <ion-icon name="musical-notes" slot="start" color="primary" />
+          <ion-label>
+            <h2>{{ playlist.name }}</h2>
+            <p>
+              {{ playlist.items.length }} tracks ·
+              {{ playlist.updatedAt | date: "short" }}
+            </p>
+          </ion-label>
+          <ion-button
+            fill="clear"
+            slot="end"
+            (click)="playPlaylist(playlist, $event)"
+            color="primary"
+            title="Reproducir playlist"
+          >
+            <ion-icon slot="icon-only" name="play" />
+          </ion-button>
+          <ion-button
+            fill="clear"
+            slot="end"
+            (click)="deletePlaylist(playlist, $event)"
+            color="danger"
+            title="Eliminar"
+          >
+            <ion-icon slot="icon-only" name="trash" />
+          </ion-button>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <ion-text color="medium" class="empty-message">
+      <ion-icon name="albums" />
+      <p>No hay playlists guardadas</p>
+      <p class="hint">Guarda una playlist desde el reproductor actual</p>
+    </ion-text>
+  }
+</ion-content>
+
+<app-lateral-panel
+  [panelId]="'saved-playlist-detail'"
+  [isOpen]="isPanelOpen()"
+  [title]="selectedPlaylist()?.name ?? ''"
+  [customWidth]="'50%'"
+  (panelClosed)="onPanelClosed()"
+>
+  @if (selectedPlaylist()) {
+    <app-saved-playlist-detail
+      [playlist]="selectedPlaylist()!"
+      (playlistUpdated)="onPlaylistUpdated($event)"
+      (playlistDeleted)="onPlaylistDeleted($event)"
+    />
+  }
+</app-lateral-panel>

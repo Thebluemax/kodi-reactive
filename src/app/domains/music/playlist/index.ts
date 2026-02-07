@@ -16,6 +16,7 @@ export * from './application/use-cases/save-playlist.use-case';
 export * from './application/use-cases/load-saved-playlist.use-case';
 export * from './application/use-cases/get-saved-playlists.use-case';
 export * from './application/use-cases/delete-saved-playlist.use-case';
+export * from './application/use-cases/update-saved-playlist.use-case';
 
 // Infrastructure
 export * from './infrastructure/repositories/playlist-kodi.repository';
@@ -23,6 +24,8 @@ export * from './infrastructure/services/playlist-storage.service';
 
 // Presentation
 export * from './presentation/components/current-play-list/current-play-list.component';
+export * from './presentation/components/saved-playlist-list/saved-playlist-list.component';
+export * from './presentation/components/saved-playlist-detail/saved-playlist-detail.component';
 
 // Providers
 export * from './playlist.providers';
