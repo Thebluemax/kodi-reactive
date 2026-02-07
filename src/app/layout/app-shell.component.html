@@ -55,11 +55,12 @@
 </ion-header>
 
 <ion-content id="main-content" class="ion-padding">
-  <div class="canvas-player">
+  <div class="canvas-player" [class.canvas-player--no-bar]="isRemoteActive()">
     <div class="flex-div">
       <ion-router-outlet />
     </div>
 
+    @if (!isRemoteActive()) {
     <div class="control-nav">
       <!-- Sección 1: Track Info -->
       <div class="control-nav__info">
@@ -99,5 +100,6 @@
         />
       </div>
     </div>
+    }
   </div>
 </ion-content>

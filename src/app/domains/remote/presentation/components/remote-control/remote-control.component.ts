@@ -3,7 +3,8 @@
 // ==========================================================================
 
 import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { RangeCustomEvent } from '@ionic/angular';
+import { IonButton, IonIcon, IonRange, IonMenuToggle } from '@ionic/angular/standalone';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -26,14 +27,19 @@ import {
   TogglePartyModeUseCase,
   PlayerWebSocketAdapter,
   PlayerState,
+  CurrentTrack,
+  SeekUseCase,
   RepeatMode
 } from '@domains/music/player';
+import { AssetsPipe } from '@shared/pipes/assets.pipe';
+import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
+import { ZeroPaddingPipe } from '@shared/pipes/zero-padding.pipe';
 
 @Component({
   selector: 'app-remote-control',
   templateUrl: './remote-control.component.html',
   styleUrls: ['./remote-control.component.scss'],
-  imports: [IonicModule],
+  imports: [IonButton, IonIcon, IonRange, IonMenuToggle, AssetsPipe, ArrayToStringPipe, ZeroPaddingPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RemoteControlComponent implements OnInit, OnDestroy {
@@ -56,17 +62,30 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
   private readonly setShuffleUseCase = inject(SetShuffleUseCase);
   private readonly setRepeatUseCase = inject(SetRepeatUseCase);
   private readonly togglePartyModeUseCase = inject(TogglePartyModeUseCase);
+  private readonly seekUseCase = inject(SeekUseCase);
   private readonly wsAdapter = inject(PlayerWebSocketAdapter);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly assetsPipe = new AssetsPipe();
 
   private readonly destroy$ = new Subject<void>();
+  private isSeeking = false;
+  private frozenPercentage = 0;
+
   state: PlayerState | null = null;
+  currentTrack: CurrentTrack | null = null;
 
   ngOnInit(): void {
     this.wsAdapter.getStateStream()
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.state = state;
+        this.cdr.markForCheck();
+      });
+
+    this.wsAdapter.getCurrentTrackStream()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(track => {
+        this.currentTrack = track;
         this.cdr.markForCheck();
       });
   }
@@ -141,6 +160,22 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
   }
 
   // ========================================================================
+  // Seek Actions
+  // ========================================================================
+
+  onSeekStart(): void {
+    this.isSeeking = true;
+    this.frozenPercentage = this.state?.percentage ?? 0;
+  }
+
+  onSeekEnd(event: Event): void {
+    const rangeEvent = event as RangeCustomEvent;
+    const value = rangeEvent.detail.value as number;
+    this.seekUseCase.execute(value).subscribe();
+    this.isSeeking = false;
+  }
+
+  // ========================================================================
   // Mode Controls
   // ========================================================================
 
@@ -159,6 +194,12 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
   // ========================================================================
   // UI Helpers
   // ========================================================================
+
+  get backgroundImage(): string {
+    const src = this.currentTrack?.fanart || this.currentTrack?.thumbnail || '';
+    if (!src) return '';
+    return this.assetsPipe.transform(src);
+  }
 
   get isPlaying(): boolean {
     return this.state?.isPlaying ?? false;
@@ -182,6 +223,39 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
 
   get partyMode(): boolean {
     return this.state?.partyMode ?? false;
+  }
+
+  get seekDisplayPercentage(): number {
+    if (this.isSeeking) return this.frozenPercentage;
+    return this.state?.percentage ?? 0;
+  }
+
+  get currentHours(): number {
+    return this.state?.currentTime?.hours ?? 0;
+  }
+
+  get currentMinutes(): number {
+    return this.state?.currentTime?.minutes ?? 0;
+  }
+
+  get currentSeconds(): number {
+    return this.state?.currentTime?.seconds ?? 0;
+  }
+
+  get totalHours(): number {
+    return this.state?.totalTime?.hours ?? 0;
+  }
+
+  get totalMinutes(): number {
+    return this.state?.totalTime?.minutes ?? 0;
+  }
+
+  get totalSeconds(): number {
+    return this.state?.totalTime?.seconds ?? 0;
+  }
+
+  get showHours(): boolean {
+    return this.totalHours > 0;
   }
 
   getRepeatColor(): string {
