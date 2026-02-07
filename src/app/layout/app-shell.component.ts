@@ -1,4 +1,5 @@
-import { Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy, signal, effect } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Router, NavigationEnd } from '@angular/router';
 import { IonRouterOutlet, IonHeader, IonIcon, IonToolbar, IonMenu, IonButton, IonButtons, IonSearchbar, IonContent, IonMenuToggle } from '@ionic/angular/standalone';
 import { Subject } from 'rxjs';
@@ -32,11 +33,22 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
 })
 export class AppShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
+  private readonly titleService = inject(Title);
   private readonly destroy$ = new Subject<void>();
   readonly playBackFacade = inject(PlaybackFacade);
   readonly globalSearch = inject(GlobalSearchService);
 
   readonly isRemoteActive = signal(false);
+
+  private readonly titleEffect = effect(() => {
+    const track = this.playBackFacade.playerInfo();
+    if (track?.title) {
+      const artist = track.artist?.length ? ` - ${track.artist.join(', ')}` : '';
+      this.titleService.setTitle(`${track.title}${artist}`);
+    } else {
+      this.titleService.setTitle('Kodi Ready');
+    }
+  });
 
   ngOnInit(): void {
     this.playBackFacade.connect();
