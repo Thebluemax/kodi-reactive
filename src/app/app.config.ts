@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter, RouteReuseStrategy, withPreloading, PreloadAllModules } from '@angular/router';
+import { provideRouter, RouteReuseStrategy, withPreloading, PreloadAllModules, withHashLocation } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideIonicAngular, IonicRouteStrategy } from '@ionic/angular/standalone';
 
@@ -19,7 +19,7 @@ import { REMOTE_PROVIDERS } from '@domains/remote';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideRouter(routes, withPreloading(PreloadAllModules), withHashLocation()),
     provideIonicAngular(),
     provideHttpClient(withInterceptorsFromDi()),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
