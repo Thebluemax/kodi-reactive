@@ -1,18 +1,3 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ artist()?.name }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="onPlayArtist()" title="Play Artist">
-        <ion-icon slot="icon-only" name="play" />
-      </ion-button>
-      <ion-button (click)="onAddArtistToPlaylist()" title="Add to Playlist">
-        <ion-icon slot="icon-only" name="add" />
-      </ion-button>
-      <ion-button (click)="onClose()">Close</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
   @if (artist(); as artist) {
     <div class="artist-frame">
@@ -33,6 +18,16 @@
             @if (artist.genres.length) {
               <span>{{ artist.genres | arrayToString }}</span>
             }
+          </div>
+          <div class="artist-actions">
+            <ion-button fill="outline" size="small" (click)="onPlayArtist()" title="Play Artist">
+              <ion-icon slot="start" name="play" />
+              Play Artist
+            </ion-button>
+            <ion-button fill="outline" size="small" (click)="onAddArtistToPlaylist()" title="Add to Playlist">
+              <ion-icon slot="start" name="add" />
+              Add to Playlist
+            </ion-button>
           </div>
         </div>
         <div class="artist-col col-70">

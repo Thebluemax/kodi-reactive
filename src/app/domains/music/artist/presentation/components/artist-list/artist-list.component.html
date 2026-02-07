@@ -26,6 +26,7 @@
 
 <app-lateral-slide
   [id]="'artistDetail'"
+  [title]="selectedArtist()?.name ?? ''"
   [openSlideBar]="isPanelOpen()"
   [customWidth]="'60%'"
   (closeSlideBar)="onClosePanel()"
@@ -33,6 +34,5 @@
   <app-artist-detail
     [artist]="selectedArtist()"
     [albums]="albums()"
-    (closeDetail)="onClosePanel()"
   />
 </app-lateral-slide>
