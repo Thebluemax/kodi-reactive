@@ -1,4 +1,28 @@
 <div class="player-control">
+  <!-- Seekbar: [0:00][════════][3:45] -->
+  <div class="player-control__seekbar">
+    <span class="player-control__time">
+      @if (showHours) {
+        {{ currentHours }}:
+      }
+      {{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}
+    </span>
+
+    <ion-range
+      class="player-control__range"
+      [value]="seekDisplayPercentage"
+      (ionKnobMoveStart)="onSeekStart()"
+      (ionKnobMoveEnd)="onSeekEnd($event)"
+    />
+
+    <span class="player-control__time">
+      @if (showHours) {
+        {{ totalHours }}:
+      }
+      {{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}
+    </span>
+  </div>
+
   <!-- Transport: [🔀][⏮][⏯][⏭][🔁] -->
   <div class="player-control__transport">
     <ion-button
@@ -35,29 +59,5 @@
     >
       <ion-icon slot="icon-only" [name]="getRepeatIcon()" />
     </ion-button>
-  </div>
-
-  <!-- Seekbar: [0:00][════════][3:45] -->
-  <div class="player-control__seekbar">
-    <span class="player-control__time">
-      @if (showHours) {
-        {{ currentHours }}:
-      }
-      {{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}
-    </span>
-
-    <ion-range
-      class="player-control__range"
-      [value]="seekDisplayPercentage"
-      (ionKnobMoveStart)="onSeekStart()"
-      (ionKnobMoveEnd)="onSeekEnd($event)"
-    />
-
-    <span class="player-control__time">
-      @if (showHours) {
-        {{ totalHours }}:
-      }
-      {{ totalMinutes | zeroPadding }}:{{ totalSeconds | zeroPadding }}
-    </span>
   </div>
 </div>
