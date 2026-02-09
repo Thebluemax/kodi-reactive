@@ -17,6 +17,7 @@ import {
   IonReorder,
   IonText,
   AlertController,
+  ToastController,
   ItemReorderEventDetail
 } from '@ionic/angular/standalone';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
@@ -51,6 +52,7 @@ import { SavePlaylistUseCase } from '../../../application/use-cases/save-playlis
 })
 export class CurrentPlayListComponent {
   private readonly alertController = inject(AlertController);
+  private readonly toastController = inject(ToastController);
   private readonly clearPlaylistUseCase = inject(ClearPlaylistUseCase);
   private readonly removePlaylistItemUseCase = inject(RemovePlaylistItemUseCase);
   private readonly reorderPlaylistUseCase = inject(ReorderPlaylistUseCase);
@@ -134,11 +136,23 @@ export class CurrentPlayListComponent {
           handler: (data) => {
             if (data.name && data.name.trim()) {
               this.savePlaylistUseCase.execute(data.name.trim(), this.playlist());
+              this.showSaveToast(data.name.trim());
             }
           }
         }
       ]
     });
     await alert.present();
+  }
+
+  private async showSaveToast(name: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message: `Playlist "${name}" guardada`,
+      duration: 2000,
+      position: 'bottom',
+      color: 'success',
+      icon: 'checkmark-circle'
+    });
+    await toast.present();
   }
 }
