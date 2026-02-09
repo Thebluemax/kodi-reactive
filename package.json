@@ -1,8 +1,8 @@
 {
-  "name": "kodi-reactive",
+  "name": "reaktive",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "thebluemax",
+  "homepage": "https://maximilianofernandez.net/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -66,5 +66,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.3"
   },
-  "description": "An Ionic project"
+  "description": "Kodi Reactive is a web-based interface built with Angular and Ionic that allows users to remotely manage their Kodi media library and playback. It communicates with Kodi in real-time through WebSockets (port 9090) for live updates and a JSON-RPC REST API (port 8008) for library operations. The application supports browsing music and video collections, managing playlists, controlling playback, and features both light and dark themes. It is designed to be packaged as an official Kodi add-on."
 }

@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonContent,
   IonList,
@@ -50,7 +51,7 @@ import { SavedPlaylistDetailComponent } from '../saved-playlist-detail/saved-pla
   styleUrl: './saved-playlist-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SavedPlaylistListComponent implements OnInit {
+export class SavedPlaylistListComponent implements OnInit, ViewWillEnter {
   private readonly getPlaylistsUseCase = inject(GetSavedPlaylistsUseCase);
   private readonly deletePlaylistUseCase = inject(DeleteSavedPlaylistUseCase);
   private readonly loadPlaylistUseCase = inject(LoadSavedPlaylistUseCase);
@@ -65,6 +66,10 @@ export class SavedPlaylistListComponent implements OnInit {
   readonly isLoading = signal<boolean>(false);
 
   ngOnInit(): void {
+    this.loadPlaylists();
+  }
+
+  ionViewWillEnter(): void {
     this.loadPlaylists();
   }
 
