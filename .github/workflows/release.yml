@@ -7,6 +7,8 @@ jobs:
   release:
     name: Build & Release Addon
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
