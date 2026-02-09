@@ -53,6 +53,7 @@
 
     @media (hover: none) {
       opacity: 1;
+      gap: 4px;
     }
   }
 
@@ -69,6 +70,7 @@
 
     @media (hover: none) {
       transform: scale(1);
+      font-size: 1.2em;
     }
   }
 
