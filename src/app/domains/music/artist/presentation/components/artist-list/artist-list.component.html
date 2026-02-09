@@ -7,10 +7,13 @@
     @for (artist of artists(); track artist.artistId) {
       <ion-card
         class="tile"
-        [style.backgroundImage]="'url(' + (artist.thumbnail | assets : 'scape') + '), url(assets/site/no_cover.webp)'"
+        [style.backgroundImage]="
+          'url(' +
+          (artist.thumbnail | assets: 'scape') +
+          '), url(assets/site/no_cover.webp)'
+        "
         [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
         [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"
-
       >
         <ion-card-header (click)="onArtistClick(artist)">
           <ion-card-title>{{ artist.name }}</ion-card-title>
@@ -31,8 +34,5 @@
   [customWidth]="'60%'"
   (closeSlideBar)="onClosePanel()"
 >
-  <app-artist-detail
-    [artist]="selectedArtist()"
-    [albums]="albums()"
-  />
+  <app-artist-detail [artist]="selectedArtist()" [albums]="albums()" />
 </app-lateral-slide>
