@@ -1,5 +1,5 @@
 # --- Variables de empaquetado ---
-ADDON_ID   := webinterface.reactive
+ADDON_ID   := webinterface.reaktive
 DIST_DIR   := ./dist
 BUILD_DIR  := ./www
 ADDON_DIR  := ./build

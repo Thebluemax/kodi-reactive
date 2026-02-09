@@ -1,12 +1,11 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 jobs:
-  test:
-    name: Test & Coverage
+  release:
+    name: Build & Release Addon
     runs-on: ubuntu-latest
 
     steps:
@@ -22,5 +21,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests with coverage
-        run: npx ng test --configuration=ci --no-watch --browsers=ChromeHeadless --code-coverage
+      - name: Run tests
+        run: npx ng test --configuration=ci --no-watch --browsers=ChromeHeadless
+
+      - name: Build production
+        run: npm run build
+
+      - name: Extract version from package.json
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update addon.xml version
+        run: sed -i "s/version=\"[^\"]*\"/version=\"${{ steps.version.outputs.VERSION }}\"/" addon.xml
+
+      - name: Package addon
+        run: make package
+
+      - name: Rename zip
+        run: mv ./build/webinterface.reaktive.zip ./build/webinterface.reaktive-v${{ steps.version.outputs.VERSION }}.zip
+
+      - name: Create GitHub Release and upload artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.VERSION }}" \
+            --title "v${{ steps.version.outputs.VERSION }}" \
+            --generate-notes \
+            "./build/webinterface.reaktive-v${{ steps.version.outputs.VERSION }}.zip"
