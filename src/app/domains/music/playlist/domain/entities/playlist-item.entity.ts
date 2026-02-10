@@ -71,7 +71,7 @@ export class PlaylistItemFactory {
   static toSavedPlaylist(name: string, items: PlaylistItem[]): SavedPlaylist {
     const now = new Date().toISOString();
     return {
-      id: crypto.randomUUID(),
+      id: self.crypto?.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join(''),
       name,
       items,
       createdAt: now,

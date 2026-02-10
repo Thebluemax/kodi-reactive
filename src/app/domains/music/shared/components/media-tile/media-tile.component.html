@@ -1,11 +1,13 @@
 <ion-card
   class="media-tile"
+  [class.media-tile--active]="actionsVisible()"
   [style.backgroundImage]="
     'url(' +
     (thumbnail() | assets: 'scape') +
     '), url(assets/site/no_cover.webp)'
   "
   [style.backgroundSize]="'cover'"
+  (click)="toggleActions()"
 >
   @if (showActionButtons()) {
     <div class="media-tile__actions">

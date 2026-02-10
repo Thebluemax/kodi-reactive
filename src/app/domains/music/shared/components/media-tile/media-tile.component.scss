@@ -41,7 +41,7 @@
     @include text-ellipsis;
   }
 
-  // Element: Actions (overlay on hover for desktop, always visible on touch)
+  // Element: Actions (overlay)
   &__actions {
     @include absolute-fill;
     @include flex-center;
@@ -50,15 +50,22 @@
     opacity: 0;
     @include transition(opacity);
     z-index: 1;
-
-    @media (hover: none) {
-      opacity: 1;
-      gap: 4px;
-    }
   }
 
+  // Desktop: show on hover
   &:hover &__actions {
     opacity: 1;
+  }
+
+  // Touch: show only when active (tapped)
+  @media (hover: none) {
+    &:hover &__actions {
+      opacity: 0;
+    }
+
+    &--active &__actions {
+      opacity: 1;
+    }
   }
 
   // Element: Action Button
@@ -67,14 +74,15 @@
     font-size: 1.6em;
     transform: scale(0.8);
     @include transition(transform, $transition-fast);
-
-    @media (hover: none) {
-      transform: scale(1);
-      font-size: 1.2em;
-    }
   }
 
   &:hover &__action-btn {
     transform: scale(1);
+  }
+
+  @media (hover: none) {
+    &--active &__action-btn {
+      transform: scale(1);
+    }
   }
 }

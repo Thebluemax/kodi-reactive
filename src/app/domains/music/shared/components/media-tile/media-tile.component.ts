@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
@@ -35,6 +35,12 @@ export class MediaTileComponent {
   // Outputs using output()
   readonly itemSelected = output<unknown>();
   readonly addToPlaylist = output<MediaTileAction>();
+
+  readonly actionsVisible = signal(false);
+
+  toggleActions(): void {
+    this.actionsVisible.update(v => !v);
+  }
 
   onItemClick(): void {
     this.itemSelected.emit(this.item());
