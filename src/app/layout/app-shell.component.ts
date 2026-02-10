@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy, signal, effect } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy, signal, effect, computed } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router, NavigationEnd } from '@angular/router';
 import { IonRouterOutlet, IonHeader, IonIcon, IonToolbar, IonMenu, IonButton, IonButtons, IonSearchbar, IonContent, IonMenuToggle } from '@ionic/angular/standalone';
@@ -8,6 +8,7 @@ import { CurrentPlayListComponent } from '@domains/music/playlist';
 import { CurrentTrackComponent, PlayerControlComponent, SoundComponent } from '@domains/music/player';
 import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 @Component({
   selector: 'app-shell',
@@ -39,6 +40,15 @@ export class AppShellComponent implements OnInit, OnDestroy {
   readonly globalSearch = inject(GlobalSearchService);
 
   readonly isRemoteActive = signal(false);
+
+  private readonly assetsPipe = new AssetsPipe();
+
+  readonly controlBgUrl = computed(() => {
+    const track = this.playBackFacade.playerInfo();
+    const src = track?.fanart || track?.thumbnail || '';
+    if (!src) return '';
+    return this.assetsPipe.transform(src);
+  });
 
   private readonly titleEffect = effect(() => {
     const track = this.playBackFacade.playerInfo();

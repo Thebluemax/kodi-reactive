@@ -62,6 +62,9 @@
 
     @if (!isRemoteActive()) {
     <div class="control-nav">
+      <div class="control-nav__bg"
+           [style.background-image]="controlBgUrl() ? 'url(' + controlBgUrl() + ')' : 'none'"></div>
+      <div class="control-nav__overlay"></div>
       <!-- Sección 1: Track Info -->
       <div class="control-nav__info">
         <player-current-track
