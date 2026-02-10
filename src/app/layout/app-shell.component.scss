@@ -11,7 +11,7 @@ ion-searchbar {
 }
 
 .control-nav {
-    background-color: rgba(0, 0, 0, .75);
+    background-color: #000;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -24,6 +24,31 @@ ion-searchbar {
     z-index: 100;
     padding: 12px 32px;
     gap: 48px;
+    overflow: hidden;
+
+    // Blurred album art background
+    &__bg {
+        position: absolute;
+        inset: -20px;
+        background-size: cover;
+        background-position: center;
+        filter: blur(20px);
+        z-index: 0;
+    }
+
+    // Dark overlay for legibility
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 0;
+    }
+
+    // All children above the overlay
+    &__info, &__playback, &__extras {
+        position: relative;
+        z-index: 1;
+    }
 
     // Sección 1: Track Info
     &__info {
