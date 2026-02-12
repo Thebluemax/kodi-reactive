@@ -8,6 +8,7 @@ import { CurrentPlayListComponent } from '@domains/music/playlist';
 import { CurrentTrackComponent, PlayerControlComponent, SoundComponent } from '@domains/music/player';
 import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { ThemeService } from '@shared/services/theme.service';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 @Component({
@@ -38,6 +39,7 @@ export class AppShellComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   readonly playBackFacade = inject(PlaybackFacade);
   readonly globalSearch = inject(GlobalSearchService);
+  readonly themeService = inject(ThemeService);
 
   readonly isRemoteActive = signal(false);
 

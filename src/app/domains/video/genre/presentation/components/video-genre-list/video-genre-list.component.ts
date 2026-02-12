@@ -13,7 +13,8 @@ import {
   IonProgressBar
 } from '@ionic/angular/standalone';
 
-import { MediaTileComponent, LateralPanelComponent } from '@domains/music/shared';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
+import { MediaTileComponent } from '@shared/components/media-tile/media-tile.component';
 import { VideoGenre } from '../../../domain/entities/video-genre.entity';
 import { GetVideoGenresUseCase } from '../../../application/use-cases/get-video-genres.use-case';
 import { VideoGenreDetailComponent } from '../video-genre-detail/video-genre-detail.component';

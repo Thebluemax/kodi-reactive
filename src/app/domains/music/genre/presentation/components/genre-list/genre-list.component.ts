@@ -17,7 +17,7 @@ import { Artist } from '@domains/music/artist/domain/entities/artist.entity';
 import { GetGenresUseCase } from '../../../application/use-cases/get-genres.use-case';
 import { GetGenreDetailUseCase } from '../../../application/use-cases/get-genre-detail.use-case';
 import { GlobalSearchService } from '@shared/services/global-search.service';
-import { LateralPanelComponent } from '@domains/music/shared';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
 import { GenreDetailPanelComponent } from '../genre-detail-panel/genre-detail-panel.component';
 
 @Component({

@@ -12,7 +12,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <img class="app-logo" src="assets/site/logo.png" alt="Kodi Reactive" />
+      <img class="app-logo" src="assets/site/logo.png" alt="ReaKtive" />
     </ion-buttons>
     @if (globalSearch.isSearchVisible()) {
       <ion-searchbar
@@ -24,31 +24,30 @@
     }
     <ion-buttons slot="end">
       <ion-button size="small" color="dark" (click)="navigateTo('music')">
-        <ion-icon
-          slot="icon-only"
-          ios="musical-notes"
-          md="musical-notes"
-        />
+        <ion-icon slot="icon-only" ios="musical-notes" md="musical-notes" />
       </ion-button>
-      <ion-button size="small" (click)="navigateTo('video')">
+      <ion-button size="small" color="dark" (click)="navigateTo('video')">
         <ion-icon slot="icon-only" ios="tv" md="tv" />
       </ion-button>
-      <ion-button size="small" (click)="navigateTo('remote')">
-        <ion-icon slot="icon-only" ios="game-controller-outline" md="game-controller-outline" />
-      </ion-button>
-      <ion-button size="small" (click)="navigateTo('playlists')">
+      <ion-button size="small" color="dark" (click)="navigateTo('remote')">
         <ion-icon
           slot="icon-only"
-          ios="list-outline"
-          md="list-outline"
+          ios="game-controller-outline"
+          md="game-controller-outline"
         />
       </ion-button>
-      <ion-button size="small">
-        <ion-icon
-          slot="icon-only"
-          ios="settings-sharp"
-          md="settings-sharp"
-        />
+      <ion-button size="small" color="dark" (click)="navigateTo('playlists')">
+        <ion-icon slot="icon-only" ios="list-outline" md="list-outline" />
+      </ion-button>
+      <ion-button
+        size="small"
+        color="dark"
+        (click)="themeService.toggleTheme()"
+      >
+        <ion-icon slot="icon-only" [name]="themeService.themeIcon()" />
+      </ion-button>
+      <ion-button size="small" color="dark">
+        <ion-icon slot="icon-only" ios="settings-sharp" md="settings-sharp" />
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -61,48 +60,52 @@
     </div>
 
     @if (!isRemoteActive()) {
-    <div class="control-nav">
-      <div class="control-nav__bg"
-           [style.background-image]="controlBgUrl() ? 'url(' + controlBgUrl() + ')' : 'none'"></div>
-      <div class="control-nav__overlay"></div>
-      <!-- Sección 1: Track Info -->
-      <div class="control-nav__info">
-        <player-current-track
-          [currentTrack]="playBackFacade.playerInfo()"
-        />
-      </div>
+      <div class="control-nav">
+        <div
+          class="control-nav__bg"
+          [style.background-image]="
+            controlBgUrl() ? 'url(' + controlBgUrl() + ')' : 'none'
+          "
+        ></div>
+        <div class="control-nav__overlay"></div>
+        <!-- Sección 1: Track Info -->
+        <div class="control-nav__info">
+          <player-current-track [currentTrack]="playBackFacade.playerInfo()" />
+        </div>
 
-      <!-- Sección 2: Playback Controls + Seekbar -->
-      <div class="control-nav__playback">
-        <app-player-control class="player-control" />
-      </div>
+        <!-- Sección 2: Playback Controls + Seekbar -->
+        <div class="control-nav__playback">
+          <app-player-control class="player-control" />
+        </div>
 
-      <!-- Sección 3: Extras (party, playlist, volume) -->
-      <div class="control-nav__extras">
-        <ion-button
-          size="small"
-          shape="round"
-          (click)="playBackFacade.togglePartyMode()"
-          [color]="playBackFacade.playerState()?.partyMode ? 'success' : 'dark'"
-        >
-          <ion-icon slot="icon-only" name="beer-outline" />
-        </ion-button>
-        <ion-menu-toggle>
-          <ion-button size="small" shape="round" color="dark">
-            <ion-icon
-              slot="icon-only"
-              ios="reorder-three-outline"
-              md="reorder-three-outline"
-            />
+        <!-- Sección 3: Extras (party, playlist, volume) -->
+        <div class="control-nav__extras">
+          <ion-button
+            size="small"
+            shape="round"
+            (click)="playBackFacade.togglePartyMode()"
+            [color]="
+              playBackFacade.playerState()?.partyMode ? 'success' : 'dark'
+            "
+          >
+            <ion-icon slot="icon-only" name="beer-outline" />
           </ion-button>
-        </ion-menu-toggle>
-        <app-sound
-          [volume]="playBackFacade.volume()"
-          [isMute]="playBackFacade.isMute()"
-          (volumeChange)="updateVolume($event)"
-        />
+          <ion-menu-toggle>
+            <ion-button size="small" shape="round" color="dark">
+              <ion-icon
+                slot="icon-only"
+                ios="reorder-three-outline"
+                md="reorder-three-outline"
+              />
+            </ion-button>
+          </ion-menu-toggle>
+          <app-sound
+            [volume]="playBackFacade.volume()"
+            [isMute]="playBackFacade.isMute()"
+            (volumeChange)="updateVolume($event)"
+          />
+        </div>
       </div>
-    </div>
     }
   </div>
 </ion-content>

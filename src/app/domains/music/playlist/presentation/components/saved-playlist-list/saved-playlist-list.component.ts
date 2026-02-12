@@ -19,7 +19,8 @@ import {
 } from '@ionic/angular/standalone';
 import { DatePipe } from '@angular/common';
 
-import { LateralPanelComponent } from '@domains/music/shared';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
+import { MediaTileComponent } from '@shared/components/media-tile/media-tile.component';
 import { SavedPlaylist } from '../../../domain/entities/playlist-item.entity';
 import { switchMap } from 'rxjs/operators';
 import { GetSavedPlaylistsUseCase } from '../../../application/use-cases/get-saved-playlists.use-case';

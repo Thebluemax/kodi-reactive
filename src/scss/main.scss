@@ -1,0 +1,169 @@
+// ==========================================================================
+// Kodi Reactive – ITCSS Entry Point
+// ==========================================================================
+// Layers ordered from generic to specific (Inverted Triangle).
+// Settings & Tools don't generate CSS – they are consumed via @use.
+
+@use 'settings' as *;
+
+// 1. GENERIC – Resets, Ionic core, dark mode palette
+@use 'generic';
+
+// 2. ELEMENTS – Bare HTML element styles
+@use 'elements';
+
+// 3. OBJECTS – Layout patterns
+@use 'objects';
+
+// 4. COMPONENTS – Global component styles
+@use 'components';
+
+// 5. UTILITIES – Helper classes (highest specificity)
+@use 'utilities';
+
+// ==========================================================================
+// Design Tokens – CSS Custom Properties
+// ==========================================================================
+
+// --------------------------------------------------------------------------
+// Light theme (default)
+// --------------------------------------------------------------------------
+:root {
+  // ---- Colors ----
+
+  // Backgrounds
+  --kodi-bg-primary: #{$white};
+  --kodi-bg-secondary: #{$gray-100};
+  --kodi-bg-elevated: #{$white};
+  --kodi-bg-control-bar: #{$gray-200};
+  --kodi-bg-card: #{$white};
+  --kodi-bg-remote: #{$gray-100};
+
+  // Text
+  --kodi-text-primary: #{$text-light-primary};
+  --kodi-text-secondary: #{$text-light-secondary};
+  --kodi-text-tertiary: #{$text-light-tertiary};
+
+  // Text on media
+  --kodi-text-on-media: #{$text-on-media};
+  --kodi-text-on-media-secondary: #{$text-on-media-secondary};
+  --kodi-text-on-media-tertiary: #{$text-on-media-tertiary};
+
+  // Overlays
+  --kodi-overlay-heavy: #{$overlay-heavy};
+  --kodi-overlay-medium: #{$overlay-medium};
+  --kodi-overlay-card: #{$overlay-card};
+  --kodi-overlay-header: #{$overlay-header};
+  --kodi-overlay-content: #{$overlay-content};
+  --kodi-overlay-page: #{$overlay-page};
+  --kodi-overlay-sidebar: #{$overlay-sidebar};
+
+  // Borders
+  --kodi-border-light: #{$border-light-on-light};
+  --kodi-border-subtle: #{$border-subtle-on-light};
+
+  // Interactive
+  --kodi-interactive-hover: #{$interactive-hover-light};
+  --kodi-interactive-muted: #{$interactive-muted-light};
+  --kodi-interactive-btn-bg: #{$interactive-btn-bg-light};
+  --kodi-interactive-btn-text: #{$interactive-btn-text-light};
+
+  // Shadows
+  --kodi-shadow-sidebar: #{$shadow-sidebar-light};
+  --kodi-shadow-header: #{$shadow-header-light};
+  --kodi-shadow-card: #{$shadow-card-light};
+  --kodi-shadow-popup: #{$shadow-popup-light};
+
+  // Lateral panel
+  --kodi-lateral-panel-bg: #{$white};
+  --kodi-lateral-panel-grabber-hover: #{$lateral-panel-grabber-hover-light};
+
+  // Seekbar controls
+  --kodi-knob-bg: #{$knob-bg};
+  --kodi-bar-bg: #{$bar-bg};
+
+  // ---- Layout ----
+
+  // Spacing
+  --kodi-space-xxs: #{$space-xxs};
+  --kodi-space-xs: #{$space-xs};
+  --kodi-space-sm: #{$space-sm};
+  --kodi-space-md: #{$space-md};
+  --kodi-space-lg: #{$space-lg};
+  --kodi-space-xl: #{$space-xl};
+  --kodi-space-2xl: #{$space-2xl};
+  --kodi-space-3xl: #{$space-3xl};
+  --kodi-space-4xl: #{$space-4xl};
+  --kodi-space-5xl: #{$space-5xl};
+
+  // Border radius
+  --kodi-radius-xs: #{$radius-xs};
+  --kodi-radius-sm: #{$radius-sm};
+  --kodi-radius-md: #{$radius-md};
+  --kodi-radius-lg: #{$radius-lg};
+  --kodi-radius-xl: #{$radius-xl};
+  --kodi-radius-full: #{$radius-full};
+
+  // Control bar
+  --kodi-control-bar-height: #{$control-bar-height};
+  --kodi-control-bar-padding: #{$control-bar-padding};
+  --kodi-control-bar-padding-mobile: #{$control-bar-padding-mobile};
+  --kodi-control-bar-gap: #{$control-bar-gap};
+  --kodi-control-bar-gap-mobile: #{$control-bar-gap-mobile};
+
+  // Sidebar
+  --kodi-sidebar-min-width: #{$sidebar-min-width};
+  --kodi-sidebar-max-width: #{$sidebar-max-width};
+  --kodi-sidebar-header-height: #{$sidebar-header-height};
+  --kodi-sidebar-grabber-width: #{$sidebar-grabber-width};
+
+  // Searchbar
+  --kodi-searchbar-max-width: #{$searchbar-max-width};
+
+  // Remote control
+  --kodi-remote-max-width: #{$remote-max-width};
+
+  // Thumbnails
+  --kodi-thumb-xs: #{$thumb-xs};
+  --kodi-thumb-sm: #{$thumb-sm};
+  --kodi-thumb-md: #{$thumb-md};
+  --kodi-thumb-lg: #{$thumb-lg};
+}
+
+// --------------------------------------------------------------------------
+// Dark theme overrides
+// --------------------------------------------------------------------------
+.ion-palette-dark {
+  // Backgrounds
+  --kodi-bg-primary: #{$gray-950};
+  --kodi-bg-secondary: #{$gray-900};
+  --kodi-bg-elevated: #{$gray-900};
+  --kodi-bg-control-bar: #{$black};
+  --kodi-bg-card: #{$gray-800};
+  --kodi-bg-remote: #{$gray-900};
+
+  // Text
+  --kodi-text-primary: #{$text-dark-primary};
+  --kodi-text-secondary: #{$text-dark-secondary};
+  --kodi-text-tertiary: #{$text-dark-tertiary};
+
+  // Borders
+  --kodi-border-light: #{$border-light-on-dark};
+  --kodi-border-subtle: #{$border-subtle-on-dark};
+
+  // Interactive
+  --kodi-interactive-hover: #{$interactive-hover-dark};
+  --kodi-interactive-muted: #{$interactive-muted-dark};
+  --kodi-interactive-btn-bg: #{$interactive-btn-bg-dark};
+  --kodi-interactive-btn-text: #{$interactive-btn-text-dark};
+
+  // Shadows
+  --kodi-shadow-sidebar: #{$shadow-sidebar-dark};
+  --kodi-shadow-header: #{$shadow-header-dark};
+  --kodi-shadow-card: #{$shadow-card-dark};
+  --kodi-shadow-popup: #{$shadow-popup-dark};
+
+  // Lateral panel
+  --kodi-lateral-panel-bg: #{$black};
+  --kodi-lateral-panel-grabber-hover: #{$lateral-panel-grabber-hover-dark};
+}

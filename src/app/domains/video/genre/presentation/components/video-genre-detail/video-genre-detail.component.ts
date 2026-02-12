@@ -37,7 +37,6 @@ import { AssetsPipe } from '@shared/pipes/assets.pipe';
     IonList,
     IonItem,
     IonLabel,
-    IonNote,
     IonButton,
     IonIcon,
     IonInfiniteScroll,

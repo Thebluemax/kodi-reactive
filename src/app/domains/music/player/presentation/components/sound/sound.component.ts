@@ -2,7 +2,7 @@
 // PRESENTATION - Sound Component
 // ==========================================================================
 
-import { Component, ChangeDetectionStrategy, input, output, signal, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, inject, computed, ElementRef, viewChild } from '@angular/core';
 import { IonButton, IonIcon, IonRange } from '@ionic/angular/standalone';
 import { ToggleMuteUseCase } from '../../../application/use-cases/toggle-mute.use-case';
 
@@ -24,8 +24,12 @@ export class SoundComponent {
   // Output using output()
   readonly volumeChange = output<number>();
 
+  // Template refs
+  private readonly triggerBtn = viewChild<ElementRef>('triggerBtn');
+
   // Local state
   readonly isOpen = signal<boolean>(false);
+  readonly popupPosition = signal<{ bottom: number; right: number }>({ bottom: 100, right: 8 });
 
   // Computed icon
   readonly volumeIcon = computed(() => {
@@ -46,7 +50,20 @@ export class SoundComponent {
   }
 
   togglePopup(): void {
-    this.isOpen.update(v => !v);
+    if (this.isOpen()) {
+      this.isOpen.set(false);
+      return;
+    }
+
+    const el = this.triggerBtn()?.nativeElement;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      this.popupPosition.set({
+        bottom: window.innerHeight - rect.top + 8,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    this.isOpen.set(true);
   }
 
   muteVolume(): void {

@@ -31,7 +31,6 @@ import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
     IonList,
     IonItem,
     IonLabel,
-    IonNote,
     IonButton,
     IonIcon,
     IonChip,
