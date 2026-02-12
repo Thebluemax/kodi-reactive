@@ -19,7 +19,8 @@ import {
 } from '@ionic/angular/standalone';
 import { forkJoin } from 'rxjs';
 
-import { MediaTileComponent, LateralPanelComponent } from '@domains/music/shared';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
+import { MediaTileComponent } from '@shared/components/media-tile/media-tile.component';
 import { TVShow, TVShowSearchParams, Season, Episode } from '../../../domain/entities/tvshow.entity';
 import { GetTVShowsUseCase } from '../../../application/use-cases/get-tvshows.use-case';
 import { GetTVShowDetailUseCase } from '../../../application/use-cases/get-tvshow-detail.use-case';

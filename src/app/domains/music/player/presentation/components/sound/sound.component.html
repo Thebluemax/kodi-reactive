@@ -1,10 +1,12 @@
 <div class="sound-container">
-  <ion-button shape="round" (click)="togglePopup()" color="dark">
+  <ion-button #triggerBtn shape="round" (click)="togglePopup()" color="dark">
     <ion-icon [name]="volumeIcon()" slot="icon-only" />
   </ion-button>
 
   @if (isOpen()) {
-    <div class="volume-popup">
+    <div class="volume-popup"
+         [style.bottom.px]="popupPosition().bottom"
+         [style.right.px]="popupPosition().right">
       <div class="volume-popup-content">
         <ion-button
           fill="clear"

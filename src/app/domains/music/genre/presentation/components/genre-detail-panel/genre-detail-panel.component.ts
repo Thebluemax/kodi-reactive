@@ -46,7 +46,6 @@ import { AlbumDetailComponent } from '@domains/music/album/presentation/componen
     IonListHeader,
     IonProgressBar,
     AssetsPipe,
-    DecimalPipe,
     LateralSlideComponent,
     AlbumDetailComponent
   ],

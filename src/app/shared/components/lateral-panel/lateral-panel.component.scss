@@ -2,15 +2,16 @@
 // COMPONENT - Lateral Panel (BEM)
 // ==========================================================================
 
-@use '../../styles' as *;
+@use 'settings' as *;
+@use 'tools' as *;
 
 // Block
 .lateral-panel {
-  background: $lateral-panel-bg;
+  background: var(--kodi-lateral-panel-bg);
   position: fixed;
   height: 100vh;
-  min-width: $lateral-panel-min-width;
-  max-width: $lateral-panel-max-width;
+  min-width: $sidebar-min-width;
+  max-width: $sidebar-max-width;
   top: 0;
   right: -100%;
   z-index: $lateral-panel-z-index;
@@ -66,7 +67,7 @@
     left: 0;
     cursor: col-resize;
     height: 100%;
-    width: $lateral-panel-grabber-width;
+    width: $sidebar-grabber-width;
     overflow: hidden;
     background-color: transparent;
     opacity: 1;
@@ -74,7 +75,7 @@
 
     &:hover,
     &:active {
-      background-color: $lateral-panel-grabber-hover-bg;
+      background-color: var(--kodi-lateral-panel-grabber-hover);
     }
   }
 
@@ -85,7 +86,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: $lateral-panel-overlay-bg;
+    background: $overlay-sidebar;
     z-index: $lateral-panel-z-index - 1000;
     display: none;
   }
@@ -95,13 +96,13 @@
 // RESPONSIVE - Breakpoints
 // ==========================================================================
 
-@include respond-to('sm') {
+@include respond-to('mobile') {
   .lateral-panel {
     max-width: 100%;
   }
 }
 
-@include respond-to('md') {
+@include respond-to('tablet') {
   .lateral-panel {
     max-width: 100%;
   }

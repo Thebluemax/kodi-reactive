@@ -5,10 +5,7 @@
 }
 
 .volume-popup {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  margin-bottom: 8px;
+  position: fixed;
   z-index: 1000;
 
   .volume-popup-content {
@@ -16,9 +13,9 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background-color: var(--ion-color-dark, #1a1a1a);
+    background-color: var(--kodi-bg-elevated);
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--kodi-shadow-popup);
     min-width: 220px;
 
     .mute-btn {

@@ -1,0 +1,88 @@
+// ==========================================================================
+// TOOLS – Mixins & functions (no CSS output by itself)
+// ==========================================================================
+
+@use 'settings' as *;
+
+// --- Responsive breakpoint ---
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'mobile' {
+    @media (max-width: $bp-mobile) {
+      @content;
+    }
+  } @else if $breakpoint == 'tablet' {
+    @media (min-width: $bp-mobile + 1) and (max-width: $bp-tablet - 1) {
+      @content;
+    }
+  } @else if $breakpoint == 'desktop' {
+    @media (min-width: $bp-desktop) {
+      @content;
+    }
+  }
+}
+
+// --- Text ellipsis ---
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// --- Flexbox helpers ---
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-row-wrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// --- Absolute positioning ---
+@mixin absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+@mixin absolute-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+// --- Transition ---
+@mixin transition($property: all, $duration: $transition-normal) {
+  transition: $property $duration;
+}
+
+// --- Overlay ---
+@mixin overlay($bg-color, $opacity: 1) {
+  background-color: $bg-color;
+  opacity: $opacity;
+}
+
+// --- Card hover effect ---
+@mixin card-hover-effect {
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// --- Media tile size ---
+@mixin media-tile-size($size, $margin) {
+  width: calc(100vw / 4 - #{$margin} * 2 + 4px);
+  height: calc(100vw / 4 - #{$margin} * 2 + 4px);
+  margin: $margin;
+}

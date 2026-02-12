@@ -18,7 +18,8 @@ import {
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
-import { MediaTileComponent, LateralPanelComponent } from '@domains/music/shared';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
+import { MediaTileComponent } from '@shared/components/media-tile/media-tile.component';
 import { Album, AlbumSearchParams } from '../../../domain/entities/album.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
 import { GetAlbumsUseCase } from '../../../application/use-cases/get-albums.use-case';

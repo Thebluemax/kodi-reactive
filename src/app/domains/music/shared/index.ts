@@ -3,5 +3,5 @@
 // ==========================================================================
 
 // Components
-export { MediaTileComponent, MediaTileAction } from './components/media-tile/media-tile.component';
-export { LateralPanelComponent } from './components/lateral-panel/lateral-panel.component';
+export { MediaTileComponent, MediaTileAction } from '../../../shared/components/media-tile/media-tile.component';
+export { LateralPanelComponent } from '../../../shared/components/lateral-panel/lateral-panel.component';

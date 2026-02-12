@@ -2,7 +2,8 @@
 // COMPONENT - Media Tile (BEM)
 // ==========================================================================
 
-@use '../../styles' as *;
+@use 'settings' as *;
+@use 'tools' as *;
 
 // Block
 .media-tile {

@@ -18,7 +18,8 @@ import {
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
-import { MediaTileComponent, LateralPanelComponent } from '@domains/music/shared';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
+import { MediaTileComponent } from '@shared/components/media-tile/media-tile.component';
 import { Movie, MovieSearchParams } from '../../../domain/entities/movie.entity';
 import { GetMoviesUseCase } from '../../../application/use-cases/get-movies.use-case';
 import { GetMovieDetailUseCase } from '../../../application/use-cases/get-movie-detail.use-case';
