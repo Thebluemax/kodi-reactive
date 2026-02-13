@@ -3,8 +3,8 @@ ADDON_ID   := webinterface.reaktive
 DIST_DIR   := ./dist
 BUILD_DIR  := ./www
 ADDON_DIR  := ./build
-PACKAGE_DIR := ./${ADDON_DIR}/$(ADDON_ID)
-ZIP_FILE   := ./${ADDON_DIR}/$(ADDON_ID).zip
+PACKAGE_DIR := ${ADDON_DIR}/$(ADDON_ID)
+ZIP_FILE   := ${ADDON_DIR}/$(ADDON_ID).zip
 
 .PHONY: package
 package: clean-package ## Prepara el contenido y genera el archivo .zip para Kodi
@@ -17,7 +17,7 @@ package: clean-package ## Prepara el contenido y genera el archivo .zip para Kod
 	cp addon.xml $(PACKAGE_DIR)/
 	
 	@echo "Comprimiendo en $(ZIP_FILE)..."
-	zip -r $(ZIP_FILE) $(PACKAGE_DIR)
+	cd $(ADDON_DIR) && zip -r -q ../$(ZIP_FILE) $(ADDON_ID)
 	
 	@echo "Limpiando archivos temporales..."
 	#rm -rf $(PACKAGE_DIR)
