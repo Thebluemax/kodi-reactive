@@ -27,3 +27,14 @@ package: clean-package ## Prepara el contenido y genera el archivo .zip para Kod
 clean-package: ## Elimina el zip y la carpeta temporal del paquete
 	rm -f $(ZIP_FILE)
 	rm -rf $(PACKAGE_DIR)
+
+# --- Versionado SemVer ---
+.PHONY: version-patch version-minor version-major
+version-patch: ## Bump patch version (0.1.0 → 0.1.1)
+	npm version patch
+
+version-minor: ## Bump minor version (0.1.0 → 0.2.0)
+	npm version minor
+
+version-major: ## Bump major version (0.1.0 → 1.0.0)
+	npm version major

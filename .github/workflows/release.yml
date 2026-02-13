@@ -35,9 +35,6 @@ jobs:
           VERSION=$(jq -r '.version' package.json)
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Update addon.xml version
-        run: sed -i "s/version=\"[^\"]*\"/version=\"${{ steps.version.outputs.VERSION }}\"/" addon.xml
-
       - name: Package addon
         run: make package
 

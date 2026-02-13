@@ -1,6 +1,6 @@
 {
   "name": "reaktive",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "thebluemax",
   "homepage": "https://maximilianofernandez.net/",
   "scripts": {
@@ -11,7 +11,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "proxy": "/usr/local/bin/node ops/proxy.js",
-    "create-issue": "node ops/create-issue.js"
+    "create-issue": "node ops/create-issue.js",
+    "version": "node ops/sync-addon-version.js"
   },
   "private": true,
   "dependencies": {
