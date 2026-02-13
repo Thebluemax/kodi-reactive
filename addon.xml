@@ -11,9 +11,10 @@
 	<extension point="xbmc.addon.metadata">
         <summary lang="es">A modern, reactive frontend to control Kodi media center via WebSockets and JSON-RPC. </summary>
         <description lang="es">Kodi Reactive is a web-based interface built with Angular and Ionic that allows users to remotely manage their Kodi media library and playback. It communicates with Kodi in real-time through 
-  WebSockets (port 9090) for live updates and a JSON-RPC REST API (port 8008) for library operations. The application supports browsing music and video collections, managing playlists,         
-  controlling playback, and features both light and dark themes. It is designed to be packaged as an official Kodi add-on.</description>
+  WebSockets for live updates and a JSON-RPC REST API for library operations. The application supports browsing music and video collections, managing local playlists,         
+  controlling playback, and features both light and dark themes.</description>
         <platform>all</platform>
+        <source>https://github.com/Thebluemax/kodi-reactive</source>
         <assets>
             <icon>icon.png</icon>
         </assets>
