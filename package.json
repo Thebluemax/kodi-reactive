@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "author": "thebluemax",
   "homepage": "https://maximilianofernandez.net/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Thebluemax/kodi-reactive.git"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
