@@ -16,7 +16,8 @@
     "lint": "ng lint",
     "proxy": "/usr/local/bin/node ops/proxy.js",
     "create-issue": "node ops/create-issue.js",
-    "version": "node ops/sync-addon-version.js"
+    "version": "node ops/sync-addon-version.js",
+    "prepare": "husky"
   },
   "private": true,
   "dependencies": {
@@ -62,6 +63,7 @@
     "eslint-plugin-jasmine": "^4.2.2",
     "eslint-plugin-jsdoc": "^48.2.1",
     "eslint-plugin-prefer-arrow": "1.2.2",
+    "husky": "^9.1.7",
     "jasmine-core": "~5.1.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~6.4.0",
@@ -69,7 +71,11 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "lint-staged": "^16.2.7",
     "typescript": "~5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,html}": "eslint"
   },
   "description": "Kodi Reactive is a web-based interface built with Angular and Ionic that allows users to remotely manage their Kodi media library and playback. It communicates with Kodi in real-time through WebSockets (port 9090) for live updates and a JSON-RPC REST API (port 8008) for library operations. The application supports browsing music and video collections, managing playlists, controlling playback, and features both light and dark themes. It is designed to be packaged as an official Kodi add-on."
 }
