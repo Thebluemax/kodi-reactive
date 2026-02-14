@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-02-13
+
+### Added
+
+- **SemVer sync**: Implementar versionado SemVer 0.x.y con sincronización automática de addon.xml (#154)
+- **Repo URL**: Agregada la URL del repositorio en package.json y addon.xml
+
+### Changed
+
+- **Packaging**: Ajustes en la estructura del archivo final para la release (#153)
+- **Addon metadata**: Actualizaciones en la descripción del addon
+
 ## [0.1.0] - 2026-02-13
 
 First stable release of Kodi Reactive, a modern web interface for Kodi.
