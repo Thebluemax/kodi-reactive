@@ -23,7 +23,7 @@ interface KodiJsonRpcRequest {
 })
 export class InputKodiRepository extends InputRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/mediaplayer`;
+  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc?mediaplayer`;
   private requestId = 1;
 
   // ========================================================================
