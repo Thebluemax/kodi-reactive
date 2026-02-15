@@ -38,14 +38,19 @@ $text-on-media: $white;
 $text-on-media-secondary: $gray-300;
 $text-on-media-tertiary: $gray-400;
 
-// --- Overlays (always dark – over images) ---
+// --- Overlays (on media – always dark, for text legibility) ---
 $overlay-heavy: rgba($black, 0.7);
 $overlay-medium: rgba($black, 0.55);
 $overlay-card: rgba($black, 0.7);
 $overlay-header: rgba($black, 0.6);
 $overlay-content: rgba($black, 0.65);
-$overlay-page: rgba($black, 0.55);
 $overlay-sidebar: rgba(22, 23, 24, 0.5);
+
+// --- Theme-aware overlays ---
+$overlay-page-light: rgba($white, 0.75);
+$overlay-page-dark: rgba($black, 0.55);
+$overlay-card-light: rgba($white, 0.8);
+$overlay-card-dark: rgba($black, 0.7);
 
 // --- Borders ---
 $border-light-on-light: rgba($black, 0.1);
