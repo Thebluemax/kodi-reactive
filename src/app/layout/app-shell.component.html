@@ -12,7 +12,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <img class="app-logo" src="assets/site/logo.png" alt="ReaKtive" />
+      <img class="app-logo" [src]="themeService.themeImage()" alt="ReaKtive" />
     </ion-buttons>
     @if (globalSearch.isSearchVisible()) {
       <ion-searchbar
@@ -65,7 +65,11 @@
         color="dark"
         (click)="themeService.toggleTheme()"
       >
-        <ion-icon slot="icon-only" [name]="themeService.themeIcon()" />
+        <ion-icon
+          slot="icon-only"
+          [ios]="themeService.themeIcon()"
+          [md]="themeService.themeIcon()"
+        />
       </ion-button>
       <ion-button size="small" fill="clear" color="dark">
         <ion-icon slot="icon-only" ios="settings-sharp" md="settings-sharp" />
