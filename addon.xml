@@ -2,7 +2,7 @@
 <addon 
    id="webinterface.reaktive" 
    name="reaktive" 
-   version="0.2.0"
+   version="0.3.0"
    provider-name="Thebluemax">
     <requires>
 		<import addon="xbmc.json" version="6.0.0"/>
