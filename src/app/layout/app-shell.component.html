@@ -23,30 +23,51 @@
       />
     }
     <ion-buttons slot="end">
-      <ion-button size="small" color="dark" (click)="navigateTo('music')">
+      <ion-button
+        size="small"
+        fill="clear"
+        color="dark"
+        (click)="navigateTo('music')"
+      >
         <ion-icon slot="icon-only" ios="musical-notes" md="musical-notes" />
       </ion-button>
-      <ion-button size="small" color="dark" (click)="navigateTo('video')">
+      <ion-button
+        size="small"
+        fill="clear"
+        color="dark"
+        (click)="navigateTo('video')"
+      >
         <ion-icon slot="icon-only" ios="tv" md="tv" />
       </ion-button>
-      <ion-button size="small" color="dark" (click)="navigateTo('remote')">
+      <ion-button
+        size="small"
+        fill="clear"
+        color="dark"
+        (click)="navigateTo('remote')"
+      >
         <ion-icon
           slot="icon-only"
           ios="game-controller-outline"
           md="game-controller-outline"
         />
       </ion-button>
-      <ion-button size="small" color="dark" (click)="navigateTo('playlists')">
+      <ion-button
+        size="small"
+        fill="clear"
+        color="dark"
+        (click)="navigateTo('playlists')"
+      >
         <ion-icon slot="icon-only" ios="list-outline" md="list-outline" />
       </ion-button>
       <ion-button
         size="small"
+        fill="clear"
         color="dark"
         (click)="themeService.toggleTheme()"
       >
         <ion-icon slot="icon-only" [name]="themeService.themeIcon()" />
       </ion-button>
-      <ion-button size="small" color="dark">
+      <ion-button size="small" fill="clear" color="dark">
         <ion-icon slot="icon-only" ios="settings-sharp" md="settings-sharp" />
       </ion-button>
     </ion-buttons>
@@ -82,16 +103,16 @@
         <div class="control-nav__extras">
           <ion-button
             size="small"
-            shape="round"
+            fill="clear"
             (click)="playBackFacade.togglePartyMode()"
             [color]="
-              playBackFacade.playerState()?.partyMode ? 'success' : 'dark'
+              playBackFacade.playerState()?.partyMode ? 'primary' : 'dark'
             "
           >
             <ion-icon slot="icon-only" name="beer-outline" />
           </ion-button>
           <ion-menu-toggle>
-            <ion-button size="small" shape="round" color="dark">
+            <ion-button size="small" fill="clear" color="dark">
               <ion-icon
                 slot="icon-only"
                 ios="reorder-three-outline"

@@ -6,7 +6,7 @@
   ion-card-header {
     background-color: var(--kodi-overlay-header);
     bottom: 0;
-    color: white;
+    color: var(--kodi-text-on-media);
     font-size: 1em;
     height: min-content;
     left: 0;
@@ -14,8 +14,13 @@
     width: 100%;
 
     ion-card-title {
+      color: var(--kodi-text-on-media);
       font-size: 0.9em;
       font-weight: 900;
+    }
+
+    ion-card-subtitle {
+      color: var(--kodi-text-on-media-secondary);
     }
 
     &.btn-active {

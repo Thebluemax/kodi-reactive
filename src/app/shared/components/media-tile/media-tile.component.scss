@@ -27,6 +27,7 @@
 
   // Element: Title
   &__title {
+    color: $media-tile-title-color;
     font-size: $media-tile-title-font-size;
     font-weight: 900;
     margin: 0;
@@ -35,10 +36,10 @@
 
   // Element: Subtitle
   &__subtitle {
+    color: $media-tile-subtitle-color;
     font-size: $media-tile-subtitle-font-size;
     font-weight: 400;
     margin: 0;
-    color: $media-tile-subtitle-color;
     @include text-ellipsis;
   }
 

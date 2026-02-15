@@ -26,36 +26,37 @@
   <!-- Transport: [🔀][⏮][⏯][⏭][🔁] -->
   <div class="player-control__transport">
     <ion-button
-      shape="round"
       size="small"
+      fill="clear"
       (click)="onShuffle()"
-      [color]="shuffled ? 'success' : 'dark'"
-      [disabled]="!canShuffle"
+      [color]="shuffled ? 'primary' : 'dark'"
+      [disabled]="!canShuffle || partyMode"
     >
       <ion-icon slot="icon-only" name="shuffle-outline" />
     </ion-button>
 
-    <ion-button shape="round" size="small" (click)="onPrevious()" color="dark">
+    <ion-button fill="clear" size="small" (click)="onPrevious()" color="dark">
       <ion-icon slot="icon-only" name="play-skip-back-outline" />
     </ion-button>
 
-    <ion-button shape="round" (click)="onPlayPause()" color="dark">
+    <ion-button fill="clear" (click)="onPlayPause()" color="dark">
       <ion-icon
         slot="icon-only"
+        [color]="isPlaying ? 'primary' : 'dark'"
         [name]="isPlaying ? 'pause-outline' : 'play-outline'"
       />
     </ion-button>
 
-    <ion-button shape="round" size="small" (click)="onNext()" color="dark">
+    <ion-button fill="clear" size="small" (click)="onNext()" color="dark">
       <ion-icon slot="icon-only" name="play-skip-forward-outline" />
     </ion-button>
 
     <ion-button
-      shape="round"
+      fill="clear"
       size="small"
       (click)="onRepeat()"
       [color]="getRepeatColor()"
-      [disabled]="!canRepeat"
+      [disabled]="!canRepeat || partyMode"
     >
       <ion-icon slot="icon-only" [name]="getRepeatIcon()" />
     </ion-button>

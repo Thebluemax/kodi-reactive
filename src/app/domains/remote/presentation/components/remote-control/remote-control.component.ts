@@ -263,7 +263,7 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
       case 'off':
         return 'dark';
       case 'all':
-        return 'success';
+        return 'primary';
       case 'one':
         return 'secondary';
       default:

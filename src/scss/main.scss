@@ -52,10 +52,10 @@
   // Overlays
   --kodi-overlay-heavy: #{$overlay-heavy};
   --kodi-overlay-medium: #{$overlay-medium};
-  --kodi-overlay-card: #{$overlay-card};
+  --kodi-overlay-card: #{$overlay-card-light};
   --kodi-overlay-header: #{$overlay-header};
   --kodi-overlay-content: #{$overlay-content};
-  --kodi-overlay-page: #{$overlay-page};
+  --kodi-overlay-page: #{$overlay-page-light};
   --kodi-overlay-sidebar: #{$overlay-sidebar};
 
   // Borders
@@ -146,6 +146,10 @@
   --kodi-text-primary: #{$text-dark-primary};
   --kodi-text-secondary: #{$text-dark-secondary};
   --kodi-text-tertiary: #{$text-dark-tertiary};
+
+  // Overlays
+  --kodi-overlay-page: #{$overlay-page-dark};
+  --kodi-overlay-card: #{$overlay-card-dark};
 
   // Borders
   --kodi-border-light: #{$border-light-on-dark};

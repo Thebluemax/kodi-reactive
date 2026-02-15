@@ -1,11 +1,37 @@
-<div class="page-bg"
-     [style.background-image]="backgroundImage ? 'url(' + backgroundImage + ')' : 'none'"></div>
+<div
+  class="page-bg"
+  [style.background-image]="
+    backgroundImage ? 'url(' + backgroundImage + ')' : 'none'
+  "
+></div>
 <div class="page-bg-overlay"></div>
 
 <div
   class="remote-control"
-  [style.background-image]="backgroundImage ? 'url(' + backgroundImage + ')' : 'none'"
+  [style.background-image]="
+    backgroundImage ? 'url(' + backgroundImage + ')' : 'none'
+  "
 >
+  <!-- Top Row: Back, Home, Info, Context Menu, Playlist -->
+  <div class="auxiliary-controls top-row">
+    <ion-button fill="clear" color="dark" (click)="onBack()">
+      <ion-icon slot="icon-only" name="arrow-back-outline" />
+    </ion-button>
+    <ion-button fill="clear" color="dark" (click)="onGoHome()">
+      <ion-icon slot="icon-only" name="home-outline" />
+    </ion-button>
+    <ion-button fill="clear" color="dark" (click)="onShowInfo()">
+      <ion-icon slot="icon-only" name="information-circle-outline" />
+    </ion-button>
+    <ion-button fill="clear" color="dark" (click)="onContextMenu()">
+      <ion-icon slot="icon-only" name="ellipsis-horizontal" />
+    </ion-button>
+    <ion-menu-toggle>
+      <ion-button fill="clear" color="dark">
+        <ion-icon slot="icon-only" name="reorder-three-outline" />
+      </ion-button>
+    </ion-menu-toggle>
+  </div>
   <!-- Now Playing -->
   @if (currentTrack) {
     <div class="now-playing">
@@ -18,9 +44,9 @@
               [alt]="currentTrack.title"
             />
           }
-          <div class="now-playing__text">
+          <div class="now-playing__text ion-text-dark">
             <h3 class="now-playing__title">{{ currentTrack.title }}</h3>
-            @if (currentTrack.type === 'song') {
+            @if (currentTrack.type === "song") {
               <p class="now-playing__subtitle">
                 {{ currentTrack.artist | arrayToString }}
                 @if (currentTrack.album) {
@@ -28,7 +54,9 @@
                 }
               </p>
             } @else {
-              <p class="now-playing__subtitle">{{ currentTrack.genre | arrayToString }}</p>
+              <p class="now-playing__subtitle">
+                {{ currentTrack.genre | arrayToString }}
+              </p>
             }
           </div>
         </div>
@@ -39,7 +67,9 @@
             @if (showHours) {
               {{ currentHours }}:
             }
-            {{ currentMinutes | zeroPadding }}:{{ currentSeconds | zeroPadding }}
+            {{ currentMinutes | zeroPadding }}:{{
+              currentSeconds | zeroPadding
+            }}
           </span>
 
           <ion-range
@@ -60,27 +90,6 @@
     </div>
   }
 
-  <!-- Top Row: Back, Home, Info, Context Menu, Playlist -->
-  <div class="auxiliary-controls top-row">
-    <ion-button fill="clear" (click)="onBack()">
-      <ion-icon slot="icon-only" name="arrow-back-outline" />
-    </ion-button>
-    <ion-button fill="clear" (click)="onGoHome()">
-      <ion-icon slot="icon-only" name="home-outline" />
-    </ion-button>
-    <ion-button fill="clear" (click)="onShowInfo()">
-      <ion-icon slot="icon-only" name="information-circle-outline" />
-    </ion-button>
-    <ion-button fill="clear" (click)="onContextMenu()">
-      <ion-icon slot="icon-only" name="ellipsis-horizontal" />
-    </ion-button>
-    <ion-menu-toggle>
-      <ion-button fill="clear">
-        <ion-icon slot="icon-only" name="reorder-three-outline" />
-      </ion-button>
-    </ion-menu-toggle>
-  </div>
-
   <!-- D-Pad Navigation -->
   <div class="dpad-container">
     <div class="dpad">
@@ -95,9 +104,7 @@
       </button>
 
       <!-- OK Button (Center) -->
-      <button class="dpad-btn dpad-ok" (click)="onSelect()">
-        OK
-      </button>
+      <button class="dpad-btn dpad-ok" (click)="onSelect()">OK</button>
 
       <!-- Right Button -->
       <button class="dpad-btn dpad-right" (click)="onNavigateRight()">
@@ -113,16 +120,20 @@
 
   <!-- Playback Controls -->
   <div class="playback-controls">
-    <ion-button fill="clear" (click)="onPrevious()">
+    <ion-button fill="clear" color="dark" (click)="onPrevious()">
       <ion-icon slot="icon-only" name="play-skip-back-outline" />
     </ion-button>
-    <ion-button fill="clear" (click)="onPlayPause()">
-      <ion-icon slot="icon-only" [name]="isPlaying ? 'pause-outline' : 'play-outline'" />
+    <ion-button fill="clear" color="dark" (click)="onPlayPause()">
+      <ion-icon
+        slot="icon-only"
+        [color]="isPlaying ? 'primary' : 'dark'"
+        [name]="isPlaying ? 'pause-outline' : 'play-outline'"
+      />
     </ion-button>
-    <ion-button fill="clear" (click)="onStop()">
+    <ion-button fill="clear" color="dark" (click)="onStop()">
       <ion-icon slot="icon-only" name="stop-outline" />
     </ion-button>
-    <ion-button fill="clear" (click)="onNext()">
+    <ion-button fill="clear" color="dark" (click)="onNext()">
       <ion-icon slot="icon-only" name="play-skip-forward-outline" />
     </ion-button>
   </div>
@@ -133,22 +144,22 @@
       fill="clear"
       (click)="onRepeat()"
       [color]="getRepeatColor()"
-      [disabled]="!canRepeat"
+      [disabled]="!canRepeat || partyMode"
     >
       <ion-icon slot="icon-only" [name]="getRepeatIcon()" />
     </ion-button>
     <ion-button
       fill="clear"
       (click)="onShuffle()"
-      [color]="shuffled ? 'success' : 'dark'"
-      [disabled]="!canShuffle"
+      [color]="shuffled ? 'primary' : 'dark'"
+      [disabled]="!canShuffle || partyMode"
     >
       <ion-icon slot="icon-only" name="shuffle-outline" />
     </ion-button>
     <ion-button
       fill="clear"
       (click)="onPartyMode()"
-      [color]="partyMode ? 'success' : 'dark'"
+      [color]="partyMode ? 'primary' : 'dark'"
     >
       <ion-icon slot="icon-only" name="beer-outline" />
     </ion-button>
