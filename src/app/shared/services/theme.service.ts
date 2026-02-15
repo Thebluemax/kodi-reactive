@@ -26,6 +26,10 @@ export class ThemeService {
     }
   });
 
+  readonly themeImage = computed(() =>
+    this.isDark() ? 'assets/site/dark.basic.png' : 'assets/site/light.basic.png'
+  );
+
   private readonly systemIsDark = signal(this.darkQuery.matches);
 
   constructor() {

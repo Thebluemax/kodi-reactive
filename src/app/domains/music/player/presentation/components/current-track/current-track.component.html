@@ -1,10 +1,10 @@
 <div class="current-track">
+  <img
+    class="current-track__thumbnail"
+    [alt]="currentTrack()?.title ?? 'No track'"
+    [src]="currentTrack()?.thumbnail ? (currentTrack()!.thumbnail | assets) : 'assets/site/logo-no-track.png'"
+  />
   @if (currentTrack(); as track) {
-    <img
-      class="current-track__thumbnail"
-      [alt]="track.title"
-      [src]="track.thumbnail | assets"
-    />
     <div class="current-track__info">
       <span class="current-track__title">{{ track.title }}</span>
       @if (track.type === 'song') {
