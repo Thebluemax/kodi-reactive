@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2026-02-16
+
+### Fixed
+
+- **Tema claro**: Overlays adaptativos al tema en lugar de valores fijos solo para oscuro (#157)
+- **Botones**: Reemplazar `shape="round"` por `fill="clear"` en player, sound, remote y app-shell (#157)
+- **Colores de texto**: Variables CSS en media-tile y square-item para legibilidad en ambos temas (#157)
+- **Remote control**: Color de botones de playback y controles auxiliares en tema claro (#157)
+
+### Changed
+
+- **Estados activos**: Unificar color de shuffle, repeat y party mode de `success` a `primary` (#157)
+- **Logo del header**: Imagen adaptativa al tema activo (light.basic / dark.basic) (#157)
+- **Current track**: Fallback con logo-no-track.png cuando no hay pista o sin thumbnail (#157)
+- **Shuffle/Repeat**: Deshabilitados cuando partyMode está activo (#157)
+- **Favicon**: Actualización del favicon del proyecto (#157)
+
 ## [0.2.0] - 2026-02-13
 
 ### Added

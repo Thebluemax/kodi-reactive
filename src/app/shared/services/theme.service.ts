@@ -43,6 +43,11 @@ export class ThemeService {
     });
   }
 
+  setTheme(pref: ThemePreference): void {
+    this.preference.set(pref);
+    localStorage.setItem(STORAGE_KEY, pref);
+  }
+
   toggleTheme(): void {
     const current = this.preference();
     const idx = CYCLE.indexOf(current);

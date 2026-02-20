@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Configuración</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Apariencia</ion-label>
+    </ion-list-header>
+
+    <ion-radio-group
+      [value]="themeService.preference()"
+      (ionChange)="onThemeChange($event)"
+    >
+      <ion-item>
+        <ion-icon slot="start" name="desktop-outline" />
+        <ion-label>Sistema</ion-label>
+        <ion-radio value="system" />
+      </ion-item>
+
+      <ion-item>
+        <ion-icon slot="start" name="sunny-outline" />
+        <ion-label>Claro</ion-label>
+        <ion-radio value="light" />
+      </ion-item>
+
+      <ion-item>
+        <ion-icon slot="start" name="moon-outline" />
+        <ion-label>Oscuro</ion-label>
+        <ion-radio value="dark" />
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-content>
