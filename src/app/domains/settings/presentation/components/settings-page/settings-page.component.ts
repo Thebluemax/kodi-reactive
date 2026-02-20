@@ -15,8 +15,10 @@ import {
   IonIcon,
   IonRadioGroup,
   IonRadio,
+  IonInput,
 } from '@ionic/angular/standalone';
 import { ThemeService, ThemePreference } from '@shared/services/theme.service';
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 @Component({
   selector: 'app-settings-page',
@@ -34,13 +36,22 @@ import { ThemeService, ThemePreference } from '@shared/services/theme.service';
     IonIcon,
     IonRadioGroup,
     IonRadio,
+    IonInput,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsPageComponent {
   readonly themeService = inject(ThemeService);
+  readonly config = inject(KodiConfigService);
 
   onThemeChange(event: CustomEvent): void {
     this.themeService.setTheme(event.detail.value as ThemePreference);
+  }
+
+  onWsPortChange(event: CustomEvent): void {
+    const port = parseInt(event.detail.value as string, 10);
+    if (!isNaN(port) && port > 0 && port <= 65535) {
+      this.config.setWsPort(port);
+    }
   }
 }

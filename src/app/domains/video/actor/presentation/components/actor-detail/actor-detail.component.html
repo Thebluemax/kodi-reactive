@@ -4,7 +4,7 @@
       @if (actor().thumbnail) {
         <ion-img
           class="actor-detail__photo"
-          [src]="actor().thumbnail | assets: 'scape'"
+          [src]="actor().thumbnail | assets"
           [alt]="actor().name"
         />
       } @else {
@@ -30,7 +30,7 @@
             >
               <ion-thumbnail slot="start" class="actor-detail__movie-thumb">
                 <ion-img
-                  [src]="movie.thumbnail | assets: 'scape'"
+                  [src]="movie.thumbnail | assets"
                   [alt]="movie.title"
                 />
               </ion-thumbnail>

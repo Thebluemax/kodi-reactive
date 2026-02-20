@@ -2,9 +2,9 @@
 // INFRASTRUCTURE - Player WebSocket Adapter
 // ==========================================================================
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 import {
   PlayerState,
@@ -46,7 +46,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
   private readonly errorSubject = new Subject<Error>();
   private readonly playlistChangedSubject = new Subject<string>();
 
-  private readonly wsUrl: string;
+  private readonly kodiConfig = inject(KodiConfigService);
 
   // Request IDs for identifying responses
   private readonly PLAYER_PROPERTIES_ID = 67;
@@ -64,11 +64,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
     return this._activePlayerId;
   }
 
-  constructor() {
-    // Build WebSocket URL from environment
-    const serverHost = environment.socketServer; //environment.serverUrl.replace(/^https?:\/\//, '').replace(/:\d+$/, '');
-    this.wsUrl = `ws://${environment.socketServer}:${environment.socketPort}/jsonrpc?kodi`;
-  }
+  constructor() { }
 
   ngOnDestroy(): void {
     this.disconnect();
@@ -86,7 +82,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
       return; // Already connected
     }
 
-    this.webSocket = new WebSocket(this.wsUrl);
+    this.webSocket = new WebSocket(this.kodiConfig.wsUrl());
 
     this.webSocket.onopen = () => {
       this.connectionSubject.next(true);

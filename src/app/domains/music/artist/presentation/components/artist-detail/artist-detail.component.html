@@ -5,7 +5,7 @@
         <div class="artist-col col-30 image-col">
           <ion-img
             class="img-canvas"
-            [src]="artist.thumbnail | assets: 'scape'"
+            [src]="artist.thumbnail | assets"
             [alt]="artist.name"
           />
           <div class="artist-meta">
@@ -60,7 +60,7 @@
               <div class="album-cover">
                 <ion-img
                   class="img-canvas"
-                  [src]="album.albumThumbnail | assets: 'scape'"
+                  [src]="album.albumThumbnail | assets"
                   [alt]="album.albumLabel"
                 />
                 <p class="album-title">{{ album.albumLabel }}</p>
