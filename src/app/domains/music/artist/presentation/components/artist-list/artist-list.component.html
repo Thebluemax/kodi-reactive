@@ -8,9 +8,9 @@
       <ion-card
         class="tile"
         [style.backgroundImage]="
-          'url(' +
-          (artist.thumbnail | assets: 'scape') +
-          '), url(assets/site/no_cover.webp)'
+          'url(\'' +
+          (artist.thumbnail | assets) +
+          '\'), url(assets/site/no_cover.webp)'
         "
         [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
         [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"

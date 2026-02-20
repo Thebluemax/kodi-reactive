@@ -13,7 +13,7 @@
         <ion-item class="genre-detail-panel__item" (click)="onAlbumClick(album)">
           <ion-img
             class="genre-detail-panel__thumb"
-            [src]="album.thumbnail | assets: 'scape'"
+            [src]="album.thumbnail | assets"
             [alt]="album.title"
             slot="start"
           />
@@ -42,7 +42,7 @@
         <ion-item class="genre-detail-panel__item">
           <ion-img
             class="genre-detail-panel__thumb genre-detail-panel__thumb--round"
-            [src]="artist.thumbnail | assets: 'scape'"
+            [src]="artist.thumbnail | assets"
             [alt]="artist.name"
             slot="start"
           />

@@ -38,7 +38,7 @@ export class KodiConfigService {
     } else {
       this.protocol = 'http:';
       this.host = environment.socketServer;
-      this.httpPort = environment.apiPort;
+      this.httpPort = environment.kodiHttpPort;
     }
 
     this.httpBaseUrl = `${this.protocol}//${this.host}:${this.httpPort}`;

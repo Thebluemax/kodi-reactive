@@ -2,6 +2,7 @@ import { Component, inject, OnDestroy, OnInit, ChangeDetectionStrategy, signal, 
 import { Title } from '@angular/platform-browser';
 import { Router, NavigationEnd } from '@angular/router';
 import { IonRouterOutlet, IonHeader, IonIcon, IonToolbar, IonMenu, IonButton, IonButtons, IonSearchbar, IonContent, IonMenuToggle } from '@ionic/angular/standalone';
+import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { CurrentPlayListComponent } from '@domains/music/playlist';
@@ -9,7 +10,6 @@ import { CurrentTrackComponent, PlayerControlComponent, SoundComponent } from '@
 import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { ThemeService } from '@shared/services/theme.service';
-import { AssetsPipe } from '@shared/pipes/assets.pipe';
 
 @Component({
   selector: 'app-shell',
@@ -29,8 +29,10 @@ import { AssetsPipe } from '@shared/pipes/assets.pipe';
     IonButtons,
     IonSearchbar,
     IonContent,
-    IonMenuToggle
+    IonMenuToggle,
+    AssetsPipe,
   ],
+  providers: [AssetsPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppShellComponent implements OnInit, OnDestroy {
@@ -43,7 +45,7 @@ export class AppShellComponent implements OnInit, OnDestroy {
 
   readonly isRemoteActive = signal(false);
 
-  private readonly assetsPipe = new AssetsPipe();
+  private readonly assetsPipe = inject(AssetsPipe);
 
   readonly controlBgUrl = computed(() => {
     const track = this.playBackFacade.playerInfo();

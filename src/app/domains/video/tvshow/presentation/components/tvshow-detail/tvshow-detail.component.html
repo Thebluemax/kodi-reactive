@@ -3,7 +3,7 @@
     <div class="tvshow-detail__cover">
       <ion-img
         class="tvshow-detail__image"
-        [src]="tvshow().thumbnail | assets: 'scape'"
+        [src]="tvshow().thumbnail | assets"
         [alt]="tvshow().title"
       />
       <div class="tvshow-detail__meta">
@@ -58,7 +58,7 @@
           <ion-item class="tvshow-detail__episode-item">
             <ion-img
               class="tvshow-detail__episode-thumb"
-              [src]="ep.thumbnail | assets: 'scape'"
+              [src]="ep.thumbnail | assets"
               [alt]="ep.title"
               slot="start"
             />
