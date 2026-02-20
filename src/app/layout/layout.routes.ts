@@ -35,6 +35,13 @@ export const LAYOUT_ROUTES: Routes = [
           ),
       },
       {
+        path: 'settings',
+        loadChildren: () =>
+          import('../domains/settings/presentation/settings.routes').then(
+            (m) => m.SETTINGS_ROUTES
+          ),
+      },
+      {
         path: '',
         redirectTo: 'music',
         pathMatch: 'full',
