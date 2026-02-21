@@ -4,22 +4,41 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.3.0] - 2026-02-16
+## [0.4.0] - 2026-02-21
 
-### Fixed
+### Added
 
-- **Tema claro**: Overlays adaptativos al tema en lugar de valores fijos solo para oscuro (#157)
-- **Botones**: Reemplazar `shape="round"` por `fill="clear"` en player, sound, remote y app-shell (#157)
-- **Colores de texto**: Variables CSS en media-tile y square-item para legibilidad en ambos temas (#157)
-- **Remote control**: Color de botones de playback y controles auxiliares en tema claro (#157)
+- **Settings page**: Nueva página de configuración con selección de tema (sistema, claro u oscuro) y sección de conexión Kodi (#162)
+- **KodiConfigService**: Servicio de configuración que auto-descubre protocolo, host y puerto HTTP desde `window.location` en producción y usa `environment` en desarrollo (#162)
+- **WebSocket port config**: Puerto WebSocket configurable mediante signal y persistido en localStorage (#162)
 
 ### Changed
 
-- **Estados activos**: Unificar color de shuffle, repeat y party mode de `success` a `primary` (#157)
-- **Logo del header**: Imagen adaptativa al tema activo (light.basic / dark.basic) (#157)
-- **Current track**: Fallback con logo-no-track.png cuando no hay pista o sin thumbnail (#157)
-- **Shuffle/Repeat**: Deshabilitados cuando partyMode está activo (#157)
-- **Favicon**: Actualización del favicon del proyecto (#157)
+- **AssetsPipe**: Refactorizado de regex frágiles a `encodeURIComponent` nativo; eliminado argumento `scape` en todos los templates (#162)
+- **PlayerWebSocketAdapter**: Reemplaza uso directo de `environment` por `KodiConfigService` (#162)
+- **AppShellComponent**: Usa `inject(AssetsPipe)` con `providers[]` en lugar de `new AssetsPipe()` (#162)
+- **Environments**: Añadido `kodiHttpPort` (8080) en los tres entornos, separado de `apiPort`, para distinguir el HTTP server de Kodi del proxy JSON-RPC (#162)
+- **App shell**: Botón de ajustes ahora navega a `/settings` (#162)
+- **Lint-staged**: Actualizado para usar `ng lint` en lugar de `eslint` directamente (#162)
+
+### Fixed
+
+- **AssetsPipe test**: Corregido error en `src/app/shared/pipes/assets.pipe.spec.ts`
+
+## [0.3.0] - 2026-02-17
+
+### Added
+
+- **Current track**: Visualización de la pista en reproducción actual
+
+### Fixed
+
+- **Light theme**: Corrección de problemas de visualización en el tema claro
+- **Media player URL**: Corrección de la URL que controla el mediaplayer
+
+### Changed
+
+- **Git hooks**: Configuración de Husky y lint-staged
 
 ## [0.2.0] - 2026-02-13
 
