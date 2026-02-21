@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.1] - 2026-02-21
+
+### Fixed
+
+- **AssetsPipe tests**: Añadido `provideZonelessChangeDetection()` al `TestBed` del spec para compatibilidad con la configuración zoneless del proyecto
+- **Husky pre-commit**: Creado `~/.config/husky/init.sh` para inicializar NVM y exponer `node`/`npm`/`npx` al entorno de ejecución de los hooks
+- **Husky hooks**: Añadidos permisos de ejecución (`chmod +x`) a `pre-commit` y `pre-push`
+- **lint-staged**: Migrado de config inline en `package.json` a `.lintstagedrc.js` con función que omite rutas de archivo al invocar `ng lint app --fix`, resolviendo el error `Invalid values: Argument: project`
+
 ## [0.4.0] - 2026-02-21
 
 ### Added
