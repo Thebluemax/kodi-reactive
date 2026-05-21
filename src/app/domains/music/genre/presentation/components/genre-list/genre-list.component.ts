@@ -13,6 +13,8 @@ import {
 } from '@ionic/angular/standalone';
 
 import { Genre } from '../../../domain/entities/genre.entity';
+import { Album } from '@domains/music/album/domain/entities/album.entity';
+import { Artist } from '@domains/music/artist/domain/entities/artist.entity';
 import { GetGenresUseCase } from '../../../application/use-cases/get-genres.use-case';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 
@@ -37,6 +39,10 @@ export class GenreListComponent implements OnInit, OnDestroy {
 
   private readonly allGenres = signal<Genre[]>([]);
   readonly isLoading = signal<boolean>(false);
+  readonly isPanelOpen = signal<boolean>(false);
+  readonly selectedGenre = signal<Genre | null>(null);
+  readonly albums = signal<Album[]>([]);
+  readonly artists = signal<Artist[]>([]);
 
   readonly genres = computed(() => {
     const term = this.globalSearch.debouncedSearchTerm().toLowerCase();
@@ -45,6 +51,8 @@ export class GenreListComponent implements OnInit, OnDestroy {
       genre.title.toLowerCase().includes(term)
     );
   });
+
+  readonly panelTitle = computed(() => this.selectedGenre()?.label ?? '');
 
   ngOnInit(): void {
     this.loadGenres();
