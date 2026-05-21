@@ -38,3 +38,7 @@ version-minor: ## Bump minor version (0.1.0 → 0.2.0)
 
 version-major: ## Bump major version (0.1.0 → 1.0.0)
 	npm version major
+
+.PHONY: proxy
+proxy: #launche a proxy to connect to Kodi
+	@npm run proxy
