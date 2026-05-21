@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { Component, OnInit, OnDestroy, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import {
   IonContent,
@@ -15,10 +16,7 @@ import { Genre } from '../../../domain/entities/genre.entity';
 import { Album } from '@domains/music/album/domain/entities/album.entity';
 import { Artist } from '@domains/music/artist/domain/entities/artist.entity';
 import { GetGenresUseCase } from '../../../application/use-cases/get-genres.use-case';
-import { GetGenreDetailUseCase } from '../../../application/use-cases/get-genre-detail.use-case';
 import { GlobalSearchService } from '@shared/services/global-search.service';
-import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
-import { GenreDetailPanelComponent } from '../genre-detail-panel/genre-detail-panel.component';
 
 @Component({
   selector: 'app-genre-list',
@@ -28,8 +26,6 @@ import { GenreDetailPanelComponent } from '../genre-detail-panel/genre-detail-pa
     IonProgressBar,
     IonChip,
     IonLabel,
-    LateralPanelComponent,
-    GenreDetailPanelComponent
   ],
   templateUrl: './genre-list.component.html',
   styleUrls: ['./genre-list.component.scss'],
@@ -37,11 +33,10 @@ import { GenreDetailPanelComponent } from '../genre-detail-panel/genre-detail-pa
 })
 export class GenreListComponent implements OnInit, OnDestroy {
   private readonly getGenresUseCase = inject(GetGenresUseCase);
-  private readonly getGenreDetailUseCase = inject(GetGenreDetailUseCase);
   private readonly globalSearch = inject(GlobalSearchService);
+  private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
 
-  // Signals for reactive state
   private readonly allGenres = signal<Genre[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly isPanelOpen = signal<boolean>(false);
@@ -87,30 +82,6 @@ export class GenreListComponent implements OnInit, OnDestroy {
   }
 
   onGenreClick(genre: Genre): void {
-    this.isLoading.set(true);
-    this.selectedGenre.set(genre);
-
-    this.getGenreDetailUseCase
-      .execute(genre)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: result => {
-          this.albums.set(result.albums);
-          this.artists.set(result.artists);
-          this.isPanelOpen.set(true);
-          this.isLoading.set(false);
-        },
-        error: error => {
-          console.error('Error loading genre detail:', error);
-          this.isLoading.set(false);
-        }
-      });
-  }
-
-  onPanelClosed(): void {
-    this.isPanelOpen.set(false);
-    this.selectedGenre.set(null);
-    this.albums.set([]);
-    this.artists.set([]);
+    this.router.navigate(['/music/genres', genre.genreId], { state: { genre } });
   }
 }
