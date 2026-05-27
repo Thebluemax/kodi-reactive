@@ -2,7 +2,7 @@
   <ion-progress-bar type="indeterminate" />
 }
 
-<ion-content class="movie-list">
+<ion-content class="movie-list scroll-list">
   <ion-list class="movie-list__grid">
     @for (movie of movies(); track movie.movieId) {
       <app-media-tile
