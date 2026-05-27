@@ -152,6 +152,6 @@ export class GenreDetailComponent implements OnInit, OnDestroy {
   }
 
   onBack(): void {
-    this.router.navigate(['/collections/genres']);
+    this.router.navigate(['/music/genres']);
   }
 }
