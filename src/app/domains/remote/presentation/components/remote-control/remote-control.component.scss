@@ -6,7 +6,6 @@
   overflow: hidden;
 }
 
-// Blurred album art page background
 .page-bg {
   position: absolute;
   inset: -20px;
@@ -17,7 +16,6 @@
   z-index: 0;
 }
 
-// Dark overlay for page background
 .page-bg-overlay {
   position: absolute;
   inset: 0;
@@ -43,7 +41,6 @@
   z-index: 1;
   overflow: hidden;
 
-  // Overlay oscuro para legibilidad sobre el fanart
   &::before {
     content: '';
     position: absolute;
@@ -52,16 +49,11 @@
     z-index: 0;
   }
 
-  // Todos los hijos sobre el overlay
   > * {
     position: relative;
     z-index: 1;
   }
 }
-
-// ========================================================================
-// Now Playing Section
-// ========================================================================
 
 .now-playing {
   width: 100%;
@@ -137,10 +129,6 @@
   }
 }
 
-// ========================================================================
-// Auxiliary Controls (Back, Home, Info, Menu)
-// ========================================================================
-
 .auxiliary-controls {
   display: flex;
   justify-content: center;
@@ -163,10 +151,6 @@
     }
   }
 }
-
-// ========================================================================
-// D-Pad Navigation
-// ========================================================================
 
 .dpad-container {
   display: flex;
@@ -247,10 +231,6 @@
   }
 }
 
-// ========================================================================
-// Playback Controls
-// ========================================================================
-
 .playback-controls {
   display: flex;
   justify-content: center;
@@ -269,20 +249,12 @@
   }
 }
 
-// ========================================================================
-// Mode Controls (Repeat, Shuffle, Party Mode)
-// ========================================================================
-
 .mode-controls {
   display: flex;
   justify-content: center;
   gap: 8px;
   width: 100%;
 }
-
-// ========================================================================
-// Volume Controls
-// ========================================================================
 
 .volume-controls {
   display: flex;
