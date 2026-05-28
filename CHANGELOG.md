@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.5.0]
+## [0.5.1] - 2026-05-29
+
+### Fixed
+
+- **Build budget**: Incrementado límite `anyComponentStyle` de 4 kB a 5 kB en `angular.json`; `remote-control` superaba el límite tras añadir el control de volumen
+
+## [0.5.0] - 2026-05-29
 
 ### Added
 
