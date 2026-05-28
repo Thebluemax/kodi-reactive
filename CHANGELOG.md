@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0]
+
+### Added
+
+- **Genre detail page**: Navegación a página de detalle de género (`/music/genres/:genreId`) con estado del router, reemplazando el panel lateral anterior (#168)
+
+### Fixed
+
+- **Genre back route**: Ruta de retroceso corregida de `/collections/genres` (inexistente) a `/music/genres` en `ion-back-button` y `onBack()` (#168)
+- **Scroll containers**: Tiles cortados en vistas de lista y detalle; añadidas clases utilitarias `.scroll-list` (`calc(100% - 90px)`) y `.scroll-detail` (`calc(100% - 63px)`) en `_objects.scss`, aplicadas en 9 componentes (#172, closes #169)
+
+### Changed
+
+- **Makefile**: Eliminado path hardcodeado de node para compatibilidad con entornos sin path absoluto
+
 ## [0.4.1] - 2026-02-21
 
 ### Fixed
