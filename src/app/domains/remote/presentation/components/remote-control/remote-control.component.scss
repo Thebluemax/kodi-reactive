@@ -279,3 +279,44 @@
   gap: 8px;
   width: 100%;
 }
+
+// ========================================================================
+// Volume Controls
+// ========================================================================
+
+.volume-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid var(--kodi-border-subtle);
+
+  &__mute-btn {
+    --color: var(--kodi-interactive-muted);
+    flex-shrink: 0;
+
+    &:hover {
+      --color: var(--ion-color-primary);
+    }
+  }
+
+  &__range {
+    flex: 1;
+    --bar-height: 3px;
+    --bar-background: var(--kodi-bar-bg);
+    --bar-background-active: var(--ion-color-primary);
+    --knob-size: 12px;
+    --knob-background: var(--kodi-knob-bg);
+    padding: 0;
+  }
+
+  &__label {
+    color: var(--kodi-interactive-muted);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    min-width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+}
