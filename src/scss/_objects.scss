@@ -2,3 +2,11 @@
 // OBJECTS – Layout patterns (no cosmetics)
 // ==========================================================================
 // Add reusable layout objects here (containers, grids, media object, …).
+
+.scroll-list {
+  max-height: calc(100% - 90px);
+}
+
+.scroll-detail {
+  max-height: calc(100% - 63px);
+}

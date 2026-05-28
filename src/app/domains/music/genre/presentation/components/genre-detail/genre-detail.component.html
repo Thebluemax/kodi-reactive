@@ -1,7 +1,6 @@
 @if (isLoading()) {
   <ion-progress-bar type="indeterminate" />
 }
-
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -10,8 +9,7 @@
     <ion-title>{{ genre()?.label }}</ion-title>
   </ion-toolbar>
 </ion-header>
-
-<ion-content class="genre-detail-content">
+<ion-content class="genre-detail-content scroll-list">
   <!-- Albums Section -->
   @if (albums().length > 0) {
     <ion-list-header>
@@ -21,7 +19,7 @@
       @for (album of albums(); track album.albumId) {
         <ion-card
           class="tile"
-          [style.backgroundImage]="'url(\'' + (album.thumbnail | assets) + '\'), url(assets/site/no_cover.webp)'"
+          [style.backgroundImage]="'url(\'' + (album.thumbnail | assets) + '\'), url(assets/site/no_cover.png)'"
 
           (click)="onAlbumClick(album)"
         >
@@ -43,7 +41,7 @@
       @for (artist of artists(); track artist.artistId) {
         <ion-card
           class="tile"
-          [style.backgroundImage]="'url(\'' + (artist.thumbnail | assets) + '\'), url(assets/site/no_cover.webp)'"
+          [style.backgroundImage]="'url(\'' + (artist.thumbnail | assets) + '\'), url(assets/site/no_cover.png)'"
           [style.backgroundSize]="artist.thumbnail ? 'auto 100%' : 'cover'"
           [style.backgroundPosition]="artist.thumbnail ? 'center' : 'top'"
 

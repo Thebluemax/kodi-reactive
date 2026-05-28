@@ -29,7 +29,9 @@ import {
   PlayerState,
   CurrentTrack,
   SeekUseCase,
-  RepeatMode
+  RepeatMode,
+  SetVolumeUseCase,
+  ToggleMuteUseCase
 } from '@domains/music/player';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
@@ -63,6 +65,8 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
   private readonly setRepeatUseCase = inject(SetRepeatUseCase);
   private readonly togglePartyModeUseCase = inject(TogglePartyModeUseCase);
   private readonly seekUseCase = inject(SeekUseCase);
+  private readonly setVolumeUseCase = inject(SetVolumeUseCase);
+  private readonly toggleMuteUseCase = inject(ToggleMuteUseCase);
   private readonly wsAdapter = inject(PlayerWebSocketAdapter);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly assetsPipe = new AssetsPipe();
@@ -273,5 +277,33 @@ export class RemoteControlComponent implements OnInit, OnDestroy {
 
   getRepeatIcon(): string {
     return this.repeat === 'one' ? 'repeat-outline' : 'repeat-outline';
+  }
+
+  // ========================================================================
+  // Volume Controls
+  // ========================================================================
+
+  get volume(): number {
+    return this.state?.volume ?? 100;
+  }
+
+  get isMute(): boolean {
+    return this.state?.muted ?? false;
+  }
+
+  get volumeIcon(): string {
+    if (this.isMute) return 'volume-mute-outline';
+    if (this.volume === 0) return 'volume-off';
+    if (this.volume < 50) return 'volume-low';
+    return 'volume-high';
+  }
+
+  onVolumeChange(event: Event): void {
+    const value = (event as CustomEvent).detail.value as number;
+    this.setVolumeUseCase.execute(value).subscribe();
+  }
+
+  onToggleMute(): void {
+    this.toggleMuteUseCase.execute().subscribe();
   }
 }
