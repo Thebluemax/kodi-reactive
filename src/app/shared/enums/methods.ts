@@ -19,6 +19,16 @@ export enum Methods {
   ApplicationSetVolume = 'Application.SetVolume',
   ApplicationGetProperties = 'Application.GetProperties',
 
+  // AudioLibrary - Maintenance
+  AudioLibraryScan = 'AudioLibrary.Scan',
+  AudioLibraryClean = 'AudioLibrary.Clean',
+
+  // AudioLibrary - Notifications
+  AudioLibraryOnScanStarted = 'AudioLibrary.OnScanStarted',
+  AudioLibraryOnScanFinished = 'AudioLibrary.OnScanFinished',
+  AudioLibraryOnCleanStarted = 'AudioLibrary.OnCleanStarted',
+  AudioLibraryOnCleanFinished = 'AudioLibrary.OnCleanFinished',
+
   // VideoLibrary
   VideoLibraryGetMovies = 'VideoLibrary.GetMovies',
   VideoLibraryGetMovieDetails = 'VideoLibrary.GetMovieDetails',
@@ -27,4 +37,14 @@ export enum Methods {
   VideoLibraryGetSeasons = 'VideoLibrary.GetSeasons',
   VideoLibraryGetEpisodes = 'VideoLibrary.GetEpisodes',
   VideoLibraryGetGenres = 'VideoLibrary.GetGenres',
+
+  // VideoLibrary - Maintenance
+  VideoLibraryScan = 'VideoLibrary.Scan',
+  VideoLibraryClean = 'VideoLibrary.Clean',
+
+  // VideoLibrary - Notifications
+  VideoLibraryOnScanStarted = 'VideoLibrary.OnScanStarted',
+  VideoLibraryOnScanFinished = 'VideoLibrary.OnScanFinished',
+  VideoLibraryOnCleanStarted = 'VideoLibrary.OnCleanStarted',
+  VideoLibraryOnCleanFinished = 'VideoLibrary.OnCleanFinished',
 }

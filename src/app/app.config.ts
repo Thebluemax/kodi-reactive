@@ -15,6 +15,7 @@ import { ACTOR_PROVIDERS } from '@domains/video/actor';
 import { TVSHOW_PROVIDERS } from '@domains/video/tvshow';
 import { VIDEO_GENRE_PROVIDERS } from '@domains/video/genre';
 import { REMOTE_PROVIDERS } from '@domains/remote';
+import { LIBRARY_PROVIDERS } from '@domains/library';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,6 +34,7 @@ export const appConfig: ApplicationConfig = {
     ...ACTOR_PROVIDERS,
     ...TVSHOW_PROVIDERS,
     ...VIDEO_GENRE_PROVIDERS,
-    ...REMOTE_PROVIDERS
+    ...REMOTE_PROVIDERS,
+    ...LIBRARY_PROVIDERS
   ]
 };
