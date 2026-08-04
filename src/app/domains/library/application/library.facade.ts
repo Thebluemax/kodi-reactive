@@ -70,11 +70,11 @@ export class LibraryFacade {
   // ========================================================================
 
   scan(type: LibraryType): void {
-    this.execute(type, LibraryOperation.Scan, this.scanUseCase.execute(type));
+    this.execute(type, LibraryOperation.Scan, () => this.scanUseCase.execute(type));
   }
 
   clean(type: LibraryType): void {
-    this.execute(type, LibraryOperation.Clean, this.cleanUseCase.execute(type));
+    this.execute(type, LibraryOperation.Clean, () => this.cleanUseCase.execute(type));
   }
 
   // ========================================================================
@@ -105,10 +105,12 @@ export class LibraryFacade {
   // Privados
   // ========================================================================
 
+  // El caso de uso se construye solo si el guard deja pasar la operación, para
+  // no invocarlo cuando ya hay una idéntica en curso.
   private execute(
     type: LibraryType,
     operation: LibraryOperation,
-    request$: Observable<void>
+    buildRequest: () => Observable<void>
   ): void {
     if (this.isRunning(type, operation)) {
       return;
@@ -118,7 +120,7 @@ export class LibraryFacade {
     // pero la notificación OnScanStarted puede tardar en llegar.
     this.markRunning(type, operation);
 
-    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    buildRequest().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: (error: Error) => {
         this.markFinished(type, operation);
         this.lastError.set(error.message);
