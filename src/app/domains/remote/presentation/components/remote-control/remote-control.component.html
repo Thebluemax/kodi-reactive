@@ -164,4 +164,23 @@
       <ion-icon slot="icon-only" name="beer-outline" />
     </ion-button>
   </div>
+
+  <!-- Volume Controls -->
+  <div class="volume-controls">
+    <ion-button
+      fill="clear"
+      (click)="onToggleMute()"
+      [color]="isMute ? 'primary' : 'dark'"
+      class="volume-controls__mute-btn"
+    >
+      <ion-icon slot="icon-only" [name]="volumeIcon" />
+    </ion-button>
+    <ion-range
+      class="volume-controls__range"
+      [value]="isMute ? 0 : volume"
+      [disabled]="isMute"
+      (ionChange)="onVolumeChange($event)"
+    />
+    <span class="volume-controls__label">{{ isMute ? 0 : volume }}</span>
+  </div>
 </div>

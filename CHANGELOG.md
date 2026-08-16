@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Library domain**: Nuevo dominio `library` con arquitectura DDD: entidades `LibraryType`/`LibraryOperation` y `LibraryEvent` con su factory, interfaz `LibraryRepository`, casos de uso `ScanLibrary` y `CleanLibrary`, y `LibraryFacade` que mantiene el estado de cada operación en signals
+- **Library maintenance UI**: Sección «Biblioteca» en Settings con botones de escaneo y limpieza para música y vídeo, spinner mientras la operación está en curso, confirmación previa a la limpieza (avisa de la pérdida de entradas si hay unidades de red desconectadas) y toasts de resultado
+- **LibraryKodiRepository**: Disparo de las operaciones vía JSON-RPC (`AudioLibrary.Scan/Clean`, `VideoLibrary.Scan/Clean`)
+- **LibraryWebSocketAdapter**: Traducción de las notificaciones de Kodi (`OnScanStarted`, `OnScanFinished`, `OnCleanStarted`, `OnCleanFinished`) a `LibraryEvent`; la conexión solo permanece abierta mientras la página de Settings está visible
+- **Library tests**: 56 tests unitarios repartidos en cinco specs, uno por capa del dominio
+
+### Changed
+
+- **KodiConfigService**: Expone `jsonRpcUrl`, que en desarrollo apunta al proxy local (`ops/proxy.js`) y en producción al host del add-on
+- **LibraryFacade**: La operación se marca como activa de forma optimista, porque la notificación `OnScanStarted` puede tardar; un timeout de seguridad de 10 minutos libera el estado si Kodi nunca notifica el fin
+
+### Removed
+
+- **kodi-relay**: Eliminado `ops/kodi-relay`, sustituido por `ops/proxy.js`, que ya cubre el proxy de desarrollo con las cabeceras CORS que Kodi no envía
+
+## [0.5.1] - 2026-05-29
+
+### Fixed
+
+- **Build budget**: Incrementado límite `anyComponentStyle` de 4 kB a 5 kB en `angular.json`; `remote-control` superaba el límite tras añadir el control de volumen
+
+## [0.5.0] - 2026-05-29
+
+### Added
+
+- **Genre detail page**: Navegación a página de detalle de género (`/music/genres/:genreId`) con estado del router, reemplazando el panel lateral anterior (#168)
+
+### Fixed
+
+- **Genre back route**: Ruta de retroceso corregida de `/collections/genres` (inexistente) a `/music/genres` en `ion-back-button` y `onBack()` (#168)
+- **Scroll containers**: Tiles cortados en vistas de lista y detalle; añadidas clases utilitarias `.scroll-list` (`calc(100% - 90px)`) y `.scroll-detail` (`calc(100% - 63px)`) en `_objects.scss`, aplicadas en 9 componentes (#172, closes #169)
+
+### Changed
+
+- **Makefile**: Eliminado path hardcodeado de node para compatibilidad con entornos sin path absoluto
+
 ## [0.4.1] - 2026-02-21
 
 ### Fixed
