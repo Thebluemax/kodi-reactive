@@ -19,6 +19,8 @@ export class KodiConfigService {
   readonly host: string;
   readonly httpPort: number;
   readonly httpBaseUrl: string;
+  /** JSON-RPC endpoint: proxy local en desarrollo, host del add-on en producción. */
+  readonly jsonRpcUrl: string;
 
   // ── Configurable (persisted in localStorage) ─────────────────────────────
   readonly wsPort = signal<number>(this.loadWsPort());
@@ -42,6 +44,12 @@ export class KodiConfigService {
     }
 
     this.httpBaseUrl = `${this.protocol}//${this.host}:${this.httpPort}`;
+
+    // En desarrollo las peticiones pasan por el proxy local (ops/proxy.js),
+    // que añade las cabeceras CORS que Kodi no envía.
+    this.jsonRpcUrl = environment.production
+      ? `${this.httpBaseUrl}/jsonrpc`
+      : `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
   }
 
   setWsPort(port: number): void {

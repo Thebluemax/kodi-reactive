@@ -61,4 +61,73 @@
     </ion-item>
   </ion-list>
 
+  <!-- ── Biblioteca ────────────────────────────────────────────────────── -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Biblioteca</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-icon slot="start" name="musical-notes-outline" />
+      <ion-label>
+        <h2>Música</h2>
+        <p>Buscar contenido nuevo o eliminar entradas huérfanas</p>
+      </ion-label>
+
+      @if (library.isBusy(LibraryType.Audio)) {
+        <ion-spinner slot="end" name="crescent" />
+      } @else {
+        <ion-button
+          slot="end"
+          fill="clear"
+          aria-label="Recargar biblioteca de música"
+          (click)="onScan(LibraryType.Audio)"
+        >
+          <ion-icon slot="icon-only" name="refresh-outline" />
+        </ion-button>
+
+        <ion-button
+          slot="end"
+          fill="clear"
+          color="danger"
+          aria-label="Limpiar biblioteca de música"
+          (click)="onClean(LibraryType.Audio)"
+        >
+          <ion-icon slot="icon-only" name="trash-outline" />
+        </ion-button>
+      }
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="film-outline" />
+      <ion-label>
+        <h2>Vídeo</h2>
+        <p>Buscar contenido nuevo o eliminar entradas huérfanas</p>
+      </ion-label>
+
+      @if (library.isBusy(LibraryType.Video)) {
+        <ion-spinner slot="end" name="crescent" />
+      } @else {
+        <ion-button
+          slot="end"
+          fill="clear"
+          aria-label="Recargar biblioteca de vídeo"
+          (click)="onScan(LibraryType.Video)"
+        >
+          <ion-icon slot="icon-only" name="refresh-outline" />
+        </ion-button>
+
+        <ion-button
+          slot="end"
+          fill="clear"
+          color="danger"
+          aria-label="Limpiar biblioteca de vídeo"
+          (click)="onClean(LibraryType.Video)"
+        >
+          <ion-icon slot="icon-only" name="trash-outline" />
+        </ion-button>
+      }
+    </ion-item>
+  </ion-list>
+
 </ion-content>
