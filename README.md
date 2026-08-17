@@ -68,14 +68,54 @@ The app will be available at `http://localhost:4200`.
 npm run build
 ```
 
-The output is generated in `dist/` and can be served by any static file server or packaged as a Kodi add-on.
+The output is generated in `www/` (with a relative `<base href="./">` so the app works from any path Kodi serves it on) and can be served by any static file server or packaged as a Kodi add-on.
 
-### Install as Kodi Add-on
+### Install as Kodi Add-on (manual zip)
 
-1. Run `npm run build` to generate the production build.
-2. Copy the contents of `dist/` along with `addon.xml` and `icon.png` into a folder named `webinterface.reaktive`.
-3. Zip the folder and install it in Kodi via _Settings > Add-ons > Install from zip file_.
-4. Activate the web interface in _Settings > Services > Control > Web interface_.
+1. Run `make package`. It builds the app and assembles `build/webinterface.reaktive/` (bundle + `addon.xml` + `icon.png`), then zips it to `build/webinterface.reaktive.zip`.
+2. Install the zip in Kodi via _Settings > Add-ons > Install from zip file_.
+3. Activate the web interface in _Settings > Services > Control > Web interface_.
+
+Manually installed add-ons never auto-update. Use the repository below instead if you want Kodi to pull new versions on its own.
+
+## Kodi Repository (auto-updates)
+
+Published add-ons live on the `gh-pages` branch of this repo, served over GitHub Pages and indexed by `addons.xml` / `addons.xml.md5`, the standard `xbmc.addon.repository` format. Installing `repo.reaktive` once lets Kodi discover and install every later `webinterface.reaktive` release by itself.
+
+### First-time install
+
+1. _Settings > File manager > Add source_ and enter this URL, naming the source `reaktive`:
+
+   ```
+   https://thebluemax.github.io/kodi-reactive/
+   ```
+
+2. _Settings > Add-ons > Install from zip file_ > `reaktive` > `repo.reaktive.zip`.
+3. _Settings > Add-ons > Install from repository > Reaktive Repository > Look and feel > Web interfaces > ReaKtive_ > **Install**.
+4. Activate it in _Settings > Services > Control > Web interface_.
+
+From now on Kodi checks the repository on its normal schedule and offers (or applies, depending on your _Add-on updates_ setting) every new version.
+
+### Publishing a new version
+
+Versioning is driven by `addon.xml`, which `npm version` keeps in sync with `package.json`:
+
+```bash
+npm version patch   # or minor / major -> bumps package.json + addon.xml
+```
+
+1. Merge the release branch into `main` (and back-merge into `development`).
+2. Run the **Release** workflow (_Actions > Release > Run workflow_) from `main`.
+
+That single workflow builds and tests once, then distributes the same zip through both channels: a GitHub Release asset (`webinterface.reaktive-v<version>.zip`) and the Kodi repository on `gh-pages` (`webinterface.reaktive-<version>.zip`, the filename Kodi requires, plus a regenerated `addons.xml`).
+
+It **refuses to publish a version that already exists** on `gh-pages` — bump the semver version instead of overwriting. It also fails if `addon.xml` and `package.json` disagree, which means someone edited `addon.xml` by hand instead of using `npm version`. To overwrite a published version on purpose, run the workflow with `force=true`.
+
+To regenerate the index locally against a checkout of `gh-pages` in `./gh-pages`:
+
+```bash
+npm run repo:index
+```
 
 ## Available Scripts
 
@@ -86,6 +126,7 @@ The output is generated in `dist/` and can be served by any static file server o
 | `npm run lint`         | Run ESLint                                      |
 | `npm test`             | Run unit tests                                  |
 | `npm run create-issue` | Create a GitHub issue via webhook                |
+| `npm run repo:index`   | Rebuild `addons.xml` / `addons.xml.md5` in `./gh-pages` |
 
 ## Project Structure
 
