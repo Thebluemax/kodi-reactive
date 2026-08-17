@@ -2,17 +2,37 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Republish even if this version was already published'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  ADDON_ID: webinterface.reaktive
+  REPO_ADDON_ID: repo.reaktive
+  PAGES_DIR: gh-pages
 
 jobs:
   release:
-    name: Build & Release Addon
+    name: Build, release & publish Kodi repository
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Warn if not releasing from main
+        if: github.ref_name != 'main'
+        run: |
+          echo "::warning title=Releasing from ${{ github.ref_name }}::Releases are expected to run on main. Everything published from this ref goes straight to end users."
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,23 +49,150 @@ jobs:
       - name: Build production
         run: npm run build
 
-      - name: Extract version from package.json
-        id: version
-        run: |
-          VERSION=$(jq -r '.version' package.json)
-          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Package addon
         run: make package
 
-      - name: Rename zip
-        run: mv ./build/webinterface.reaktive.zip ./build/webinterface.reaktive-v${{ steps.version.outputs.VERSION }}.zip
+      - name: Read and cross-check versions
+        id: versions
+        run: |
+          set -euo pipefail
+          read_version() {
+            python3 -c "import xml.etree.ElementTree as ET,sys;print(ET.parse(sys.argv[1]).getroot().get('version'))" "$1"
+          }
+          ADDON_VERSION=$(read_version "build/${ADDON_ID}/addon.xml")
+          REPO_VERSION=$(read_version "${REPO_ADDON_ID}/addon.xml")
+          PKG_VERSION=$(jq -r '.version' package.json)
 
-      - name: Create GitHub Release and upload artifact
+          if [ "$ADDON_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error title=Version mismatch::addon.xml is ${ADDON_VERSION} but package.json is ${PKG_VERSION}. Bump with 'npm version <patch|minor|major>' so ops/sync-addon-version.js keeps both in sync instead of editing addon.xml by hand."
+            exit 1
+          fi
+
+          echo "addon=$ADDON_VERSION" >> "$GITHUB_OUTPUT"
+          echo "repo=$REPO_VERSION" >> "$GITHUB_OUTPUT"
+          echo "$ADDON_ID $ADDON_VERSION / $REPO_ADDON_ID $REPO_VERSION"
+
+      - name: Checkout gh-pages branch
+        env:
+          REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads "$REMOTE" gh-pages >/dev/null 2>&1; then
+            echo "gh-pages exists, cloning it"
+            git clone --branch gh-pages --single-branch --depth 1 "$REMOTE" "$PAGES_DIR"
+          else
+            echo "gh-pages does not exist, initialising an orphan branch"
+            mkdir -p "$PAGES_DIR"
+            git -C "$PAGES_DIR" init -q -b gh-pages
+            git -C "$PAGES_DIR" remote add origin "$REMOTE"
+          fi
+          git -C "$PAGES_DIR" config user.name "github-actions[bot]"
+          git -C "$PAGES_DIR" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Guard against publishing a duplicate version
+        env:
+          ADDON_VERSION: ${{ steps.versions.outputs.addon }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          set -euo pipefail
+          PUBLISHED="${PAGES_DIR}/${ADDON_ID}/${ADDON_ID}-${ADDON_VERSION}.zip"
+          if [ -f "$PUBLISHED" ] && [ "$FORCE" != "true" ]; then
+            echo "::error title=Version already published::${ADDON_ID} ${ADDON_VERSION} is already on gh-pages. Bump the semver version ('npm version patch|minor|major', which syncs addon.xml via ops/sync-addon-version.js), merge to main and release again. To overwrite this version on purpose, re-run with force=true."
+            exit 1
+          fi
+          echo "Version ${ADDON_VERSION} is not published yet, continuing."
+
+      - name: Stage webinterface.reaktive
+        id: stage
+        env:
+          ADDON_VERSION: ${{ steps.versions.outputs.addon }}
+        run: |
+          set -euo pipefail
+          TARGET="${PAGES_DIR}/${ADDON_ID}"
+          mkdir -p "$TARGET"
+          cp "build/${ADDON_ID}/addon.xml" "$TARGET/addon.xml"
+          cp "build/${ADDON_ID}/icon.png" "$TARGET/icon.png"
+          if [ -f CHANGELOG.md ]; then
+            cp CHANGELOG.md "$TARGET/changelog.txt"
+          fi
+
+          # Kodi resolves <datadir>/<id>/<id>-<version>.zip, so this filename is not free-form.
+          KODI_ZIP="${TARGET}/${ADDON_ID}-${ADDON_VERSION}.zip"
+          rm -f "$KODI_ZIP"
+          (cd build && zip -r -q "${GITHUB_WORKSPACE}/${KODI_ZIP}" "${ADDON_ID}")
+
+          # Same bytes, published to GitHub Releases under the historical -v<version> name.
+          RELEASE_ZIP="build/${ADDON_ID}-v${ADDON_VERSION}.zip"
+          cp "$KODI_ZIP" "$RELEASE_ZIP"
+          echo "release_zip=$RELEASE_ZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Stage repo.reaktive
+        env:
+          REPO_VERSION: ${{ steps.versions.outputs.repo }}
+        run: |
+          set -euo pipefail
+          TARGET="${PAGES_DIR}/${REPO_ADDON_ID}"
+          mkdir -p "$TARGET"
+          cp "${REPO_ADDON_ID}/addon.xml" "$TARGET/addon.xml"
+          cp "${REPO_ADDON_ID}/icon.png" "$TARGET/icon.png"
+          rm -f "$TARGET/${REPO_ADDON_ID}-${REPO_VERSION}.zip"
+          zip -r -q "${TARGET}/${REPO_ADDON_ID}-${REPO_VERSION}.zip" "${REPO_ADDON_ID}"
+          # Stable filename at the repository root for the first-time manual install.
+          cp "${TARGET}/${REPO_ADDON_ID}-${REPO_VERSION}.zip" "${PAGES_DIR}/${REPO_ADDON_ID}.zip"
+          # Keep GitHub Pages from filtering the add-on folders if Pages is ever enabled.
+          touch "${PAGES_DIR}/.nojekyll"
+
+      - name: Generate addons.xml and addons.xml.md5
+        run: python3 ops/addons_xml_generator.py --path "$PAGES_DIR"
+
+      - name: Publish to gh-pages
+        env:
+          ADDON_VERSION: ${{ steps.versions.outputs.addon }}
+          REPO_VERSION: ${{ steps.versions.outputs.repo }}
+        run: |
+          set -euo pipefail
+          cd "$PAGES_DIR"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing changed on gh-pages, skipping push."
+            exit 0
+          fi
+          git commit -m "publish ${ADDON_ID} ${ADDON_VERSION} (${REPO_ADDON_ID} ${REPO_VERSION})" \
+                     -m "Source commit: ${GITHUB_SHA}"
+          git push origin HEAD:gh-pages
+          echo "Published ${ADDON_ID} ${ADDON_VERSION} to gh-pages."
+
+      - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          ADDON_VERSION: ${{ steps.versions.outputs.addon }}
+          RELEASE_ZIP: ${{ steps.stage.outputs.release_zip }}
         run: |
-          gh release create "v${{ steps.version.outputs.VERSION }}" \
-            --title "v${{ steps.version.outputs.VERSION }}" \
-            --generate-notes \
-            "./build/webinterface.reaktive-v${{ steps.version.outputs.VERSION }}.zip"
+          set -euo pipefail
+          TAG="v${ADDON_VERSION}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists, attaching the artifact to it."
+            gh release upload "$TAG" "$RELEASE_ZIP" --clobber
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --generate-notes \
+              "$RELEASE_ZIP"
+          fi
+
+      - name: Summary
+        if: always()
+        env:
+          ADDON_VERSION: ${{ steps.versions.outputs.addon }}
+          REPO_VERSION: ${{ steps.versions.outputs.repo }}
+        run: |
+          {
+            echo "### Release"
+            echo ""
+            echo "| Add-on | Version |"
+            echo "| --- | --- |"
+            echo "| \`${ADDON_ID}\` | ${ADDON_VERSION:-unknown} |"
+            echo "| \`${REPO_ADDON_ID}\` | ${REPO_VERSION:-unknown} |"
+            echo ""
+            echo "Kodi repository: https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}/"
+          } >> "$GITHUB_STEP_SUMMARY"

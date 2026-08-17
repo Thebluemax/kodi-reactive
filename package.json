@@ -10,13 +10,14 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production",
+    "build": "ng build --configuration production --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
     "proxy": "node ops/proxy.js",
     "create-issue": "node ops/create-issue.js",
     "version": "node ops/sync-addon-version.js",
+    "repo:index": "python3 ops/addons_xml_generator.py --path gh-pages",
     "prepare": "husky"
   },
   "private": true,
