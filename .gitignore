@@ -30,6 +30,9 @@ log.txt
 /bazel-out
 build
 
+# Local checkout of the published Kodi repository branch
+/gh-pages
+
 # Node
 /node_modules
 npm-debug.log

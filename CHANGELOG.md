@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.1] - 2026-08-17
+
+### Added
+
+- **Repositorio Kodi**: Nuevo add-on `repo.reaktive` (`xbmc.addon.repository`) que permite a Kodi descubrir y actualizar `webinterface.reaktive` automáticamente, en lugar de reinstalar el zip a mano en cada versión
+- **addons_xml_generator**: Script `ops/addons_xml_generator.py` que recorre las carpetas de add-on publicadas y regenera `addons.xml` y `addons.xml.md5`, el índice que Kodi consulta para detectar versiones nuevas
+- **Publicación en gh-pages**: El workflow `Release` empaqueta el add-on, lo copia a la rama `gh-pages` con el nombre que exige Kodi (`<id>/<id>-<version>.zip`), regenera el índice y publica el mismo zip como asset de GitHub Release
+- **Guard de versión duplicada**: El workflow aborta si esa versión ya está publicada en `gh-pages`, o si `addon.xml` y `package.json` no coinciden (señal de que alguien editó `addon.xml` a mano en vez de usar `npm version`). El input `force` permite sobrescribir a propósito
+- **repo:index**: Script `npm run repo:index` para regenerar el índice en local contra un checkout de `gh-pages`
+
+### Changed
+
+- **Base href relativa**: `npm run build` pasa `--base-href ./`, para que la app funcione desde cualquier ruta en la que Kodi sirva el add-on
+- **README**: Documentadas las dos vías de instalación (zip manual y repositorio con auto-actualización) y el procedimiento de publicación de versiones
+
 ## [0.6.0] - 2026-08-17
 
 ### Added
