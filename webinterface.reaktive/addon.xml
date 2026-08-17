@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon 
+   id="webinterface.reaktive" 
+   name="reaktive" 
+   version="0.6.1"
+   provider-name="Thebluemax">
+    <requires>
+		<import addon="xbmc.json" version="6.0.0"/>
+	</requires>
+	<extension point="xbmc.webinterface"/>
+	<extension point="xbmc.addon.metadata">
+        <summary lang="es">A modern, reactive frontend to control Kodi media center via WebSockets and JSON-RPC. </summary>
+        <description lang="es">Kodi Reactive is a web-based interface built with Angular and Ionic that allows users to remotely manage their Kodi media library and playback. It communicates with Kodi in real-time through 
+  WebSockets for live updates and a JSON-RPC REST API for library operations. The application supports browsing music and video collections, managing local playlists,         
+  controlling playback, and features both light and dark themes.</description>
+        <platform>all</platform>
+        <source>https://github.com/Thebluemax/kodi-reactive</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon >

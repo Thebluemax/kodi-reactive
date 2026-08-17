@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+   id="repo.reaktive"
+   name="Reaktive Repository"
+   version="1.0.0"
+   provider-name="Thebluemax">
+    <extension point="xbmc.addon.repository" name="Reaktive Repository">
+        <dir>
+            <info compressed="false">https://thebluemax.github.io/kodi-reactive/addons.xml</info>
+            <checksum>https://thebluemax.github.io/kodi-reactive/addons.xml.md5</checksum>
+            <datadir zip="true">https://thebluemax.github.io/kodi-reactive/</datadir>
+            <hashes>false</hashes>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Reaktive add-on repository</summary>
+        <summary lang="es">Repositorio de complementos Reaktive</summary>
+        <description lang="en">Official repository for the ReaKtive Kodi web interface. Install it once and Kodi will keep webinterface.reaktive up to date automatically.</description>
+        <description lang="es">Repositorio oficial de la interfaz web ReaKtive para Kodi. Instalalo una vez y Kodi mantendra webinterface.reaktive actualizado automaticamente.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+        <source>https://github.com/Thebluemax/kodi-reactive</source>
+        <website>https://maximilianofernandez.net/</website>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
