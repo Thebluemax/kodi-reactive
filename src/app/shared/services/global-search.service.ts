@@ -51,12 +51,19 @@ export class GlobalSearchService {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(([prev, curr]) => {
-        this.parseCurrentRoute(curr.urlAfterRedirects);
+        const previous = this.parseRoute(prev.urlAfterRedirects);
+        const current = this.parseRoute(curr.urlAfterRedirects);
 
-        const prevSection = this.extractSection(prev.urlAfterRedirects);
-        const currSection = this.extractSection(curr.urlAfterRedirects);
+        this._activeSection.set(current.section);
+        this._activeSubSection.set(current.subSection);
 
-        if (prevSection !== currSection) {
+        // El termino se limpia tambien entre sub-secciones: cada lista filtra
+        // por un campo distinto y sin vocabulario en comun, asi que arrastrarlo
+        // solo produce pantallas vacias.
+        if (
+          previous.section !== current.section ||
+          previous.subSection !== current.subSection
+        ) {
           this.clearSearch();
         }
       });
@@ -75,11 +82,22 @@ export class GlobalSearchService {
   }
 
   private parseCurrentRoute(url: string): void {
-    const section = this.extractSection(url);
+    const { section, subSection } = this.parseRoute(url);
     this._activeSection.set(section);
-
-    const subSection = this.extractSubSection(url);
     this._activeSubSection.set(subSection);
+  }
+
+  private parseRoute(url: string): { section: Section; subSection: string | null } {
+    const path = this.stripUrlSuffix(url);
+    return {
+      section: this.extractSection(path),
+      subSection: this.extractSubSection(path)
+    };
+  }
+
+  /** Descarta query string y fragment para que no alteren la comparacion de rutas */
+  private stripUrlSuffix(url: string): string {
+    return url.split(/[?#]/)[0];
   }
 
   private extractSection(url: string): Section {
