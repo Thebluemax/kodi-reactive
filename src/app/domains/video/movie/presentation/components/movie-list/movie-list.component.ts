@@ -1,7 +1,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  OnInit,
   inject,
   signal,
   computed,
@@ -9,6 +8,7 @@ import {
   DestroyRef
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subject, catchError, switchMap } from 'rxjs';
 import {
   IonContent,
   IonList,
@@ -48,7 +48,7 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
   styleUrl: './movie-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MovieListComponent implements OnInit {
+export class MovieListComponent {
   // Use Cases
   private readonly getMoviesUseCase = inject(GetMoviesUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
@@ -73,7 +73,10 @@ export class MovieListComponent implements OnInit {
   private readonly limit = 40;
   private start = 0;
   private end = this.limit;
-  private currentSearchTerm = '';
+  private currentSearchTerm: string | null = null;
+
+  // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
+  private readonly loadRequest$ = new Subject<MovieSearchParams>();
 
   // Computed
   readonly hasMoreMovies = computed(() => this.start < this.totalMovies());
@@ -85,6 +88,25 @@ export class MovieListComponent implements OnInit {
   });
 
   constructor() {
+    this.loadRequest$
+      .pipe(
+        switchMap(params =>
+          this.getMoviesUseCase.execute(params).pipe(
+            catchError(err => {
+              console.error('Error loading movies:', err);
+              this.isLoading.set(false);
+              return EMPTY;
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(result => {
+        this.totalMovies.set(result.total);
+        this.movies.update(current => [...current, ...result.movies]);
+        this.isLoading.set(false);
+      });
+
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
       if (this.currentSearchTerm !== term) {
@@ -93,10 +115,6 @@ export class MovieListComponent implements OnInit {
         this.loadMovies();
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.loadMovies();
   }
 
   private resetPagination(): void {
@@ -108,24 +126,10 @@ export class MovieListComponent implements OnInit {
   loadMovies(): void {
     this.isLoading.set(true);
 
-    const params: MovieSearchParams = {
+    this.loadRequest$.next({
       start: this.start,
       end: this.end,
       searchTerm: this.currentSearchTerm || undefined
-    };
-
-    this.getMoviesUseCase.execute(params).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (result) => {
-        this.totalMovies.set(result.total);
-        this.movies.update(current => [...current, ...result.movies]);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading movies:', err);
-        this.isLoading.set(false);
-      }
     });
   }
 
