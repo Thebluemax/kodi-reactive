@@ -27,11 +27,13 @@ import { RemovePlaylistItemUseCase } from '../../../application/use-cases/remove
 import { ReorderPlaylistUseCase } from '../../../application/use-cases/reorder-playlist.use-case';
 import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-playlist-item.use-case';
 import { SavePlaylistUseCase } from '../../../application/use-cases/save-playlist.use-case';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-current-play-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonToolbar,
     IonButtons,
     IonButton,

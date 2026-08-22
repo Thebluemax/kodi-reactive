@@ -30,11 +30,13 @@ import { Actor } from '@domains/video/actor/domain/entities/actor.entity';
 import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '@domains/video/actor/presentation/components/actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-movie-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,

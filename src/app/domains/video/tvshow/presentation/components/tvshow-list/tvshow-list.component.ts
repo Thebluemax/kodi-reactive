@@ -29,11 +29,13 @@ import { GetEpisodesUseCase } from '../../../application/use-cases/get-episodes.
 import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-episode-to-playlist.use-case';
 import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-tvshow-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,

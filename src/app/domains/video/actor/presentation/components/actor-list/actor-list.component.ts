@@ -27,11 +27,13 @@ import { GetActorsUseCase } from '../../../application/use-cases/get-actors.use-
 import { GetMoviesByActorUseCase } from '../../../application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '../actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-actor-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,

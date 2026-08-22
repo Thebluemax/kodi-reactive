@@ -15,6 +15,10 @@
         (itemSelected)="onMovieSelected($event)"
         (addToPlaylist)="onAddToPlaylist($event)"
       />
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state icon="film-outline" message="No hay películas en la biblioteca" />
+      }
     }
   </ion-list>
 

@@ -14,6 +14,7 @@ import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArtistDetailComponent } from '../artist-detail/artist-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 const PAGE_SIZE = 40;
 
@@ -21,6 +22,7 @@ const PAGE_SIZE = 40;
   selector: 'app-artist-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonicModule,
 
     LateralSlideComponent,

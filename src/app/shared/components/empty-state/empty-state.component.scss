@@ -1,0 +1,37 @@
+// ==========================================================================
+// COMPONENT - Empty State (BEM)
+// ==========================================================================
+
+// Block
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 48px 24px;
+  text-align: center;
+
+  // Element: Icon
+  &__icon {
+    font-size: 48px;
+    color: var(--ion-color-medium);
+    opacity: 0.6;
+  }
+
+  // Element: Message
+  &__message {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.95em;
+  }
+
+  // Element: Hint
+  &__hint {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.8em;
+    opacity: 0.8;
+  }
+}

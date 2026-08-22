@@ -17,11 +17,13 @@ import { Album } from '@domains/music/album/domain/entities/album.entity';
 import { Artist } from '@domains/music/artist/domain/entities/artist.entity';
 import { GetGenresUseCase } from '../../../application/use-cases/get-genres.use-case';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-genre-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonProgressBar,
     IonChip,

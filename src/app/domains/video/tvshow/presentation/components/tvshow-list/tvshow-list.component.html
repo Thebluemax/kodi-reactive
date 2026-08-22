@@ -14,6 +14,10 @@
         [showActionButtons]="false"
         (itemSelected)="onTVShowSelected($event)"
       />
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state icon="tv" message="No hay series en la biblioteca" />
+      }
     }
   </ion-list>
 

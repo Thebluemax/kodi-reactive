@@ -1,0 +1,17 @@
+<div class="empty-state">
+  <ion-icon class="empty-state__icon" [name]="icon()" aria-hidden="true" />
+
+  @if (isFiltered()) {
+    <p class="empty-state__message">
+      Sin resultados para «{{ globalSearch.debouncedSearchTerm() }}»
+    </p>
+    <ion-button size="small" fill="clear" (click)="onClearSearch()">
+      Limpiar búsqueda
+    </ion-button>
+  } @else {
+    <p class="empty-state__message">{{ message() }}</p>
+    @if (hint()) {
+      <p class="empty-state__hint">{{ hint() }}</p>
+    }
+  }
+</div>

@@ -13,7 +13,6 @@ import {
   IonIcon,
   IonButtons,
   IonToolbar,
-  IonText,
   IonProgressBar,
   AlertController
 } from '@ionic/angular/standalone';
@@ -29,11 +28,13 @@ import { LoadSavedPlaylistUseCase } from '../../../application/use-cases/load-sa
 import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-playlist-item.use-case';
 import { UpdateSavedPlaylistUseCase } from '../../../application/use-cases/update-saved-playlist.use-case';
 import { SavedPlaylistDetailComponent } from '../saved-playlist-detail/saved-playlist-detail.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-saved-playlist-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonItem,
@@ -42,7 +43,6 @@ import { SavedPlaylistDetailComponent } from '../saved-playlist-detail/saved-pla
     IonIcon,
     IonButtons,
     IonToolbar,
-    IonText,
     IonProgressBar,
     DatePipe,
     LateralPanelComponent,

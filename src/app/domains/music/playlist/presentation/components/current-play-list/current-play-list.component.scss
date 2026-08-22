@@ -47,17 +47,4 @@
     text-overflow: unset !important;
     overflow: inherit;
   }
-
-  .empty-message {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    text-align: center;
-
-    p {
-      margin: 0;
-      font-size: 0.9em;
-    }
-  }
 }

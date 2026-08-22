@@ -12,6 +12,10 @@
         [showActionButtons]="false"
         (itemSelected)="onGenreSelected($event)"
       />
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state icon="bookmark" message="No hay géneros en la biblioteca" />
+      }
     }
   </ion-list>
 </ion-content>

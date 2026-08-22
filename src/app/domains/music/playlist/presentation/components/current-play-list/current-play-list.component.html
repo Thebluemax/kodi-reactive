@@ -36,8 +36,9 @@
   </ion-list>
 
   @if (playlist().length === 0) {
-    <ion-text color="medium" class="empty-message">
-      <p>Playlist is empty</p>
-    </ion-text>
+    <app-empty-state
+      icon="musical-notes-outline"
+      message="La cola de reproducción está vacía"
+    />
   }
 </div>

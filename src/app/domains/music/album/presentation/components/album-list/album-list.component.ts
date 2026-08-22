@@ -28,11 +28,13 @@ import { GetAlbumDetailUseCase } from '../../../application/use-cases/get-album-
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 import { AlbumDetailComponent } from '../album-detail/album-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-album-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,
