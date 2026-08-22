@@ -139,7 +139,7 @@ export class MovieListComponent {
       return;
     }
 
-    this.start = this.end + 1;
+    this.start = this.end;
     this.end = this.end + this.limit;
     this.loadMovies();
 
