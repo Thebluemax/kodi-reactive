@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   effect,
+  untracked,
   DestroyRef
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -63,15 +64,15 @@ export class AlbumListComponent {
 
   // Pagination
   private readonly limit = 40;
-  private start = 0;
-  private end = this.limit;
+  private readonly start = signal<number>(0);
+  private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
 
   // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
   private readonly loadRequest$ = new Subject<AlbumSearchParams>();
 
   // Computed
-  readonly hasMoreAlbums = computed(() => this.start < this.totalAlbums());
+  readonly hasMoreAlbums = computed(() => this.start() < this.totalAlbums());
 
   constructor() {
     this.loadRequest$
@@ -95,17 +96,23 @@ export class AlbumListComponent {
 
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
-      if (this.currentSearchTerm !== term) {
-        this.currentSearchTerm = term;
-        this.resetPagination();
-        this.loadAlbums();
-      }
+
+      // El effect solo debe depender del termino: resetPagination y loadAlbums
+      // escriben y leen los signals de paginacion, que si no quedarian
+      // registrados como dependencias del propio effect.
+      untracked(() => {
+        if (this.currentSearchTerm !== term) {
+          this.currentSearchTerm = term;
+          this.resetPagination();
+          this.loadAlbums();
+        }
+      });
     });
   }
 
   private resetPagination(): void {
-    this.start = 0;
-    this.end = this.limit;
+    this.start.set(0);
+    this.end.set(this.limit);
     this.albums.set([]);
   }
 
@@ -113,8 +120,8 @@ export class AlbumListComponent {
     this.isLoading.set(true);
 
     this.loadRequest$.next({
-      start: this.start,
-      end: this.end,
+      start: this.start(),
+      end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
   }
@@ -125,8 +132,8 @@ export class AlbumListComponent {
       return;
     }
 
-    this.start = this.end;
-    this.end = this.end + this.limit;
+    this.start.set(this.end());
+    this.end.update(current => current + this.limit);
     this.loadAlbums();
 
     setTimeout(() => event.target.complete(), 500);
