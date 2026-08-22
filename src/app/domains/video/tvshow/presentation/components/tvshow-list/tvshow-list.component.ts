@@ -1,7 +1,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  OnInit,
   inject,
   signal,
   computed,
@@ -17,7 +16,7 @@ import {
   IonProgressBar,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
-import { forkJoin } from 'rxjs';
+import { EMPTY, Subject, catchError, forkJoin, switchMap } from 'rxjs';
 
 import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
 import { MediaTileComponent } from '@shared/components/media-tile/media-tile.component';
@@ -47,7 +46,7 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
   styleUrl: './tvshow-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TVShowListComponent implements OnInit {
+export class TVShowListComponent {
   // Use Cases
   private readonly getTVShowsUseCase = inject(GetTVShowsUseCase);
   private readonly getTVShowDetailUseCase = inject(GetTVShowDetailUseCase);
@@ -70,13 +69,35 @@ export class TVShowListComponent implements OnInit {
   private readonly limit = 40;
   private start = 0;
   private end = this.limit;
-  private currentSearchTerm = '';
+  private currentSearchTerm: string | null = null;
+
+  // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
+  private readonly loadRequest$ = new Subject<TVShowSearchParams>();
 
   // Computed
   readonly hasMoreTVShows = computed(() => this.start < this.totalTVShows());
   readonly panelTitle = computed(() => this.selectedTVShow()?.title ?? '');
 
   constructor() {
+    this.loadRequest$
+      .pipe(
+        switchMap(params =>
+          this.getTVShowsUseCase.execute(params).pipe(
+            catchError(err => {
+              console.error('Error loading TV shows:', err);
+              this.isLoading.set(false);
+              return EMPTY;
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(result => {
+        this.totalTVShows.set(result.total);
+        this.tvshows.update(current => [...current, ...result.tvshows]);
+        this.isLoading.set(false);
+      });
+
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
       if (this.currentSearchTerm !== term) {
@@ -85,10 +106,6 @@ export class TVShowListComponent implements OnInit {
         this.loadTVShows();
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.loadTVShows();
   }
 
   private resetPagination(): void {
@@ -100,24 +117,10 @@ export class TVShowListComponent implements OnInit {
   loadTVShows(): void {
     this.isLoading.set(true);
 
-    const params: TVShowSearchParams = {
+    this.loadRequest$.next({
       start: this.start,
       end: this.end,
       searchTerm: this.currentSearchTerm || undefined
-    };
-
-    this.getTVShowsUseCase.execute(params).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (result) => {
-        this.totalTVShows.set(result.total);
-        this.tvshows.update(current => [...current, ...result.tvshows]);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading TV shows:', err);
-        this.isLoading.set(false);
-      }
     });
   }
 

@@ -2,11 +2,11 @@
 // PRESENTATION - Artist List Component
 // ==========================================================================
 
-import { Component, OnInit, OnDestroy, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule, InfiniteScrollCustomEvent } from '@ionic/angular';
-import { Subject, takeUntil } from 'rxjs';
+import { EMPTY, Subject, catchError, switchMap, takeUntil } from 'rxjs';
 
-import { Artist, ArtistAlbumGroup } from '../../../domain/entities/artist.entity';
+import { Artist, ArtistAlbumGroup, ArtistSearchParams } from '../../../domain/entities/artist.entity';
 import { GetArtistsUseCase } from '../../../application/use-cases/get-artists.use-case';
 import { GetArtistDetailUseCase } from '../../../application/use-cases/get-artist-detail.use-case';
 
@@ -31,7 +31,7 @@ const PAGE_SIZE = 40;
   styleUrls: ['./artist-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArtistListComponent implements OnInit, OnDestroy {
+export class ArtistListComponent implements OnDestroy {
   private readonly getArtistsUseCase = inject(GetArtistsUseCase);
   private readonly getArtistDetailUseCase = inject(GetArtistDetailUseCase);
   private readonly globalSearch = inject(GlobalSearchService);
@@ -45,7 +45,11 @@ export class ArtistListComponent implements OnInit, OnDestroy {
   readonly isPanelOpen = signal<boolean>(false);
   readonly totalArtists = signal<number>(0);
 
-  private currentSearchTerm = '';
+  private currentSearchTerm: string | null = null;
+
+  // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
+  private readonly loadRequest$ = new Subject<ArtistSearchParams>();
+  private pendingScroll: InfiniteScrollCustomEvent | null = null;
 
   // Computed values
   readonly hasMoreArtists = computed(() =>
@@ -56,6 +60,27 @@ export class ArtistListComponent implements OnInit, OnDestroy {
   private end = PAGE_SIZE;
 
   constructor() {
+    this.loadRequest$
+      .pipe(
+        switchMap(params =>
+          this.getArtistsUseCase.execute(params).pipe(
+            catchError(error => {
+              console.error('Error loading artists:', error);
+              this.isLoading.set(false);
+              this.completePendingScroll();
+              return EMPTY;
+            })
+          )
+        ),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(result => {
+        this.artists.update(current => [...current, ...result.artists]);
+        this.totalArtists.set(result.total);
+        this.isLoading.set(false);
+        this.completePendingScroll();
+      });
+
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
       if (this.currentSearchTerm !== term) {
@@ -66,42 +91,32 @@ export class ArtistListComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    this.loadArtists();
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   private resetPagination(): void {
+    this.completePendingScroll();
     this.start = 0;
     this.end = PAGE_SIZE;
     this.artists.set([]);
   }
 
+  /** Libera el infinite scroll que quedo esperando una peticion ya cancelada */
+  private completePendingScroll(): void {
+    this.pendingScroll?.target.complete();
+    this.pendingScroll = null;
+  }
+
   loadArtists(): void {
     this.isLoading.set(true);
 
-    this.getArtistsUseCase
-      .execute({
-        start: this.start,
-        end: this.end,
-        searchTerm: this.currentSearchTerm || undefined
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: result => {
-          this.artists.update(current => [...current, ...result.artists]);
-          this.totalArtists.set(result.total);
-          this.isLoading.set(false);
-        },
-        error: error => {
-          console.error('Error loading artists:', error);
-          this.isLoading.set(false);
-        }
-      });
+    this.loadRequest$.next({
+      start: this.start,
+      end: this.end,
+      searchTerm: this.currentSearchTerm || undefined
+    });
   }
 
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
@@ -113,23 +128,8 @@ export class ArtistListComponent implements OnInit, OnDestroy {
     this.start = this.end;
     this.end = this.start + PAGE_SIZE;
 
-    this.getArtistsUseCase
-      .execute({
-        start: this.start,
-        end: this.end,
-        searchTerm: this.currentSearchTerm || undefined
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: result => {
-          this.artists.update(current => [...current, ...result.artists]);
-          event.target.complete();
-        },
-        error: error => {
-          console.error('Error loading more artists:', error);
-          event.target.complete();
-        }
-      });
+    this.pendingScroll = event;
+    this.loadArtists();
   }
 
   onArtistClick(artist: Artist): void {
