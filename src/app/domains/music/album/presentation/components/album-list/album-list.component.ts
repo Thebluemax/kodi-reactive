@@ -1,7 +1,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  OnInit,
   inject,
   signal,
   computed,
@@ -9,6 +8,7 @@ import {
   DestroyRef
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subject, catchError, switchMap } from 'rxjs';
 import {
   IonContent,
   IonList,
@@ -45,7 +45,7 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
   styleUrl: './album-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AlbumListComponent implements OnInit {
+export class AlbumListComponent {
   // Use Cases
   private readonly getAlbumsUseCase = inject(GetAlbumsUseCase);
   private readonly getAlbumDetailUseCase = inject(GetAlbumDetailUseCase);
@@ -65,12 +65,34 @@ export class AlbumListComponent implements OnInit {
   private readonly limit = 40;
   private start = 0;
   private end = this.limit;
-  private currentSearchTerm = '';
+  private currentSearchTerm: string | null = null;
+
+  // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
+  private readonly loadRequest$ = new Subject<AlbumSearchParams>();
 
   // Computed
   readonly hasMoreAlbums = computed(() => this.start < this.totalAlbums());
 
   constructor() {
+    this.loadRequest$
+      .pipe(
+        switchMap(params =>
+          this.getAlbumsUseCase.execute(params).pipe(
+            catchError(err => {
+              console.error('Error loading albums:', err);
+              this.isLoading.set(false);
+              return EMPTY;
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(result => {
+        this.totalAlbums.set(result.total);
+        this.albums.update(current => [...current, ...result.albums]);
+        this.isLoading.set(false);
+      });
+
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
       if (this.currentSearchTerm !== term) {
@@ -79,10 +101,6 @@ export class AlbumListComponent implements OnInit {
         this.loadAlbums();
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.loadAlbums();
   }
 
   private resetPagination(): void {
@@ -94,24 +112,10 @@ export class AlbumListComponent implements OnInit {
   loadAlbums(): void {
     this.isLoading.set(true);
 
-    const params: AlbumSearchParams = {
+    this.loadRequest$.next({
       start: this.start,
       end: this.end,
       searchTerm: this.currentSearchTerm || undefined
-    };
-
-    this.getAlbumsUseCase.execute(params).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (result) => {
-        this.totalAlbums.set(result.total);
-        this.albums.update(current => [...current, ...result.albums]);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading albums:', err);
-        this.isLoading.set(false);
-      }
     });
   }
 
