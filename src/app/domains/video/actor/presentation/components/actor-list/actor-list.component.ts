@@ -58,7 +58,7 @@ export class ActorListComponent implements OnInit {
 
   // Client-side pagination
   private readonly pageSize = 40;
-  private displayCount = this.pageSize;
+  private readonly displayCount = signal<number>(this.pageSize);
 
   // Filtered actors based on search term
   private readonly filteredActors = computed(() => {
@@ -70,15 +70,15 @@ export class ActorListComponent implements OnInit {
   });
 
   // Displayed actors (sliced from filtered actors)
-  readonly actors = computed(() => this.filteredActors().slice(0, this.displayCount));
+  readonly actors = computed(() => this.filteredActors().slice(0, this.displayCount()));
   readonly totalActors = computed(() => this.filteredActors().length);
-  readonly hasMoreActors = computed(() => this.displayCount < this.totalActors());
+  readonly hasMoreActors = computed(() => this.displayCount() < this.totalActors());
 
   constructor() {
     // Reset pagination when search term changes
     effect(() => {
       this.globalSearch.debouncedSearchTerm();
-      this.displayCount = this.pageSize;
+      this.displayCount.set(this.pageSize);
     });
   }
 
@@ -125,9 +125,7 @@ export class ActorListComponent implements OnInit {
       return;
     }
 
-    this.displayCount += this.pageSize;
-    // Force re-computation by triggering signal update
-    this.allActors.update(actors => [...actors]);
+    this.displayCount.update(current => current + this.pageSize);
 
     setTimeout(() => event.target.complete(), 200);
   }

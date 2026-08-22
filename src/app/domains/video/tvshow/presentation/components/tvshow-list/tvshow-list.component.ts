@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   effect,
+  untracked,
   DestroyRef
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -67,15 +68,15 @@ export class TVShowListComponent {
 
   // Pagination
   private readonly limit = 40;
-  private start = 0;
-  private end = this.limit;
+  private readonly start = signal<number>(0);
+  private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
 
   // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
   private readonly loadRequest$ = new Subject<TVShowSearchParams>();
 
   // Computed
-  readonly hasMoreTVShows = computed(() => this.start < this.totalTVShows());
+  readonly hasMoreTVShows = computed(() => this.start() < this.totalTVShows());
   readonly panelTitle = computed(() => this.selectedTVShow()?.title ?? '');
 
   constructor() {
@@ -100,17 +101,23 @@ export class TVShowListComponent {
 
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
-      if (this.currentSearchTerm !== term) {
-        this.currentSearchTerm = term;
-        this.resetPagination();
-        this.loadTVShows();
-      }
+
+      // El effect solo debe depender del termino: resetPagination y loadTVShows
+      // escriben y leen los signals de paginacion, que si no quedarian
+      // registrados como dependencias del propio effect.
+      untracked(() => {
+        if (this.currentSearchTerm !== term) {
+          this.currentSearchTerm = term;
+          this.resetPagination();
+          this.loadTVShows();
+        }
+      });
     });
   }
 
   private resetPagination(): void {
-    this.start = 0;
-    this.end = this.limit;
+    this.start.set(0);
+    this.end.set(this.limit);
     this.tvshows.set([]);
   }
 
@@ -118,8 +125,8 @@ export class TVShowListComponent {
     this.isLoading.set(true);
 
     this.loadRequest$.next({
-      start: this.start,
-      end: this.end,
+      start: this.start(),
+      end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
   }
@@ -130,8 +137,8 @@ export class TVShowListComponent {
       return;
     }
 
-    this.start = this.end;
-    this.end = this.end + this.limit;
+    this.start.set(this.end());
+    this.end.update(current => current + this.limit);
     this.loadTVShows();
 
     setTimeout(() => event.target.complete(), 500);

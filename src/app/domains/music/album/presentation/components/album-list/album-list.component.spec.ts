@@ -68,6 +68,29 @@ describe('AlbumListComponent', () => {
     );
   });
 
+  it('deja de pedir paginas al llegar al total', () => {
+    // El total llega igual en cada respuesta, asi que totalAlbums.set() no
+    // notifica por igualdad. Si start no fuese un signal, hasMoreAlbums
+    // quedaria congelado en el valor calculado con start = 0 y el scroll
+    // seguiria pidiendo paginas para siempre.
+    getAlbums.execute.and.returnValue(
+      of({ albums: [], total: PAGE_SIZE * 2, start: 0, end: PAGE_SIZE })
+    );
+    fixture.detectChanges();
+
+    component.onInfiniteScroll(scrollEvent());
+    component.onInfiniteScroll(scrollEvent());
+
+    expect(component.hasMoreAlbums()).toBeFalse();
+
+    const callsBefore = getAlbums.execute.calls.count();
+    const event = scrollEvent();
+    component.onInfiniteScroll(event);
+
+    expect(getAlbums.execute.calls.count()).toBe(callsBefore);
+    expect(event.target.disabled).toBeTrue();
+  });
+
   it('mantiene el encadenado en paginas sucesivas', () => {
     component.onInfiniteScroll(scrollEvent());
     component.onInfiniteScroll(scrollEvent());
