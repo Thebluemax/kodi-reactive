@@ -184,8 +184,15 @@ export class AlbumListComponent {
     });
   }
 
-  /** El modal solo conoce claves y valores; el mapeo a la API es del repositorio. */
-  editValue(): Record<string, MediaEditValue> {
+  /**
+   * El modal solo conoce claves y valores; el mapeo a la API es del repositorio.
+   *
+   * Es un computed y no un metodo a proposito: la plantilla lo lee en cada
+   * ciclo de deteccion, y un metodo devolveria un objeto nuevo cada vez. El
+   * input del modal lo tomaria por un valor distinto y repondria el borrador,
+   * borrando lo que el usuario acabara de teclear.
+   */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
     const album = this.albumBeingEdited();
 
     if (!album) {
@@ -201,7 +208,7 @@ export class AlbumListComponent {
       year: album.year,
       description: album.description ?? ''
     };
-  }
+  });
 
   onEditRequested(album: Album): void {
     // El panel se aparta mientras se edita. No es solo estetico: el panel se

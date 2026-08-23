@@ -163,6 +163,23 @@ describe('AlbumListComponent', () => {
       );
     });
 
+    it('mantiene la referencia del valor mientras se edita', () => {
+      // Si cambia entre lecturas, el input del modal la toma por un valor nuevo
+      // y repone el borrador: lo tecleado se pierde y Guardar nunca se habilita.
+      component.onEditRequested(ALBUM);
+
+      expect(component.editValue()).toBe(component.editValue());
+    });
+
+    it('cambia la referencia al editar otro album', () => {
+      component.onEditRequested(ALBUM);
+      const first = component.editValue();
+
+      component.onEditRequested({ ...ALBUM, albumId: 7, title: 'Amnesiac' });
+
+      expect(component.editValue()).not.toBe(first);
+    });
+
     it('guarda contra el album correcto con el detalle ya limpio', () => {
       component.onEditRequested(ALBUM);
       panelEmitsClosed();

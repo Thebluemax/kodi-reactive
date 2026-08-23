@@ -67,7 +67,15 @@ const LIST_SEPARATOR = ',';
 export class MediaEditModalComponent {
   readonly title = input<string>('Editar');
   readonly schema = input.required<MediaEditSchema>();
-  /** Valores actuales del medio, en el vocabulario del dominio. */
+  /**
+   * Valores actuales del medio, en el vocabulario del dominio.
+   *
+   * Tiene que ser una referencia estable: cambiarla repone el borrador y
+   * descarta lo tecleado, que es lo que queremos al pasar de un medio a otro.
+   * Si el contenedor la construye con un metodo en la plantilla, devolvera un
+   * objeto nuevo en cada ciclo de deteccion y el formulario se vaciara solo.
+   * Un computed.
+   */
   readonly value = input.required<Record<string, MediaEditValue>>();
   readonly saving = input<boolean>(false);
 
