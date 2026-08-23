@@ -12,12 +12,56 @@ import {
   Album,
   AlbumListResult,
   AlbumSearchParams,
+  AlbumUpdate,
   AlbumFactory,
   KodiAlbumResponse
 } from '../../domain/entities/album.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { Methods } from '@shared/enums/methods';
+
+/**
+ * Kodi responde a los errores con HTTP 200 y el fallo dentro del sobre, asi que
+ * un rechazo no llega como error de red y hay que leerlo del cuerpo.
+ */
+interface KodiJsonRpcEnvelope {
+  result?: unknown;
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+
+/**
+ * Traduccion del vocabulario del dominio al de AudioLibrary.SetAlbumDetails.
+ * Los nombres de la API son minusculas sin separador; los del dominio siguen la
+ * convencion del resto de entidades.
+ */
+const UPDATE_PARAM_NAMES: Record<keyof AlbumUpdate, string> = {
+  title: 'title',
+  artists: 'artist',
+  description: 'description',
+  genres: 'genre',
+  themes: 'theme',
+  moods: 'mood',
+  styles: 'style',
+  type: 'type',
+  label: 'albumlabel',
+  rating: 'rating',
+  year: 'year',
+  userRating: 'userrating',
+  votes: 'votes',
+  musicBrainzAlbumId: 'musicbrainzalbumid',
+  musicBrainzReleaseGroupId: 'musicbrainzreleasegroupid',
+  sortArtist: 'sortartist',
+  displayArtist: 'displayartist',
+  musicBrainzAlbumArtistIds: 'musicbrainzalbumartistid',
+  art: 'art',
+  isBoxSet: 'isboxset',
+  releaseDate: 'releasedate',
+  originalDate: 'originaldate'
+};
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -134,6 +178,51 @@ export class AlbumKodiRepository extends AlbumRepository {
     return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
+  }
+
+  updateAlbum(albumId: number, patch: AlbumUpdate): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.AudioLibrarySetAlbumDetails,
+      params: {
+        albumid: albumId,
+        ...this.toKodiParams(patch)
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi rechazo la actualizacion: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
+  }
+
+  /**
+   * Solo viajan los campos presentes en el patch. `undefined` significa "no
+   * tocar" y se descarta; `null` si viaja, porque en las listas y en el artwork
+   * es como se borra un valor.
+   */
+  private toKodiParams(patch: AlbumUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof AlbumUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
   }
 
   private buildAlbumsRequest(params: AlbumSearchParams): KodiJsonRpcRequest {

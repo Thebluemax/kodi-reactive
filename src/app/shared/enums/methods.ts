@@ -19,6 +19,11 @@ export enum Methods {
   ApplicationSetVolume = 'Application.SetVolume',
   ApplicationGetProperties = 'Application.GetProperties',
 
+  // AudioLibrary - Escritura
+  AudioLibrarySetAlbumDetails = 'AudioLibrary.SetAlbumDetails',
+  AudioLibrarySetArtistDetails = 'AudioLibrary.SetArtistDetails',
+  AudioLibrarySetSongDetails = 'AudioLibrary.SetSongDetails',
+
   // AudioLibrary - Maintenance
   AudioLibraryScan = 'AudioLibrary.Scan',
   AudioLibraryClean = 'AudioLibrary.Clean',
@@ -37,6 +42,10 @@ export enum Methods {
   VideoLibraryGetSeasons = 'VideoLibrary.GetSeasons',
   VideoLibraryGetEpisodes = 'VideoLibrary.GetEpisodes',
   VideoLibraryGetGenres = 'VideoLibrary.GetGenres',
+
+  // VideoLibrary - Escritura
+  VideoLibrarySetMovieDetails = 'VideoLibrary.SetMovieDetails',
+  VideoLibrarySetTVShowDetails = 'VideoLibrary.SetTVShowDetails',
 
   // VideoLibrary - Maintenance
   VideoLibraryScan = 'VideoLibrary.Scan',
