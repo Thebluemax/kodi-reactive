@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 .sidebar {
     background: var(--kodi-lateral-panel-bg);
     position: fixed;
@@ -12,7 +14,7 @@
     box-shadow: var(--kodi-shadow-sidebar);
     right: -100%;
     transition: right 0.55s ease;
-    z-index: 40000;
+    z-index: $lateral-panel-z-index;
 
     &__header {
         position: relative;
