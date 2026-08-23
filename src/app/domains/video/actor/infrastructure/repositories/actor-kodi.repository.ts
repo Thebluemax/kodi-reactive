@@ -15,8 +15,7 @@ import {
   KodiMovieResponse
 } from '@domains/video/movie/domain/entities/movie.entity';
 import { environment } from 'src/environments/environment';
-
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -51,6 +50,7 @@ const MOVIE_PROPERTIES_FULL = [
 })
 export class ActorKodiRepository extends ActorRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getActors(): Observable<ActorListResult> {
@@ -64,7 +64,7 @@ export class ActorKodiRepository extends ActorRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         const movies = MovieFactory.fromKodiResponseList(response.result.movies || []);
         const actors = ActorFactory.fromMovieCastData(movies);
@@ -92,7 +92,7 @@ export class ActorKodiRepository extends ActorRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => MovieFactory.fromKodiResponseList(response.result.movies || []))
     );
   }

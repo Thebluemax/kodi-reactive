@@ -16,10 +16,7 @@ import {
 } from '../../domain/entities/genre.entity';
 import { Album, AlbumFactory, KodiAlbumResponse } from '@domains/music/album/domain/entities/album.entity';
 import { Artist, ArtistFactory, KodiArtistResponse } from '@domains/music/artist/domain/entities/artist.entity';
-import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -66,6 +63,7 @@ interface KodiArtistsResponse {
 })
 export class GenreKodiRepository extends GenreRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getGenres(): Observable<GenreListResult> {
@@ -83,7 +81,7 @@ export class GenreKodiRepository extends GenreRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiGenresResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiGenresResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ({
         genres: GenreFactory.fromKodiResponseList(response.result.genres || []),
         total: response.result.limits.total
@@ -111,7 +109,7 @@ export class GenreKodiRepository extends GenreRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiAlbumsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiAlbumsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => AlbumFactory.fromKodiResponseList(response.result.albums || []))
     );
   }
@@ -136,7 +134,7 @@ export class GenreKodiRepository extends GenreRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiArtistsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiArtistsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ArtistFactory.fromKodiResponseList(response.result.artists || []))
     );
   }

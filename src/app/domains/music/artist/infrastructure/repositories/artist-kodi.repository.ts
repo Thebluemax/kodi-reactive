@@ -18,9 +18,7 @@ import {
 } from '../../domain/entities/artist.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
 import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -62,12 +60,13 @@ interface KodiSongsResponse {
 })
 export class ArtistKodiRepository extends ArtistRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getArtists(params: ArtistSearchParams): Observable<ArtistListResult> {
     const request = this.buildArtistsRequest(params);
 
-    return this.http.post<KodiArtistsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiArtistsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ({
         artists: ArtistFactory.fromKodiResponseList(response.result.artists || []),
         total: response.result.limits.total,
@@ -92,7 +91,7 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiArtistDetailResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiArtistDetailResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ArtistFactory.fromKodiResponse(response.result.artistdetails))
     );
   }
@@ -113,7 +112,7 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiSongsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiSongsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => this.groupSongsByAlbumId(response.result.songs || []))
     );
   }
@@ -128,7 +127,7 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }
@@ -143,7 +142,7 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }
@@ -159,7 +158,7 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }

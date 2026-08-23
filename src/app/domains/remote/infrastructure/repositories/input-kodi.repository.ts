@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 
 import { InputRepository } from '../../domain/repositories/input.repository';
 import { InputAction } from '../../domain/entities/input-action.entity';
-import { environment } from 'src/environments/environment';
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -23,7 +23,8 @@ interface KodiJsonRpcRequest {
 })
 export class InputKodiRepository extends InputRepository {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc?mediaplayer`;
+  private readonly config = inject(KodiConfigService);
+  private readonly apiUrl = `${this.config.jsonRpcUrl}?mediaplayer`;
   private requestId = 1;
 
   // ========================================================================

@@ -16,9 +16,7 @@ import {
   KodiMovieResponse
 } from '../../domain/entities/movie.entity';
 import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -55,12 +53,13 @@ const MOVIE_PROPERTIES = [
 })
 export class MovieKodiRepository extends MovieRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getMovies(params: MovieSearchParams): Observable<MovieListResult> {
     const request = this.buildMoviesRequest(params);
 
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ({
         movies: MovieFactory.fromKodiResponseList(response.result.movies || []),
         total: response.result.limits.total,
@@ -81,7 +80,7 @@ export class MovieKodiRepository extends MovieRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiMovieDetailResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiMovieDetailResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if ((response as any).error) {
           throw new Error((response as any).error.message || 'Unknown Kodi error');
@@ -101,7 +100,7 @@ export class MovieKodiRepository extends MovieRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }

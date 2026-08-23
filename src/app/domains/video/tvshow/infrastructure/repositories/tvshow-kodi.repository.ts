@@ -22,9 +22,7 @@ import {
   KodiEpisodeResponse
 } from '../../domain/entities/tvshow.entity';
 import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -83,12 +81,13 @@ const EPISODE_PROPERTIES = [
 })
 export class TVShowKodiRepository extends TVShowRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getTVShows(params: TVShowSearchParams): Observable<TVShowListResult> {
     const request = this.buildTVShowsRequest(params);
 
-    return this.http.post<KodiTVShowsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiTVShowsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ({
         tvshows: TVShowFactory.fromKodiResponseList(response.result.tvshows || []),
         total: response.result.limits.total,
@@ -109,7 +108,7 @@ export class TVShowKodiRepository extends TVShowRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiTVShowDetailResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiTVShowDetailResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if ((response as any).error) {
           throw new Error((response as any).error.message || 'Unknown Kodi error');
@@ -131,7 +130,7 @@ export class TVShowKodiRepository extends TVShowRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiSeasonsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiSeasonsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => SeasonFactory.fromKodiResponseList(response.result.seasons || []))
     );
   }
@@ -149,7 +148,7 @@ export class TVShowKodiRepository extends TVShowRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiEpisodesResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiEpisodesResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => EpisodeFactory.fromKodiResponseList(response.result.episodes || []))
     );
   }
@@ -164,7 +163,7 @@ export class TVShowKodiRepository extends TVShowRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }

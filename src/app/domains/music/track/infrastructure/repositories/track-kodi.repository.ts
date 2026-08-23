@@ -8,10 +8,7 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 import { TrackRepository } from '../../domain/repositories/track.repository';
-import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -25,6 +22,7 @@ interface KodiJsonRpcRequest {
 })
 export class TrackKodiRepository extends TrackRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   addToPlaylist(trackId: number, playImmediately: boolean): Observable<void> {
@@ -37,7 +35,7 @@ export class TrackKodiRepository extends TrackRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }
@@ -50,7 +48,7 @@ export class TrackKodiRepository extends TrackRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }
