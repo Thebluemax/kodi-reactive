@@ -17,9 +17,7 @@ import {
 } from '../../domain/entities/album.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
 import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -61,12 +59,13 @@ interface KodiTracksResponse {
 })
 export class AlbumKodiRepository extends AlbumRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getAlbums(params: AlbumSearchParams): Observable<AlbumListResult> {
     const request = this.buildAlbumsRequest(params);
 
-    return this.http.post<KodiAlbumsResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiAlbumsResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ({
         albums: AlbumFactory.fromKodiResponseList(response.result.albums || []),
         total: response.result.limits.total,
@@ -91,7 +90,7 @@ export class AlbumKodiRepository extends AlbumRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiAlbumDetailResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiAlbumDetailResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if ((response as any).error) {
           throw new Error((response as any).error.message || 'Unknown Kodi error');
@@ -117,7 +116,7 @@ export class AlbumKodiRepository extends AlbumRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiTracksResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiTracksResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => TrackFactory.fromKodiResponseList(response.result.songs || []))
     );
   }
@@ -132,7 +131,7 @@ export class AlbumKodiRepository extends AlbumRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
+    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
       map(() => void 0)
     );
   }

@@ -9,10 +9,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { PlaylistRepository } from '../../domain/repositories/playlist.repository';
 import { PlaylistItem, PlaylistItemFactory, PlaylistResult, KodiPlaylistItemResponse } from '../../domain/entities/playlist-item.entity';
-import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -45,6 +42,7 @@ interface KodiPlaylistResponse {
 })
 export class PlaylistKodiRepository extends PlaylistRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getPlaylist(playlistId: number = 0): Observable<PlaylistResult> {
@@ -61,7 +59,7 @@ export class PlaylistKodiRepository extends PlaylistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiJsonRpcResponse<KodiPlaylistResponse>>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiJsonRpcResponse<KodiPlaylistResponse>>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if (response.error) {
           throw new Error(`Kodi API Error: ${response.error.message}`);
@@ -85,7 +83,7 @@ export class PlaylistKodiRepository extends PlaylistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiJsonRpcResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if (response.error) {
           throw new Error(`Failed to clear playlist: ${response.error.message}`);
@@ -105,7 +103,7 @@ export class PlaylistKodiRepository extends PlaylistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiJsonRpcResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if (response.error) {
           throw new Error(`Failed to remove item: ${response.error.message}`);
@@ -126,7 +124,7 @@ export class PlaylistKodiRepository extends PlaylistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiJsonRpcResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if (response.error) {
           throw new Error(`Failed to swap items: ${response.error.message}`);
@@ -148,7 +146,7 @@ export class PlaylistKodiRepository extends PlaylistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiJsonRpcResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if (response.error) {
           throw new Error(`Failed to play item: ${response.error.message}`);
@@ -170,7 +168,7 @@ export class PlaylistKodiRepository extends PlaylistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiJsonRpcResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         if (response.error) {
           throw new Error(`Failed to add item: ${response.error.message}`);

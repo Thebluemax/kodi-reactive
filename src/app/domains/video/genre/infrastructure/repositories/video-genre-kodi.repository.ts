@@ -20,9 +20,7 @@ import {
   KodiMovieResponse
 } from '@domains/video/movie';
 import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -59,6 +57,7 @@ const MOVIE_PROPERTIES = [
 })
 export class VideoGenreKodiRepository extends VideoGenreRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private requestId = 1;
 
   getGenres(): Observable<VideoGenreListResult> {
@@ -73,7 +72,7 @@ export class VideoGenreKodiRepository extends VideoGenreRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiGenresResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiGenresResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
         const genres = VideoGenreFactory.fromKodiResponseList(response.result.genres || []);
         return {
@@ -104,7 +103,7 @@ export class VideoGenreKodiRepository extends VideoGenreRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
+    return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => ({
         movies: MovieFactory.fromKodiResponseList(response.result.movies || []),
         total: response.result.limits.total,

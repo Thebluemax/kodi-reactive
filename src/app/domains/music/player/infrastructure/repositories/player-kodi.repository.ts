@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 
 import { PlayerRepository } from '../../domain/repositories/player.repository';
 import { PlayerWebSocketAdapter } from '../adapters/player-websocket.adapter';
-import { environment } from 'src/environments/environment';
+import { KodiConfigService } from '@shared/services/kodi-config.service';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -23,9 +23,9 @@ interface KodiJsonRpcRequest {
 })
 export class PlayerKodiRepository extends PlayerRepository {
   private readonly http = inject(HttpClient);
+  private readonly config = inject(KodiConfigService);
   private readonly wsAdapter = inject(PlayerWebSocketAdapter);
-  // Use proxy (serverApiUrl) to avoid CORS issues
-  private readonly apiUrl = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+  private readonly apiUrl = this.config.jsonRpcUrl;
   private requestId = 1;
 
   private get playerId(): number {
