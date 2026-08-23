@@ -90,6 +90,41 @@ describe('AlbumKodiRepository', () => {
       expect('genre' in params).toBeTrue();
     });
 
+    it('pide en el detalle todo lo que el editor sabe escribir', () => {
+      repository.getAlbumById(7).subscribe();
+
+      const req = httpMock.expectOne(JSON_RPC_URL);
+      const body = req.request.body as { params: { properties: string[] } };
+
+      expect(body.params.properties).toEqual(
+        jasmine.arrayContaining([
+          'theme', 'mood', 'type', 'rating', 'userrating', 'votes',
+          'sortartist', 'displayartist', 'isboxset', 'releasedate',
+          'originaldate', 'musicbrainzalbumid', 'musicbrainzreleasegroupid',
+          'musicbrainzalbumartistid'
+        ])
+      );
+      req.flush({ id: 1, jsonrpc: '2.0', result: { albumdetails: { albumid: 7 } } });
+    });
+
+    it('pide en la lista solo lo que las tarjetas pintan', () => {
+      repository.getAlbums({ start: 0, end: 40 }).subscribe();
+
+      const req = httpMock.expectOne(JSON_RPC_URL);
+      const body = req.request.body as { params: { properties: string[] } };
+
+      // Pagina de 40: cada propiedad de mas se paga en cada pagina, y al abrir
+      // el detalle se recarga el album entero de todas formas.
+      expect(body.params.properties.sort()).toEqual(
+        ['artist', 'artistid', 'thumbnail', 'year']
+      );
+      req.flush({
+        id: 1,
+        jsonrpc: '2.0',
+        result: { albums: [], limits: { start: 0, end: 0, total: 0 } }
+      });
+    });
+
     it('pide el artwork entre las propiedades del detalle', () => {
       repository.getAlbumById(7).subscribe();
 

@@ -203,11 +203,25 @@ export class AlbumListComponent {
     return {
       title: album.title,
       artists: album.artists,
+      displayArtist: album.displayArtist,
+      sortArtist: album.sortArtist,
+      description: album.description ?? '',
       genres: album.genres,
       styles: album.styles,
+      moods: album.moods,
+      themes: album.themes,
+      type: album.type,
       label: album.label,
       year: album.year,
-      description: album.description ?? ''
+      releaseDate: album.releaseDate,
+      originalDate: album.originalDate,
+      rating: album.rating,
+      userRating: album.userRating,
+      votes: album.votes,
+      isBoxSet: album.isBoxSet,
+      musicBrainzAlbumId: album.musicBrainzAlbumId,
+      musicBrainzReleaseGroupId: album.musicBrainzReleaseGroupId,
+      musicBrainzAlbumArtistIds: album.musicBrainzAlbumArtistIds
     };
   });
 
