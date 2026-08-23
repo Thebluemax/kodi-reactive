@@ -19,11 +19,13 @@ import { VideoGenre } from '../../../domain/entities/video-genre.entity';
 import { GetVideoGenresUseCase } from '../../../application/use-cases/get-video-genres.use-case';
 import { VideoGenreDetailComponent } from '../video-genre-detail/video-genre-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-video-genre-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonProgressBar,

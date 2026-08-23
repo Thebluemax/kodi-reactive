@@ -19,6 +19,10 @@
           <ion-card-title>{{ artist.name }}</ion-card-title>
         </ion-card-header>
       </ion-card>
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state icon="people" message="No hay artistas en la biblioteca" />
+      }
     }
   </ion-list>
 

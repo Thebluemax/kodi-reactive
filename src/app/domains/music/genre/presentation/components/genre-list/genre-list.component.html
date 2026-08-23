@@ -11,6 +11,10 @@
       >
         <ion-label>{{ genre.label }}</ion-label>
       </ion-chip>
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state icon="bookmark" message="No hay géneros en la biblioteca" />
+      }
     }
   </div>
 </ion-content>

@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Empty state**: Nuevo componente compartido `app-empty-state` que distingue «la biblioteca está vacía» de «el filtro no encontró nada», mostrando en el segundo caso el término buscado y un botón para limpiarlo. Aplicado en las nueve listas, que hasta ahora dejaban la pantalla en blanco sin explicación: un término sin coincidencias era indistinguible de un fallo de carga (#184)
+- **Tests de listas y búsqueda**: Specs nuevos para `GlobalSearchService`, `AlbumList`, `MovieList`, `TVShowList`, `ActorList` y `EmptyState`, ninguno de los cuales tenía cobertura
+
+### Changed
+
+- **Estado de paginación en signals**: `start`, `end` y `displayCount` pasan de campos planos a `signal<number>`. Varios `computed` los leían directamente, y como Angular no trackea campos planos no se invalidaban al cambiar el valor; funcionaban apoyados en que algún otro signal de la misma expresión notificara. El cuerpo del effect de búsqueda queda envuelto en `untracked()`, para que dependa solo del término y no de los signals de paginación que él mismo escribe. Se elimina el workaround de `actor-list`, que reemplazaba `allActors` entero para forzar la invalidación y obligaba a re-filtrar toda la lista en cada scroll (#183)
+- **Empty state de playlists unificado**: `current-play-list` y `saved-playlist-list` tenían su propio markup de lista vacía, uno de ellos además en inglés; ahora usan el componente compartido
+
+### Fixed
+
+- **Race de doble carga con filtro activo**: Las listas paginadas disparaban dos peticiones al montarse cuando había un término de búsqueda: `ngOnInit` cargaba sin filtro y el `effect` del constructor volvía a cargar con filtro. Como el handler appendea, si la petición sin filtrar resolvía última contaminaba la lista filtrada y pisaba el total. El `effect` pasa a ser el único punto de entrada, las peticiones van por un `Subject` con `switchMap` que cancela la anterior, y `catchError` va dentro del `switchMap` para que un error no mate la suscripción de larga vida (#180)
+- **Filtro al cambiar de sub-sección**: El término sobrevivía al navegar entre sub-secciones de una misma sección (`/music/albums` → `/music/artists`), porque el listener de `NavigationEnd` solo comparaba `music`/`video`/`remote`. Como cada lista filtra por un campo distinto y sin vocabulario en común, arrastrarlo producía una pantalla vacía. Se compara también la sub-sección y se normaliza la URL, descartando query string y fragment antes de parsear (#181)
+- **Paginación off-by-one**: El infinite scroll de albums, movies y tvshows hacía `start = end + 1`, pero `end` es exclusivo en el objeto `List.Limits` de Kodi JSON-RPC. Con límite 40, la página 2 arrancaba en 41 y el registro 40 nunca se cargaba; la pérdida era acumulativa, un registro por salto de página (#182)
+- **Infinite scroll sin fin**: `hasMoreAlbums`, `hasMoreMovies` y `hasMoreTVShows` leían `this.start` como campo plano y solo recalculaban al notificarse `totalX`. Como el total llega igual en cada respuesta, `set()` deja de notificar por igualdad a partir de la segunda página y la condición quedaba congelada en `true`: el guard nunca cortaba y el scroll seguía pidiendo páginas vacías contra Kodi (#183)
+
 ## [0.6.1] - 2026-08-17
 
 ### Added
