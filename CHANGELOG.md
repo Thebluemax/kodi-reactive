@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Barra del modal de edición**: Cancelar y Guardar pasan de botones con texto a iconos —una «x» y un disquete—, y el título se va a la derecha, más pequeño y recortado con puntos suspensivos. Los botones con nombre y un título centrado se repartían la barra y dejaban las acciones incómodas, y un título de álbum largo las empujaba (#200)
 - **Estado de paginación en signals**: `start`, `end` y `displayCount` pasan de campos planos a `signal<number>`. Varios `computed` los leían directamente, y como Angular no trackea campos planos no se invalidaban al cambiar el valor; funcionaban apoyados en que algún otro signal de la misma expresión notificara. El cuerpo del effect de búsqueda queda envuelto en `untracked()`, para que dependa solo del término y no de los signals de paginación que él mismo escribe. Se elimina el workaround de `actor-list`, que reemplazaba `allActors` entero para forzar la invalidación y obligaba a re-filtrar toda la lista en cada scroll (#183)
 - **Empty state de playlists unificado**: `current-play-list` y `saved-playlist-list` tenían su propio markup de lista vacía, uno de ellos además en inglés; ahora usan el componente compartido
 

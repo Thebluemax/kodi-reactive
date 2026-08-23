@@ -1,18 +1,22 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="onCancel()" [disabled]="saving()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
       <ion-button
-        strong="true"
+        aria-label="Cancelar"
+        [disabled]="saving()"
+        (click)="onCancel()"
+      >
+        <ion-icon slot="icon-only" name="close" />
+      </ion-button>
+      <ion-button
+        aria-label="Guardar"
         [disabled]="saving() || !isDirty()"
         (click)="onSave()"
       >
-        Guardar
+        <ion-icon slot="icon-only" name="save-outline" />
       </ion-button>
     </ion-buttons>
+    <ion-title slot="end" class="media-edit__title">{{ title() }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

@@ -15,6 +15,20 @@
 .media-edit {
   flex: 1;
 
+  // Element: Title
+  // A la derecha y discreto: las acciones mandan en la barra, y un titulo de
+  // album largo no debe empujarlas ni partir la barra en dos.
+  &__title {
+    padding-inline: 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-align: end;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   // Element: Field
   &__field {
     --padding-start: 16px;
