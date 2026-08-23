@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Servicio de notificaciones**: Nuevo `NotificationService` compartido con métodos por intención (`success`, `error`, `info`). Hasta ahora cada componente creaba su toast con `ToastController`, con duración, color e icono propios: los mismos avisos se veían distintos según de dónde salieran. Los errores se quedan ahora más tiempo en pantalla que los aciertos, porque hay que leerlos y decidir (#198)
 - **Tests de configuración de Kodi**: `KodiConfigService` no tenía cobertura. El spec nuevo lo inyecta de verdad, sin sustituirlo como hacen los demás, para fijar en qué modo corre la suite (#195)
 - **Empty state**: Nuevo componente compartido `app-empty-state` que distingue «la biblioteca está vacía» de «el filtro no encontró nada», mostrando en el segundo caso el término buscado y un botón para limpiarlo. Aplicado en las nueve listas, que hasta ahora dejaban la pantalla en blanco sin explicación: un término sin coincidencias era indistinguible de un fallo de carga (#184)
 - **Tests de listas y búsqueda**: Specs nuevos para `GlobalSearchService`, `AlbumList`, `MovieList`, `TVShowList`, `ActorList` y `EmptyState`, ninguno de los cuales tenía cobertura

@@ -17,7 +17,6 @@ import {
   IonReorder,
   IonText,
   AlertController,
-  ToastController,
   ItemReorderEventDetail
 } from '@ionic/angular/standalone';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
@@ -28,6 +27,7 @@ import { ReorderPlaylistUseCase } from '../../../application/use-cases/reorder-p
 import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-playlist-item.use-case';
 import { SavePlaylistUseCase } from '../../../application/use-cases/save-playlist.use-case';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-current-play-list',
@@ -54,7 +54,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 })
 export class CurrentPlayListComponent {
   private readonly alertController = inject(AlertController);
-  private readonly toastController = inject(ToastController);
+  private readonly notifications = inject(NotificationService);
   private readonly clearPlaylistUseCase = inject(ClearPlaylistUseCase);
   private readonly removePlaylistItemUseCase = inject(RemovePlaylistItemUseCase);
   private readonly reorderPlaylistUseCase = inject(ReorderPlaylistUseCase);
@@ -147,14 +147,7 @@ export class CurrentPlayListComponent {
     await alert.present();
   }
 
-  private async showSaveToast(name: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message: `Playlist "${name}" guardada`,
-      duration: 2000,
-      position: 'bottom',
-      color: 'success',
-      icon: 'checkmark-circle'
-    });
-    await toast.present();
+  private showSaveToast(name: string): Promise<void> {
+    return this.notifications.success(`Playlist "${name}" guardada`);
   }
 }
