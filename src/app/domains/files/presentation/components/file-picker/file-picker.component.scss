@@ -1,0 +1,67 @@
+// ==========================================================================
+// COMPONENT - File Picker (BEM)
+// ==========================================================================
+
+.file-picker {
+  // Element: Bar
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.1));
+  }
+
+  // Element: Path
+  &__path {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85em;
+    color: var(--ion-color-medium);
+  }
+
+  // Element: Status
+  &__status {
+    display: block;
+    padding: 24px 16px;
+    text-align: center;
+  }
+
+  // Element: Error
+  &__error {
+    display: block;
+    padding: 12px 16px;
+  }
+
+  // Element: Preview
+  &__preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+  }
+
+  &__preview-image {
+    max-width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+  }
+
+  &__preview-name {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--ion-color-medium);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  &__preview-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}

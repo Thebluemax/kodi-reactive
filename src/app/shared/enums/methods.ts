@@ -34,6 +34,11 @@ export enum Methods {
   AudioLibraryOnCleanStarted = 'AudioLibrary.OnCleanStarted',
   AudioLibraryOnCleanFinished = 'AudioLibrary.OnCleanFinished',
 
+  // Files
+  FilesGetSources = 'Files.GetSources',
+  FilesGetDirectory = 'Files.GetDirectory',
+  FilesPrepareDownload = 'Files.PrepareDownload',
+
   // VideoLibrary
   VideoLibraryGetMovies = 'VideoLibrary.GetMovies',
   VideoLibraryGetMovieDetails = 'VideoLibrary.GetMovieDetails',

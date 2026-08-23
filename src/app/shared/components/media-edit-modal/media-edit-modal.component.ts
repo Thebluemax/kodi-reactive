@@ -17,6 +17,10 @@ import {
 import { FormsModule } from '@angular/forms';
 
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
+// El navegador de ficheros vive en su dominio, no en shared: es una capacidad
+// de Kodi, no un ladrillo de interfaz. Se importa aqui para que los cinco
+// medios lo hereden sin cablearlo cada uno.
+import { FilePickerComponent } from '@domains/files/presentation/components/file-picker/file-picker.component';
 import {
   IonButton,
   IonButtons,
@@ -58,6 +62,7 @@ const KNOWN_ART_KEYS = ['thumb', 'poster', 'fanart', 'banner'] as const;
   imports: [
     FormsModule,
     AssetsPipe,
+    FilePickerComponent,
     IonButton,
     IonButtons,
     IonContent,
@@ -109,6 +114,8 @@ export class MediaEditModalComponent {
   /** Claves cuya URL el navegador no ha conseguido cargar. */
   private readonly brokenArt = signal<Set<string>>(new Set());
   readonly newArtKey = signal<string>('');
+  /** Clave de arte para la que se esta navegando, o null si no se navega. */
+  readonly browsingKey = signal<string | null>(null);
 
   constructor() {
     // Reabrir el modal sobre otro medio tiene que descartar lo tecleado antes.
@@ -124,6 +131,7 @@ export class MediaEditModalComponent {
   }
 
   readonly hasArtwork = computed(() => this.artwork() !== null);
+  readonly isBrowsing = computed(() => this.browsingKey() !== null);
 
   /** Las conocidas primero, y despues las que el medio o el usuario anadieron. */
   readonly artKeys = computed(() => {
@@ -160,6 +168,24 @@ export class MediaEditModalComponent {
 
   onArtLoaded(key: string): void {
     this.clearBroken(key);
+  }
+
+  onBrowse(key: string): void {
+    this.browsingKey.set(key);
+  }
+
+  onBrowseCancelled(): void {
+    this.browsingKey.set(null);
+  }
+
+  onFilePicked(path: string): void {
+    const key = this.browsingKey();
+
+    if (key) {
+      this.onArtChange(key, path);
+    }
+
+    this.browsingKey.set(null);
   }
 
   onAddArtKey(): void {
