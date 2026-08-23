@@ -78,7 +78,8 @@ const UPDATE_PARAM_NAMES: Record<keyof MovieUpdate, string> = {
   imdbNumber: 'imdbnumber',
   trailer: 'trailer',
   set: 'set',
-  art: 'art'
+  art: 'art',
+  uniqueId: 'uniqueid'
 };
 
 /** El detalle alimenta el editor: pide todo lo que SetMovieDetails escribe. */

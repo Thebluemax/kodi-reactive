@@ -39,7 +39,7 @@ import { MediaEditModalComponent } from '@shared/components/media-edit-modal/med
 import { NotificationService } from '@shared/services/notification.service';
 import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
 import { MediaArtworkSet } from '@shared/types/media-artwork.type';
-import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
+import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
 import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
@@ -156,6 +156,18 @@ export class MovieListComponent {
           placeholder: 'Título con el que buscar'
         },
         {
+          name: 'year',
+          type: 'text',
+          value: movie.year > 0 ? String(movie.year) : '',
+          placeholder: 'Año, para separar títulos homónimos'
+        },
+        {
+          name: 'imdb',
+          type: 'text',
+          value: movie.imdbNumber,
+          placeholder: 'IMDb (tt0068646), si el año no basta'
+        },
+        {
           name: 'ignoreNfo',
           type: 'checkbox',
           label: 'Ignorar el archivo NFO local',
@@ -166,11 +178,20 @@ export class MovieListComponent {
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Buscar',
-          handler: (data: { title?: string; ignoreNfo?: string[] }) => {
-            this.refreshMovie(movie, {
-              title: data.title,
-              ignoreNfo: (data.ignoreNfo ?? []).includes('ignoreNfo')
-            });
+          handler: (data: {
+            title?: string;
+            year?: string;
+            imdb?: string;
+            ignoreNfo?: string[];
+          }) => {
+            this.refreshMovie(
+              movie,
+              {
+                title: buildSearchTitle(data.title ?? '', data.year),
+                ignoreNfo: (data.ignoreNfo ?? []).includes('ignoreNfo')
+              },
+              (data.imdb ?? '').trim()
+            );
           }
         }
       ]
@@ -187,8 +208,22 @@ export class MovieListComponent {
     void this.notifications.info('Datos recargados desde Kodi');
   }
 
-  private refreshMovie(movie: Movie, options: MediaRefreshOptions): void {
-    this.refreshMovieUseCase.execute(movie.movieId, options).subscribe({
+  /**
+   * El identificador unico, si se indica, se escribe antes de refrescar: es lo
+   * unico que desambigua con garantias, porque el scraper lo respeta en vez de
+   * volver a buscar por titulo.
+   */
+  private refreshMovie(movie: Movie, options: MediaRefreshOptions, imdb: string): void {
+    const refresh$ = this.refreshMovieUseCase.execute(movie.movieId, options);
+
+    const request$ =
+      imdb.length > 0 && imdb !== movie.imdbNumber
+        ? this.updateMovieUseCase
+            .execute(movie.movieId, { imdbNumber: imdb, uniqueId: { imdb } })
+            .pipe(switchMap(() => refresh$))
+        : refresh$;
+
+    request$.subscribe({
       next: () => {
         // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras, asi
         // que recargar aqui devolveria los datos viejos.

@@ -71,6 +71,14 @@ describe('MovieKodiRepository', () => {
       expect(params['userrating']).toBe(10);
     });
 
+    it('envía el identificador único, que el editor no expone', () => {
+      // Escribirlo antes de un re-scrapeo es lo que desambigua dos peliculas
+      // homonimas: el scraper lo respeta en vez de volver a buscar por titulo.
+      repository.updateMovie(11, { uniqueId: { imdb: 'tt0068646' } }).subscribe();
+
+      expect(expectUpdateRequest()['uniqueid']).toEqual({ imdb: 'tt0068646' });
+    });
+
     it('envía los votos como cadena', () => {
       // Optional.String para pelicula, a diferencia de album.
       repository.updateMovie(11, { votes: '1.900.000' }).subscribe();
