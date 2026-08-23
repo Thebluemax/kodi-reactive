@@ -16,7 +16,6 @@ import {
   IonInfiniteScrollContent,
   IonProgressBar,
   IonModal,
-  AlertController,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 import { EMPTY, Subject, catchError, forkJoin, switchMap } from 'rxjs';
@@ -33,7 +32,11 @@ import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component'
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { UpdateTVShowUseCase } from '../../../application/use-cases/update-tvshow.use-case';
 import { RefreshTVShowUseCase } from '../../../application/use-cases/refresh-tvshow.use-case';
-import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
+import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
+import {
+  MediaRefreshModalComponent,
+  MediaRefreshRequest
+} from '@shared/components/media-refresh-modal/media-refresh-modal.component';
 import { TVShowUpdate } from '../../../domain/entities/tvshow.entity';
 import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
 import { NotificationService } from '@shared/services/notification.service';
@@ -56,7 +59,8 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     LateralPanelComponent,
     TVShowDetailComponent,
     IonModal,
-    MediaEditModalComponent
+    MediaEditModalComponent,
+    MediaRefreshModalComponent
   ],
   templateUrl: './tvshow-list.component.html',
   styleUrl: './tvshow-list.component.scss',
@@ -68,7 +72,6 @@ export class TVShowListComponent {
   private readonly getTVShowDetailUseCase = inject(GetTVShowDetailUseCase);
   private readonly updateTVShowUseCase = inject(UpdateTVShowUseCase);
   private readonly refreshTVShowUseCase = inject(RefreshTVShowUseCase);
-  private readonly alertController = inject(AlertController);
   private readonly notifications = inject(NotificationService);
   private readonly getSeasonsUseCase = inject(GetSeasonsUseCase);
   private readonly getEpisodesUseCase = inject(GetEpisodesUseCase);
@@ -215,6 +218,20 @@ export class TVShowListComponent {
   // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
   readonly editSchema = TVSHOW_EDIT_SCHEMA;
   readonly tvshowBeingEdited = signal<TVShow | null>(null);
+  readonly tvshowBeingRefreshed = signal<TVShow | null>(null);
+
+  /** Referencia estable, como editValue. */
+  readonly refreshValue = computed<MediaRefreshRequest>(() => {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    return {
+      title: tvshow?.title ?? '',
+      year: tvshow && tvshow.year > 0 ? String(tvshow.year) : '',
+      uniqueId: '',
+      ignoreNfo: false,
+      refreshEpisodes: false
+    };
+  });
   readonly isSaving = signal<boolean>(false);
 
   /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
@@ -250,67 +267,39 @@ export class TVShowListComponent {
   );
 
   /**
-   * Pregunta con que titulo buscar antes de lanzar el re-scrapeo, y si el
-   * refresco debe arrastrar a los episodios.
+   * El panel se aparta mientras se pide el titulo: se saca a si mismo a
+   * document.body en su ngOnInit, fuera de ion-app.
    */
-  async onRefreshRequested(tvshow: TVShow): Promise<void> {
-    // El panel se aparta igual que al editar: se saca a si mismo a
-    // document.body en su ngOnInit, fuera de ion-app.
+  onRefreshRequested(tvshow: TVShow): void {
+    this.tvshowBeingRefreshed.set(tvshow);
     this.isPanelOpen.set(false);
+  }
 
-    const alert = await this.alertController.create({
-      header: 'Volver a buscar los datos',
-      message:
-        'Kodi buscara de nuevo en el scraper y reescribira los campos de esta ' +
-        'serie, incluidas las correcciones hechas a mano.',
-      inputs: [
-        {
-          name: 'title',
-          type: 'text',
-          value: tvshow.title,
-          placeholder: 'Título con el que buscar'
-        },
-        {
-          name: 'ignoreNfo',
-          type: 'checkbox',
-          label: 'Ignorar el archivo NFO local',
-          value: 'ignoreNfo'
-        },
-        {
-          name: 'refreshEpisodes',
-          type: 'checkbox',
-          label: 'Refrescar también todos los episodios',
-          value: 'refreshEpisodes'
-        }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Buscar',
-          handler: (data: {
-            title?: string;
-            ignoreNfo?: string[];
-            refreshEpisodes?: string[];
-          }) => {
-            const checked = [
-              ...(data.ignoreNfo ?? []),
-              ...(data.refreshEpisodes ?? [])
-            ];
+  onRefreshCancelled(): void {
+    const tvshow = this.tvshowBeingRefreshed();
 
-            this.refreshTVShow(tvshow, {
-              title: data.title,
-              ignoreNfo: checked.includes('ignoreNfo'),
-              refreshEpisodes: checked.includes('refreshEpisodes')
-            });
-          }
-        }
-      ]
-    });
+    if (!tvshow) {
+      return;
+    }
 
-    await alert.present();
-    await alert.onDidDismiss();
-
+    this.tvshowBeingRefreshed.set(null);
     this.restoreDetail(tvshow);
+  }
+
+  onRefreshConfirmed(request: MediaRefreshRequest): void {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingRefreshed.set(null);
+    this.restoreDetail(tvshow);
+    this.refreshTVShow(tvshow, {
+      title: buildSearchTitle(request.title, request.year),
+      ignoreNfo: request.ignoreNfo,
+      refreshEpisodes: request.refreshEpisodes
+    });
   }
 
   onReloadRequested(tvshow: TVShow): void {

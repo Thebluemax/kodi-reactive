@@ -68,3 +68,18 @@
     />
   </ng-template>
 </ion-modal>
+
+<ion-modal
+  [isOpen]="tvshowBeingRefreshed() !== null"
+  (ionModalDidDismiss)="onRefreshCancelled()"
+>
+  <ng-template>
+    <app-media-refresh-modal
+      [initial]="refreshValue()"
+      [showYear]="true"
+      [showRefreshEpisodes]="true"
+      (confirmed)="onRefreshConfirmed($event)"
+      (cancelled)="onRefreshCancelled()"
+    />
+  </ng-template>
+</ion-modal>

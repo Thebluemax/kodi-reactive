@@ -17,7 +17,6 @@ import {
   IonInfiniteScrollContent,
   IonProgressBar,
   IonModal,
-  AlertController,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
@@ -40,6 +39,10 @@ import { NotificationService } from '@shared/services/notification.service';
 import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
 import { MediaArtworkSet } from '@shared/types/media-artwork.type';
 import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
+import {
+  MediaRefreshModalComponent,
+  MediaRefreshRequest
+} from '@shared/components/media-refresh-modal/media-refresh-modal.component';
 import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
@@ -58,7 +61,8 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     MovieDetailComponent,
     ActorDetailComponent,
     IonModal,
-    MediaEditModalComponent
+    MediaEditModalComponent,
+    MediaRefreshModalComponent
   ],
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.scss',
@@ -70,7 +74,6 @@ export class MovieListComponent {
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
   private readonly updateMovieUseCase = inject(UpdateMovieUseCase);
   private readonly refreshMovieUseCase = inject(RefreshMovieUseCase);
-  private readonly alertController = inject(AlertController);
   private readonly notifications = inject(NotificationService);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
@@ -91,6 +94,20 @@ export class MovieListComponent {
   // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
   readonly editSchema = MOVIE_EDIT_SCHEMA;
   readonly movieBeingEdited = signal<Movie | null>(null);
+  readonly movieBeingRefreshed = signal<Movie | null>(null);
+
+  /** Referencia estable, como editValue. */
+  readonly refreshValue = computed<MediaRefreshRequest>(() => {
+    const movie = this.movieBeingRefreshed();
+
+    return {
+      title: movie?.title ?? '',
+      year: movie && movie.year > 0 ? String(movie.year) : '',
+      uniqueId: movie?.imdbNumber ?? '',
+      ignoreNfo: false,
+      refreshEpisodes: false
+    };
+  });
   readonly isSaving = signal<boolean>(false);
 
   /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
@@ -134,73 +151,43 @@ export class MovieListComponent {
   );
 
   /**
-   * Pregunta con que titulo buscar antes de lanzar el re-scrapeo. El valor de
-   * partida es el titulo actual; si esta mal, es justo lo que hay que corregir.
+   * El panel se aparta mientras se pide el titulo: se saca a si mismo a
+   * document.body en su ngOnInit, fuera de ion-app, asi que ninguna capa
+   * montada dentro de la aplicacion queda por encima de el.
    */
-  async onRefreshRequested(movie: Movie): Promise<void> {
-    // El panel se aparta igual que al editar: se saca a si mismo a
-    // document.body en su ngOnInit, fuera de ion-app, asi que ninguna capa
-    // montada dentro de la aplicacion queda por encima de el.
+  onRefreshRequested(movie: Movie): void {
+    this.movieBeingRefreshed.set(movie);
     this.isPanelOpen.set(false);
+  }
 
-    const alert = await this.alertController.create({
-      header: 'Volver a buscar los datos',
-      message:
-        'Kodi buscara de nuevo en el scraper y reescribira los campos de esta ' +
-        'pelicula, incluidas las correcciones hechas a mano.',
-      inputs: [
-        {
-          name: 'title',
-          type: 'text',
-          value: movie.title,
-          placeholder: 'Título con el que buscar'
-        },
-        {
-          name: 'year',
-          type: 'text',
-          value: movie.year > 0 ? String(movie.year) : '',
-          placeholder: 'Año, para separar títulos homónimos'
-        },
-        {
-          name: 'imdb',
-          type: 'text',
-          value: movie.imdbNumber,
-          placeholder: 'IMDb (tt0068646), si el año no basta'
-        },
-        {
-          name: 'ignoreNfo',
-          type: 'checkbox',
-          label: 'Ignorar el archivo NFO local',
-          value: 'ignoreNfo'
-        }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Buscar',
-          handler: (data: {
-            title?: string;
-            year?: string;
-            imdb?: string;
-            ignoreNfo?: string[];
-          }) => {
-            this.refreshMovie(
-              movie,
-              {
-                title: buildSearchTitle(data.title ?? '', data.year),
-                ignoreNfo: (data.ignoreNfo ?? []).includes('ignoreNfo')
-              },
-              (data.imdb ?? '').trim()
-            );
-          }
-        }
-      ]
-    });
+  onRefreshCancelled(): void {
+    const movie = this.movieBeingRefreshed();
 
-    await alert.present();
-    await alert.onDidDismiss();
+    if (!movie) {
+      return;
+    }
 
+    this.movieBeingRefreshed.set(null);
     this.restoreDetail(movie);
+  }
+
+  onRefreshConfirmed(request: MediaRefreshRequest): void {
+    const movie = this.movieBeingRefreshed();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingRefreshed.set(null);
+    this.restoreDetail(movie);
+    this.refreshMovie(
+      movie,
+      {
+        title: buildSearchTitle(request.title, request.year),
+        ignoreNfo: request.ignoreNfo
+      },
+      request.uniqueId
+    );
   }
 
   onReloadRequested(movie: Movie): void {

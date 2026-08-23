@@ -80,3 +80,18 @@
     />
   </ng-template>
 </ion-modal>
+
+<ion-modal
+  [isOpen]="movieBeingRefreshed() !== null"
+  (ionModalDidDismiss)="onRefreshCancelled()"
+>
+  <ng-template>
+    <app-media-refresh-modal
+      [initial]="refreshValue()"
+      [showYear]="true"
+      [showUniqueId]="true"
+      (confirmed)="onRefreshConfirmed($event)"
+      (cancelled)="onRefreshCancelled()"
+    />
+  </ng-template>
+</ion-modal>

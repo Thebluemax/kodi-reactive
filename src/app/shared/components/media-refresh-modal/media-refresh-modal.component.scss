@@ -1,0 +1,59 @@
+// ==========================================================================
+// COMPONENT - Media Refresh Modal (BEM)
+// ==========================================================================
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.media-refresh {
+  flex: 1;
+
+  // Element: Title
+  &__title {
+    padding-inline: 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-align: end;
+  }
+
+  // Element: Warning
+  &__warning {
+    display: block;
+    padding: 16px;
+    font-size: 0.8em;
+  }
+
+  // Element: Hint
+  &__hint {
+    display: block;
+    padding: 4px 16px 12px;
+    font-size: 0.75em;
+  }
+
+  // Element: Preview
+  &__preview {
+    margin: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--ion-color-step-100, rgba(0, 0, 0, 0.04));
+  }
+
+  &__preview-label {
+    display: block;
+    font-size: 0.7em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ion-color-medium);
+  }
+
+  &__preview-value {
+    display: block;
+    padding-top: 4px;
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+}
