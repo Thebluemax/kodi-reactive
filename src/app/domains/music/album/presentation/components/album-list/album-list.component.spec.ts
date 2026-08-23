@@ -5,6 +5,7 @@ import { InfiniteScrollCustomEvent } from '@ionic/angular/standalone';
 import { Subject, of } from 'rxjs';
 
 import { AlbumListComponent } from './album-list.component';
+import { ALBUM_EDIT_SCHEMA } from '../../schemas/album-edit.schema';
 import { GetAlbumsUseCase } from '../../../application/use-cases/get-albums.use-case';
 import { GetAlbumDetailUseCase } from '../../../application/use-cases/get-album-detail.use-case';
 import { UpdateAlbumUseCase } from '../../../application/use-cases/update-album.use-case';
@@ -126,7 +127,21 @@ describe('AlbumListComponent', () => {
       dateAdded: '',
       playCount: 0,
       description: '',
-      art: { thumb: 'image://cover/', fanart: '' }
+      art: { thumb: 'image://cover/', fanart: '' },
+      themes: [],
+      moods: ['Melancholic'],
+      type: 'album',
+      rating: 8.5,
+      userRating: 9,
+      votes: 120,
+      sortArtist: 'Radiohead',
+      displayArtist: 'Radiohead',
+      isBoxSet: false,
+      releaseDate: '2000-10-02',
+      originalDate: '',
+      musicBrainzAlbumId: 'mb-album',
+      musicBrainzReleaseGroupId: 'mb-group',
+      musicBrainzAlbumArtistIds: ['mb-artist']
     };
 
     /** Lo que hace el panel al cerrarse: emitir panelClosed. */
@@ -162,6 +177,19 @@ describe('AlbumListComponent', () => {
       expect(component.editValue()).toEqual(
         jasmine.objectContaining({ title: 'Kid A', year: 2000, label: 'Parlophone' })
       );
+    });
+
+    it('da valor a todas las claves que el esquema declara', () => {
+      // Una clave declarada sin valor sale como caja vacia sobre un campo que
+      // en Kodi si tiene contenido, y el usuario lo pisa sin querer.
+      component.onEditRequested(ALBUM);
+      const value = component.editValue();
+
+      const sinValor = ALBUM_EDIT_SCHEMA
+        .map(field => field.key)
+        .filter(key => !(key in value));
+
+      expect(sinValor).toEqual([]);
     });
 
     it('mantiene la referencia del valor mientras se edita', () => {

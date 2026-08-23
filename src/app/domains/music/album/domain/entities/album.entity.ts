@@ -24,6 +24,23 @@ export interface Album {
   readonly description?: string;
   /** Artwork tal cual lo devuelve Kodi: claves de Media.Artwork a ruta o URL. */
   readonly art: MediaArtworkSet;
+  readonly themes: string[];
+  readonly moods: string[];
+  readonly type: string;
+  /** La del scraper, con decimales. */
+  readonly rating: number;
+  /** La del usuario, entera de 0 a 10. */
+  readonly userRating: number;
+  readonly votes: number;
+  readonly sortArtist: string;
+  readonly displayArtist: string;
+  readonly isBoxSet: boolean;
+  /** Texto libre, no una fecha con formato. */
+  readonly releaseDate: string;
+  readonly originalDate: string;
+  readonly musicBrainzAlbumId: string;
+  readonly musicBrainzReleaseGroupId: string;
+  readonly musicBrainzAlbumArtistIds: string[];
 }
 
 /**
@@ -106,7 +123,21 @@ export class AlbumFactory {
       dateAdded: raw.dateadded || '',
       playCount: raw.playcount || 0,
       description: raw.description,
-      art: raw.art ?? {}
+      art: raw.art ?? {},
+      themes: raw.theme || [],
+      moods: raw.mood || [],
+      type: raw.type || '',
+      rating: raw.rating || 0,
+      userRating: raw.userrating || 0,
+      votes: raw.votes || 0,
+      sortArtist: raw.sortartist || '',
+      displayArtist: raw.displayartist || '',
+      isBoxSet: raw.isboxset ?? false,
+      releaseDate: raw.releasedate || '',
+      originalDate: raw.originaldate || '',
+      musicBrainzAlbumId: raw.musicbrainzalbumid || '',
+      musicBrainzReleaseGroupId: raw.musicbrainzreleasegroupid || '',
+      musicBrainzAlbumArtistIds: raw.musicbrainzalbumartistid || []
     };
   }
 
@@ -135,4 +166,18 @@ export interface KodiAlbumResponse {
   description?: string;
   year?: number;
   art?: Record<string, string>;
+  theme?: string[];
+  mood?: string[];
+  type?: string;
+  rating?: number;
+  userrating?: number;
+  votes?: number;
+  sortartist?: string;
+  displayartist?: string;
+  isboxset?: boolean;
+  releasedate?: string;
+  originaldate?: string;
+  musicbrainzalbumid?: string;
+  musicbrainzreleasegroupid?: string;
+  musicbrainzalbumartistid?: string[];
 }

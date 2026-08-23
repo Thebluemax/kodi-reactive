@@ -63,6 +63,28 @@ const UPDATE_PARAM_NAMES: Record<keyof AlbumUpdate, string> = {
   originalDate: 'originaldate'
 };
 
+/**
+ * El detalle alimenta el editor, asi que pide todo lo que SetAlbumDetails sabe
+ * escribir. Los 22 campos escribibles figuran en Audio.Fields.Album, de modo
+ * que no hay ninguno que se pueda escribir y no leer.
+ */
+const ALBUM_DETAIL_PROPERTIES = [
+  'title', 'description', 'artist', 'artistid', 'genre', 'theme', 'mood',
+  'style', 'type', 'albumlabel', 'rating', 'userrating', 'votes', 'year',
+  'musicbrainzalbumid', 'musicbrainzreleasegroupid', 'musicbrainzalbumartistid',
+  'sortartist', 'displayartist', 'isboxset', 'releasedate', 'originaldate',
+  'thumbnail', 'fanart', 'playcount', 'dateadded', 'art'
+];
+
+/**
+ * La lista pagina de 40 en 40 y sus tarjetas solo pintan titulo, artistas,
+ * caratula y año. Pedir mas multiplicaria la carga util de cada pagina sin que
+ * nadie lo lea: al abrir el detalle se recarga el album entero de todas formas.
+ */
+const ALBUM_LIST_PROPERTIES = [
+  'artist', 'artistid', 'thumbnail', 'year'
+];
+
 interface KodiJsonRpcRequest {
   jsonrpc: string;
   method: string;
@@ -125,11 +147,7 @@ export class AlbumKodiRepository extends AlbumRepository {
       method: 'AudioLibrary.GetAlbumDetails',
       params: {
         albumid: albumId,
-        properties: [
-          'thumbnail', 'playcount', 'artistid', 'artist', 'genre',
-          'albumlabel', 'year', 'dateadded', 'style', 'fanart',
-          'mood', 'description', 'rating', 'type', 'theme', 'art'
-        ]
+        properties: ALBUM_DETAIL_PROPERTIES
       },
       id: this.getNextId()
     };
@@ -234,11 +252,7 @@ export class AlbumKodiRepository extends AlbumRepository {
           start: params.start,
           end: params.end
         },
-        properties: [
-          'title', 'description', 'artist', 'genre', 'theme', 'mood',
-          'style', 'type', 'albumlabel', 'rating', 'year',
-          'fanart', 'thumbnail', 'playcount', 'artistid', 'dateadded', 'art'
-        ],
+        properties: ALBUM_LIST_PROPERTIES,
         sort: { order: 'ascending', method: 'album' }
       },
       id: this.getNextId()
