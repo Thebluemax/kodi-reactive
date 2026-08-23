@@ -40,6 +40,11 @@ export class ArtistDetailComponent {
   // Outputs (signal-based)
   trackSelected = output<Track>();
   albumSelected = output<number>();
+  /**
+   * El modal no se monta aqui: este componente vive dentro del cajon lateral,
+   * que se saca a si mismo a document.body. Lo presenta el contenedor.
+   */
+  editRequested = output<Artist>();
 
   onPlayTrack(track: Track): void {
     console.log('onPlayTrack called with track:', track);

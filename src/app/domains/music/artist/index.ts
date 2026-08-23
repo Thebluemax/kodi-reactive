@@ -8,8 +8,7 @@ export {
   ArtistListResult,
   ArtistSearchParams,
   ArtistAlbumGroup,
-  ArtistFactory
-} from './domain/entities/artist.entity';
+  ArtistFactory, ArtistUpdate } from './domain/entities/artist.entity';
 
 // Domain - Repository (interface)
 export { ArtistRepository } from './domain/repositories/artist.repository';
@@ -24,6 +23,8 @@ export { AddTrackToPlaylistUseCase } from './application/use-cases/add-track-to-
 // Presentation - Components
 export { ArtistListComponent } from './presentation/components/artist-list/artist-list.component';
 export { ArtistDetailComponent } from './presentation/components/artist-detail/artist-detail.component';
+
+export { UpdateArtistUseCase } from './application/use-cases/update-artist.use-case';
 
 // Infrastructure - Providers
 export { ARTIST_PROVIDERS } from './artist.providers';

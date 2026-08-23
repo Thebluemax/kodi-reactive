@@ -14,11 +14,49 @@ import {
   ArtistSearchParams,
   ArtistAlbumGroup,
   ArtistFactory,
-  KodiArtistResponse
-} from '../../domain/entities/artist.entity';
+  KodiArtistResponse, ArtistUpdate } from '../../domain/entities/artist.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { Methods } from '@shared/enums/methods';
+
+/** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
+interface KodiJsonRpcEnvelope {
+  result?: unknown;
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+
+/** Traduccion del vocabulario del dominio al de AudioLibrary.SetArtistDetails. */
+const UPDATE_PARAM_NAMES: Record<keyof ArtistUpdate, string> = {
+  name: 'artist',
+  instruments: 'instrument',
+  styles: 'style',
+  moods: 'mood',
+  born: 'born',
+  formed: 'formed',
+  description: 'description',
+  genres: 'genre',
+  died: 'died',
+  disbanded: 'disbanded',
+  yearsActive: 'yearsactive',
+  musicBrainzId: 'musicbrainzartistid',
+  sortName: 'sortname',
+  type: 'type',
+  gender: 'gender',
+  disambiguation: 'disambiguation',
+  art: 'art'
+};
+
+/** El detalle alimenta el editor: pide todo lo que SetArtistDetails escribe. */
+const ARTIST_DETAIL_PROPERTIES = [
+  'thumbnail', 'fanart', 'born', 'formed', 'description',
+  'died', 'disbanded', 'yearsactive', 'instrument', 'genre',
+  'style', 'mood', 'musicbrainzartistid', 'sortname', 'type',
+  'gender', 'disambiguation', 'art'
+];
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -82,11 +120,7 @@ export class ArtistKodiRepository extends ArtistRepository {
       method: 'AudioLibrary.GetArtistDetails',
       params: {
         artistid: artistId,
-        properties: [
-          'thumbnail', 'fanart', 'born', 'formed', 'description',
-          'died', 'disbanded', 'yearsactive', 'instrument', 'genre',
-          'style', 'mood', 'musicbrainzartistid'
-        ]
+        properties: ARTIST_DETAIL_PROPERTIES
       },
       id: this.getNextId()
     };
@@ -223,5 +257,49 @@ export class ArtistKodiRepository extends ArtistRepository {
 
   private getNextId(): number {
     return this.requestId++;
+  }
+
+  updateArtist(artistId: number, patch: ArtistUpdate): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.AudioLibrarySetArtistDetails,
+      params: {
+        artistid: artistId,
+        ...this.toKodiParams(patch)
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi rechazo la actualizacion: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
+  }
+
+  /**
+   * Solo viajan los campos presentes. `undefined` significa "no tocar" y se
+   * descarta; `null` si viaja, porque en las listas y el artwork borra el valor.
+   */
+  private toKodiParams(patch: ArtistUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof ArtistUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
   }
 }
