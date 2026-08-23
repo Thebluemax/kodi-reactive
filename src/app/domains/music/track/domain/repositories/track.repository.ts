@@ -3,7 +3,7 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
-import { Track } from '../entities/track.entity';
+import { Track, TrackUpdate } from '../entities/track.entity';
 
 /**
  * Track Repository Interface
@@ -23,4 +23,11 @@ export abstract class TrackRepository {
    * @param trackId - Track ID (songId)
    */
   abstract playTrack(trackId: number): Observable<void>;
+
+  /**
+   * Update a song with a partial patch
+   * @param songId - Song ID
+   * @param patch - Only the fields to change; anything absent is left untouched
+   */
+  abstract updateSong(songId: number, patch: TrackUpdate): Observable<void>;
 }
