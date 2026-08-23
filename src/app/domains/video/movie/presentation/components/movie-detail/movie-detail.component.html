@@ -85,5 +85,10 @@
         </ion-list>
       </div>
     }
+
+    <app-media-path
+      [path]="movie().file"
+      emptyMessage="Kodi no ha devuelto la ruta de este archivo"
+    />
   </div>
 </ion-content>

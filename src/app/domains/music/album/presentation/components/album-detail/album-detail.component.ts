@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  computed,
   input,
   output,
   inject
@@ -24,6 +25,8 @@ import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
 import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 import { AddTrackToPlaylistUseCase, PlayTrackUseCase } from '@domains/music/track';
+import { MediaPathComponent } from '@shared/components/media-path/media-path.component';
+import { commonFolder, fileName, isSpreadAcrossFolders } from '@shared/utils/media-path';
 
 @Component({
   selector: 'app-album-detail',
@@ -38,6 +41,7 @@ import { AddTrackToPlaylistUseCase, PlayTrackUseCase } from '@domains/music/trac
     IonButtons,
     IonButton,
     IonIcon,
+    MediaPathComponent,
     AssetsPipe,
     ArrayToStringPipe,
     SecondsToStringPipe
@@ -57,6 +61,23 @@ export class AlbumDetailComponent {
 
   // Outputs
   readonly trackSelected = output<Track>();
+
+  /**
+   * La API no expone `file` para album: Audio.Fields.Album no lo declara. La
+   * carpeta solo puede deducirse de la de sus pistas, y solo vale si todas
+   * comparten una.
+   */
+  readonly albumFolder = computed(() =>
+    commonFolder(this.tracks().map(track => track.file))
+  );
+
+  readonly tracksAreSpread = computed(() =>
+    isSpreadAcrossFolders(this.tracks().map(track => track.file))
+  );
+
+  trackFileName(track: Track): string {
+    return fileName(track.file);
+  }
   /**
    * El modal no se monta aqui: este componente se proyecta dentro del panel
    * lateral, y un ion-modal inline se queda donde se declara, heredando su

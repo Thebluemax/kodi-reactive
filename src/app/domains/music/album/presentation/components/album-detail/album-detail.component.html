@@ -45,6 +45,11 @@
                 >{{ track.trackNumber }}.</span
               >
               {{ track.title }}
+              @if (track.file) {
+                <p class="album-detail__track-file" [title]="track.file">
+                  {{ trackFileName(track) }}
+                </p>
+              }
             </ion-label>
             <ion-note slot="end">{{ track.duration | secondsToStr }}</ion-note>
             <ion-buttons slot="end">
@@ -59,5 +64,16 @@
         }
       </ion-list>
     </div>
+
+    <app-media-path
+      label="Carpeta"
+      [derived]="true"
+      [path]="albumFolder()"
+      [emptyMessage]="
+        tracksAreSpread()
+          ? 'Las pistas de este álbum están repartidas en varias carpetas'
+          : ''
+      "
+    />
   </div>
 </ion-content>
