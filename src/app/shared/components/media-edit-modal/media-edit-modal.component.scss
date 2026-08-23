@@ -2,7 +2,19 @@
 // COMPONENT - Media Edit Modal (BEM)
 // ==========================================================================
 
+// Host: el componente se proyecta dentro del <ng-template> del ion-modal, donde
+// no hay ion-page que le de altura. Sin esto el ion-content colapsa y los campos
+// quedan apretados en una franja en vez de ocupar el modal.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// Block
 .media-edit {
+  flex: 1;
+
   // Element: Field
   &__field {
     --padding-start: 16px;

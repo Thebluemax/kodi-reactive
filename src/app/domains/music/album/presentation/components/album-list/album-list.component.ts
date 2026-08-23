@@ -204,11 +204,31 @@ export class AlbumListComponent {
   }
 
   onEditRequested(album: Album): void {
+    // El panel se aparta mientras se edita. No es solo estetico: el panel se
+    // saca a si mismo a document.body en ngOnInit, fuera de ion-app, asi que no
+    // hay sitio dentro de la aplicacion desde el que un modal quede por encima.
     this.albumBeingEdited.set(album);
+    this.isPanelOpen.set(false);
   }
 
   onEditCancelled(): void {
+    const album = this.albumBeingEdited();
+
+    if (!album) {
+      return;
+    }
+
     this.albumBeingEdited.set(null);
+    this.restoreDetail(album);
+  }
+
+  /**
+   * Cerrar el panel hace que emita panelClosed, que limpia el album
+   * seleccionado, asi que volver al detalle exige reponerlo.
+   */
+  private restoreDetail(album: Album): void {
+    this.selectedAlbum.set(album);
+    this.isPanelOpen.set(true);
   }
 
   onEditSave(patch: MediaEditPatch): void {
@@ -225,6 +245,7 @@ export class AlbumListComponent {
         this.isSaving.set(false);
         this.albumBeingEdited.set(null);
         void this.notifications.success('Álbum actualizado');
+        this.restoreDetail(album);
         this.refreshSelectedAlbum(album.albumId);
       },
       error: (error: Error) => {
