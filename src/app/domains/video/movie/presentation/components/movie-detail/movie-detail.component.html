@@ -37,6 +37,10 @@
           <ion-icon slot="start" name="duplicate-outline" />
           Agregar a cola
         </ion-button>
+        <ion-button fill="outline" (click)="editRequested.emit(movie())">
+          <ion-icon slot="start" name="create" />
+          Editar
+        </ion-button>
       </div>
 
       @if (movie().director.length) {

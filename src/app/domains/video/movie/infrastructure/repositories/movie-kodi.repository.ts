@@ -13,10 +13,10 @@ import {
   MovieListResult,
   MovieSearchParams,
   MovieFactory,
-  KodiMovieResponse
-} from '../../domain/entities/movie.entity';
+  KodiMovieResponse, MovieUpdate } from '../../domain/entities/movie.entity';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { Methods } from '@shared/enums/methods';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -42,10 +42,59 @@ interface KodiMovieDetailResponse {
   };
 }
 
-const MOVIE_PROPERTIES = [
-  'title', 'genre', 'year', 'rating', 'runtime', 'plot',
-  'director', 'cast', 'thumbnail', 'fanart', 'playcount',
-  'dateadded', 'file', 'tagline', 'studio', 'country'
+/** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
+interface KodiJsonRpcEnvelope {
+  result?: unknown;
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+
+/** Traduccion del vocabulario del dominio al de VideoLibrary.SetMovieDetails. */
+const UPDATE_PARAM_NAMES: Record<keyof MovieUpdate, string> = {
+  title: 'title',
+  originalTitle: 'originaltitle',
+  sortTitle: 'sorttitle',
+  tagline: 'tagline',
+  plot: 'plot',
+  plotOutline: 'plotoutline',
+  genre: 'genre',
+  director: 'director',
+  writer: 'writer',
+  studio: 'studio',
+  country: 'country',
+  tag: 'tag',
+  showlink: 'showlink',
+  year: 'year',
+  premiered: 'premiered',
+  runtime: 'runtime',
+  rating: 'rating',
+  userRating: 'userrating',
+  votes: 'votes',
+  top250: 'top250',
+  mpaa: 'mpaa',
+  imdbNumber: 'imdbnumber',
+  trailer: 'trailer',
+  set: 'set',
+  art: 'art'
+};
+
+/** El detalle alimenta el editor: pide todo lo que SetMovieDetails escribe. */
+const MOVIE_DETAIL_PROPERTIES = [
+  'title', 'originaltitle', 'sorttitle', 'genre', 'year', 'premiered',
+  'rating', 'userrating', 'votes', 'top250', 'runtime', 'plot', 'plotoutline',
+  'director', 'writer', 'cast', 'studio', 'country', 'tag', 'showlink',
+  'mpaa', 'imdbnumber', 'trailer', 'set', 'tagline',
+  'thumbnail', 'fanart', 'art', 'playcount', 'dateadded', 'file'
+];
+
+/**
+ * La lista pagina y sus tarjetas solo pintan titulo, generos, fanart y año.
+ * Al abrir el detalle la pelicula se recarga entera de todas formas.
+ */
+const MOVIE_LIST_PROPERTIES = [
+  'title', 'genre', 'fanart', 'year'
 ];
 
 @Injectable({
@@ -75,7 +124,7 @@ export class MovieKodiRepository extends MovieRepository {
       method: 'VideoLibrary.GetMovieDetails',
       params: {
         movieid: movieId,
-        properties: MOVIE_PROPERTIES
+        properties: MOVIE_DETAIL_PROPERTIES
       },
       id: this.getNextId()
     };
@@ -114,7 +163,7 @@ export class MovieKodiRepository extends MovieRepository {
           start: params.start,
           end: params.end
         },
-        properties: MOVIE_PROPERTIES,
+        properties: MOVIE_LIST_PROPERTIES,
         sort: { order: 'ascending', method: 'title' }
       },
       id: this.getNextId()
@@ -133,5 +182,49 @@ export class MovieKodiRepository extends MovieRepository {
 
   private getNextId(): number {
     return this.requestId++;
+  }
+
+  updateMovie(movieId: number, patch: MovieUpdate): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.VideoLibrarySetMovieDetails,
+      params: {
+        movieid: movieId,
+        ...this.toKodiParams(patch)
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi rechazo la actualizacion: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
+  }
+
+  /**
+   * Solo viajan los campos presentes. `undefined` significa "no tocar" y se
+   * descarta; `null` si viaja, porque en las listas y el artwork borra el valor.
+   */
+  private toKodiParams(patch: MovieUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof MovieUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
   }
 }

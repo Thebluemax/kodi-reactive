@@ -16,6 +16,7 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonProgressBar,
+  IonModal,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
@@ -30,6 +31,13 @@ import { Actor } from '@domains/video/actor/domain/entities/actor.entity';
 import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '@domains/video/actor/presentation/components/actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { UpdateMovieUseCase } from '../../../application/use-cases/update-movie.use-case';
+import { MovieUpdate } from '../../../domain/entities/movie.entity';
+import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
+import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
@@ -45,7 +53,9 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     MediaTileComponent,
     LateralPanelComponent,
     MovieDetailComponent,
-    ActorDetailComponent
+    ActorDetailComponent,
+    IonModal,
+    MediaEditModalComponent
   ],
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.scss',
@@ -55,6 +65,8 @@ export class MovieListComponent {
   // Use Cases
   private readonly getMoviesUseCase = inject(GetMoviesUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
+  private readonly updateMovieUseCase = inject(UpdateMovieUseCase);
+  private readonly notifications = inject(NotificationService);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
   private readonly globalSearch = inject(GlobalSearchService);
@@ -69,6 +81,109 @@ export class MovieListComponent {
 
   // Cross-navigation: actor panel
   readonly panelType = signal<'movie' | 'actor'>('movie');
+
+  // Edicion. El panel lateral se saca a si mismo a document.body, fuera de
+  // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
+  readonly editSchema = MOVIE_EDIT_SCHEMA;
+  readonly movieBeingEdited = signal<Movie | null>(null);
+  readonly isSaving = signal<boolean>(false);
+
+  /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
+    const movie = this.movieBeingEdited();
+
+    if (!movie) {
+      return {};
+    }
+
+    return {
+      title: movie.title,
+      originalTitle: movie.originalTitle,
+      sortTitle: movie.sortTitle,
+      tagline: movie.tagline,
+      plot: movie.plot,
+      plotOutline: movie.plotOutline,
+      genre: movie.genre,
+      director: movie.director,
+      writer: movie.writer,
+      studio: movie.studio,
+      country: movie.country,
+      tag: movie.tag,
+      set: movie.set,
+      showlink: movie.showlink,
+      premiered: movie.premiered,
+      year: movie.year,
+      runtime: movie.runtime,
+      rating: movie.rating,
+      userRating: movie.userRating,
+      votes: movie.votes,
+      top250: movie.top250,
+      mpaa: movie.mpaa,
+      imdbNumber: movie.imdbNumber,
+      trailer: movie.trailer
+    };
+  });
+
+  readonly editArtwork = computed<MediaArtworkSet | null>(
+    () => this.movieBeingEdited()?.art ?? null
+  );
+
+  onEditRequested(movie: Movie): void {
+    this.movieBeingEdited.set(movie);
+    this.isPanelOpen.set(false);
+  }
+
+  onEditCancelled(): void {
+    const movie = this.movieBeingEdited();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingEdited.set(null);
+    this.restoreDetail(movie);
+  }
+
+  onEditSave(patch: MediaEditPatch): void {
+    const movie = this.movieBeingEdited();
+
+    if (!movie) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    this.updateMovieUseCase.execute(movie.movieId, patch as MovieUpdate).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.movieBeingEdited.set(null);
+        void this.notifications.success('Película actualizada');
+        this.restoreDetail(movie);
+        this.refreshSelectedMovie(movie.movieId);
+      },
+      error: (error: Error) => {
+        this.isSaving.set(false);
+        void this.notifications.error(error.message);
+      }
+    });
+  }
+
+  /**
+   * Cerrar el panel emite panelClosed, que limpia la pelicula y devuelve el
+   * panel a su modo por defecto, asi que volver al detalle exige reponer ambos.
+   */
+  private restoreDetail(movie: Movie): void {
+    this.selectedMovie.set(movie);
+    this.panelType.set('movie');
+    this.isPanelOpen.set(true);
+  }
+
+  /** Tras guardar, el detalle debe mostrar lo que Kodi tiene ahora. */
+  private refreshSelectedMovie(movieId: number): void {
+    this.getMovieDetailUseCase.execute(movieId).subscribe({
+      next: detail => this.selectedMovie.set(detail)
+    });
+  }
   readonly selectedActor = signal<Actor | null>(null);
   readonly actorMovies = signal<Movie[]>([]);
 
