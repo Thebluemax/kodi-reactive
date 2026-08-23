@@ -16,6 +16,7 @@ import {
   IonInfiniteScrollContent,
   IonProgressBar,
   IonModal,
+  AlertController,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 import { EMPTY, Subject, catchError, forkJoin, switchMap } from 'rxjs';
@@ -31,6 +32,8 @@ import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-
 import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { UpdateTVShowUseCase } from '../../../application/use-cases/update-tvshow.use-case';
+import { RefreshTVShowUseCase } from '../../../application/use-cases/refresh-tvshow.use-case';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 import { TVShowUpdate } from '../../../domain/entities/tvshow.entity';
 import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
 import { NotificationService } from '@shared/services/notification.service';
@@ -64,6 +67,8 @@ export class TVShowListComponent {
   private readonly getTVShowsUseCase = inject(GetTVShowsUseCase);
   private readonly getTVShowDetailUseCase = inject(GetTVShowDetailUseCase);
   private readonly updateTVShowUseCase = inject(UpdateTVShowUseCase);
+  private readonly refreshTVShowUseCase = inject(RefreshTVShowUseCase);
+  private readonly alertController = inject(AlertController);
   private readonly notifications = inject(NotificationService);
   private readonly getSeasonsUseCase = inject(GetSeasonsUseCase);
   private readonly getEpisodesUseCase = inject(GetEpisodesUseCase);
@@ -243,6 +248,80 @@ export class TVShowListComponent {
   readonly editArtwork = computed<MediaArtworkSet | null>(
     () => this.tvshowBeingEdited()?.art ?? null
   );
+
+  /**
+   * Pregunta con que titulo buscar antes de lanzar el re-scrapeo, y si el
+   * refresco debe arrastrar a los episodios.
+   */
+  async onRefreshRequested(tvshow: TVShow): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Volver a buscar los datos',
+      message:
+        'Kodi buscara de nuevo en el scraper y reescribira los campos de esta ' +
+        'serie, incluidas las correcciones hechas a mano.',
+      inputs: [
+        {
+          name: 'title',
+          type: 'text',
+          value: tvshow.title,
+          placeholder: 'Título con el que buscar'
+        },
+        {
+          name: 'ignoreNfo',
+          type: 'checkbox',
+          label: 'Ignorar el archivo NFO local',
+          value: 'ignoreNfo'
+        },
+        {
+          name: 'refreshEpisodes',
+          type: 'checkbox',
+          label: 'Refrescar también todos los episodios',
+          value: 'refreshEpisodes'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Buscar',
+          handler: (data: {
+            title?: string;
+            ignoreNfo?: string[];
+            refreshEpisodes?: string[];
+          }) => {
+            const checked = [
+              ...(data.ignoreNfo ?? []),
+              ...(data.refreshEpisodes ?? [])
+            ];
+
+            this.refreshTVShow(tvshow, {
+              title: data.title,
+              ignoreNfo: checked.includes('ignoreNfo'),
+              refreshEpisodes: checked.includes('refreshEpisodes')
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  onReloadRequested(tvshow: TVShow): void {
+    this.refreshSelectedTVShow(tvshow.tvshowId);
+    void this.notifications.info('Datos recargados desde Kodi');
+  }
+
+  private refreshTVShow(tvshow: TVShow, options: MediaRefreshOptions): void {
+    this.refreshTVShowUseCase.execute(tvshow.tvshowId, options).subscribe({
+      next: () => {
+        // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras.
+        void this.notifications.info(
+          'Kodi está buscando los datos. Usa «recargar» cuando termine.'
+        );
+      },
+      error: (error: Error) => void this.notifications.error(error.message)
+    });
+  }
 
   onEditRequested(tvshow: TVShow): void {
     this.tvshowBeingEdited.set(tvshow);

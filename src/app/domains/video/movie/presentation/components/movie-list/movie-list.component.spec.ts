@@ -6,6 +6,7 @@ import { Subject, of } from 'rxjs';
 
 import { MovieListComponent } from './movie-list.component';
 import { GetMoviesUseCase } from '../../../application/use-cases/get-movies.use-case';
+import { RefreshMovieUseCase } from '../../../application/use-cases/refresh-movie.use-case';
 import { UpdateMovieUseCase } from '../../../application/use-cases/update-movie.use-case';
 import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { GetMovieDetailUseCase } from '../../../application/use-cases/get-movie-detail.use-case';
@@ -56,6 +57,10 @@ describe('MovieListComponent', () => {
         {
           provide: UpdateMovieUseCase,
           useValue: jasmine.createSpyObj('UpdateMovieUseCase', ['execute'])
+        },
+        {
+          provide: RefreshMovieUseCase,
+          useValue: jasmine.createSpyObj('RefreshMovieUseCase', ['execute'])
         }
       ]
     }).compileComponents();

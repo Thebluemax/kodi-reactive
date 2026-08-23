@@ -128,4 +128,59 @@ describe('MovieKodiRepository', () => {
       result: { movies: [], limits: { start: 0, end: 0, total: 0 } }
     });
   });
+
+  // ========================================================================
+  // refreshMovie
+  // ========================================================================
+
+  describe('refreshMovie', () => {
+    function expectRefreshRequest(): Record<string, unknown> {
+      const req = httpMock.expectOne(JSON_RPC_URL);
+      const body = req.request.body as { method: string; params: Record<string, unknown> };
+
+      expect(body.method).toBe(Methods.VideoLibraryRefreshMovie);
+
+      req.flush({ id: 1, jsonrpc: '2.0', result: 'OK' });
+      return body.params;
+    }
+
+    it('manda el título con el que buscar en vez del nombre del archivo', () => {
+      repository.refreshMovie(11, { title: 'El Padrino' }).subscribe();
+
+      expect(expectRefreshRequest()['title']).toBe('El Padrino');
+    });
+
+    it('recorta el título, que viene de un campo de texto', () => {
+      repository.refreshMovie(11, { title: '  El Padrino  ' }).subscribe();
+
+      expect(expectRefreshRequest()['title']).toBe('El Padrino');
+    });
+
+    it('sin título manda cadena vacía, que es «dedúcelo del archivo»', () => {
+      repository.refreshMovie(11, {}).subscribe();
+      const params = expectRefreshRequest();
+
+      expect(params['title']).toBe('');
+      expect(params['ignorenfo']).toBeFalse();
+    });
+
+    it('traslada la opción de ignorar el NFO', () => {
+      repository.refreshMovie(11, { ignoreNfo: true }).subscribe();
+
+      expect(expectRefreshRequest()['ignorenfo']).toBeTrue();
+    });
+
+    it('propaga el fallo del scraper, que llega con HTTP 200', () => {
+      let caught: Error | undefined;
+      repository.refreshMovie(11, {}).subscribe({ error: (err: Error) => (caught = err) });
+
+      httpMock.expectOne(JSON_RPC_URL).flush({
+        id: 1,
+        jsonrpc: '2.0',
+        error: { code: -32100, message: 'Scraper failed' }
+      });
+
+      expect(caught?.message).toContain('Scraper failed');
+    });
+  });
 });

@@ -17,6 +17,7 @@ import {
   IonInfiniteScrollContent,
   IonProgressBar,
   IonModal,
+  AlertController,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
@@ -32,11 +33,13 @@ import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-ca
 import { ActorDetailComponent } from '@domains/video/actor/presentation/components/actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { UpdateMovieUseCase } from '../../../application/use-cases/update-movie.use-case';
+import { RefreshMovieUseCase } from '../../../application/use-cases/refresh-movie.use-case';
 import { MovieUpdate } from '../../../domain/entities/movie.entity';
 import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
 import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
@@ -66,6 +69,8 @@ export class MovieListComponent {
   private readonly getMoviesUseCase = inject(GetMoviesUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
   private readonly updateMovieUseCase = inject(UpdateMovieUseCase);
+  private readonly refreshMovieUseCase = inject(RefreshMovieUseCase);
+  private readonly alertController = inject(AlertController);
   private readonly notifications = inject(NotificationService);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
@@ -127,6 +132,65 @@ export class MovieListComponent {
   readonly editArtwork = computed<MediaArtworkSet | null>(
     () => this.movieBeingEdited()?.art ?? null
   );
+
+  /**
+   * Pregunta con que titulo buscar antes de lanzar el re-scrapeo. El valor de
+   * partida es el titulo actual; si esta mal, es justo lo que hay que corregir.
+   */
+  async onRefreshRequested(movie: Movie): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Volver a buscar los datos',
+      message:
+        'Kodi buscara de nuevo en el scraper y reescribira los campos de esta ' +
+        'pelicula, incluidas las correcciones hechas a mano.',
+      inputs: [
+        {
+          name: 'title',
+          type: 'text',
+          value: movie.title,
+          placeholder: 'Título con el que buscar'
+        },
+        {
+          name: 'ignoreNfo',
+          type: 'checkbox',
+          label: 'Ignorar el archivo NFO local',
+          value: 'ignoreNfo'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Buscar',
+          handler: (data: { title?: string; ignoreNfo?: string[] }) => {
+            this.refreshMovie(movie, {
+              title: data.title,
+              ignoreNfo: (data.ignoreNfo ?? []).includes('ignoreNfo')
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  onReloadRequested(movie: Movie): void {
+    this.refreshSelectedMovie(movie.movieId);
+    void this.notifications.info('Datos recargados desde Kodi');
+  }
+
+  private refreshMovie(movie: Movie, options: MediaRefreshOptions): void {
+    this.refreshMovieUseCase.execute(movie.movieId, options).subscribe({
+      next: () => {
+        // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras, asi
+        // que recargar aqui devolveria los datos viejos.
+        void this.notifications.info(
+          'Kodi está buscando los datos. Usa «recargar» cuando termine.'
+        );
+      },
+      error: (error: Error) => void this.notifications.error(error.message)
+    });
+  }
 
   onEditRequested(movie: Movie): void {
     this.movieBeingEdited.set(movie);

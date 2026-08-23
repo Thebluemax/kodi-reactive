@@ -6,6 +6,7 @@ import { Subject, of } from 'rxjs';
 
 import { TVShowListComponent } from './tvshow-list.component';
 import { GetTVShowsUseCase } from '../../../application/use-cases/get-tvshows.use-case';
+import { RefreshTVShowUseCase } from '../../../application/use-cases/refresh-tvshow.use-case';
 import { UpdateTVShowUseCase } from '../../../application/use-cases/update-tvshow.use-case';
 import { GetTVShowDetailUseCase } from '../../../application/use-cases/get-tvshow-detail.use-case';
 import { GetSeasonsUseCase } from '../../../application/use-cases/get-seasons.use-case';
@@ -60,6 +61,10 @@ describe('TVShowListComponent', () => {
         {
           provide: UpdateTVShowUseCase,
           useValue: jasmine.createSpyObj('UpdateTVShowUseCase', ['execute'])
+        },
+        {
+          provide: RefreshTVShowUseCase,
+          useValue: jasmine.createSpyObj('RefreshTVShowUseCase', ['execute'])
         }
       ]
     }).compileComponents();

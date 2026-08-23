@@ -17,6 +17,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -226,5 +227,31 @@ export class MovieKodiRepository extends MovieRepository {
     }
 
     return params;
+  }
+
+  refreshMovie(movieId: number, options: MediaRefreshOptions): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.VideoLibraryRefreshMovie,
+      params: {
+        movieid: movieId,
+        ignorenfo: options.ignoreNfo ?? false,
+        // Cadena vacia significa "deducelo del archivo", que es el
+        // comportamiento por defecto de Kodi.
+        title: options.title?.trim() ?? ''
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi no ha podido volver a buscar los datos: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
   }
 }
