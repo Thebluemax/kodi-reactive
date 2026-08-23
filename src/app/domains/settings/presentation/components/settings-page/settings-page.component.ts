@@ -19,10 +19,10 @@ import {
   IonButton,
   IonSpinner,
   AlertController,
-  ToastController,
 } from '@ionic/angular/standalone';
 import { ThemeService, ThemePreference } from '@shared/services/theme.service';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { NotificationService } from '@shared/services/notification.service';
 import { LibraryFacade } from '@domains/library/application/library.facade';
 import {
   LibraryType,
@@ -67,7 +67,7 @@ export class SettingsPageComponent {
   readonly library = inject(LibraryFacade);
 
   private readonly alertController = inject(AlertController);
-  private readonly toastController = inject(ToastController);
+  private readonly notifications = inject(NotificationService);
 
   // Expuesto al template
   readonly LibraryType = LibraryType;
@@ -77,7 +77,7 @@ export class SettingsPageComponent {
       const error = this.library.lastError();
 
       if (error) {
-        void this.showToast(error, 'danger');
+        void this.notifications.error(error);
         this.library.clearError();
       }
     });
@@ -89,7 +89,7 @@ export class SettingsPageComponent {
         const operation = OPERATION_LABELS[finished.operation];
         const target = LIBRARY_LABELS[finished.type];
 
-        void this.showToast(`${operation} de ${target} finalizada`, 'success');
+        void this.notifications.success(`${operation} de ${target} finalizada`);
         this.library.clearFinished();
       }
     });
@@ -138,16 +138,5 @@ export class SettingsPageComponent {
     });
 
     await alert.present();
-  }
-
-  private async showToast(message: string, color: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      color,
-      duration: 3000,
-      position: 'bottom',
-    });
-
-    await toast.present();
   }
 }

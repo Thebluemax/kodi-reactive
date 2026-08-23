@@ -2,9 +2,11 @@ import {
     // Remote control icons
     add,
     albums,
+    alertCircleOutline,
     arrowBackOutline,
     beerOutline,
     bookmark,
+    checkmarkCircleOutline,
     chevronBack,
     chevronBackOutline,
     chevronDownOutline,
@@ -61,9 +63,11 @@ export const ION_ICONS = {
     // Remote control icons
     add,
     albums,
+    alertCircleOutline,
     arrowBackOutline,
     beerOutline,
     bookmark,
+    checkmarkCircleOutline,
     chevronBack,
     chevronBackOutline,
     chevronForwardOutline,
