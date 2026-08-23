@@ -2,8 +2,19 @@
 // COMPONENT - Media Path (BEM)
 // ==========================================================================
 
+// Host: los detalles son grids de dos columnas, la primera estrecha para la
+// caratula. Sin esto el componente entra como un item mas y la ruta se pinta
+// dentro de 200px, partida cada pocos caracteres. Se ignora sola fuera de grid.
+:host {
+  display: block;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
 .media-path {
-  padding-top: 8px;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.08));
 
   // Element: Label
   &__label {
@@ -27,10 +38,12 @@
   // falta antes que desbordar el panel.
   &__value {
     display: block;
+    padding-top: 2px;
     font-size: 0.8em;
-    line-height: 1.4;
+    line-height: 1.5;
+    // Parte solo cuando hace falta. break-all cortaria tambien las rutas que
+    // caben, dejandolas en columna.
     overflow-wrap: anywhere;
-    word-break: break-all;
     user-select: all;
   }
 
