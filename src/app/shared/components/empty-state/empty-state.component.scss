@@ -2,6 +2,14 @@
 // COMPONENT - Empty State (BEM)
 // ==========================================================================
 
+// Host: el componente se usa dentro de <ion-list>, donde el display inline por
+// defecto deja al bloque interno sin ancho de referencia y el contenido pegado
+// a la izquierda.
+:host {
+  display: block;
+  width: 100%;
+}
+
 // Block
 .empty-state {
   display: flex;
