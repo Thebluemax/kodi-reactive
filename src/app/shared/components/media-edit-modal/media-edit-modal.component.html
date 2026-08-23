@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ title() }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="onCancel()" [disabled]="saving()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button
+        strong="true"
+        [disabled]="saving() || !isDirty()"
+        (click)="onSave()"
+      >
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="media-edit">
+  @for (field of schema(); track field.key) {
+    <ion-item class="media-edit__field">
+      @switch (field.kind) {
+        @case ('textarea') {
+          <ion-textarea
+            labelPlacement="stacked"
+            autoGrow="true"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+        @case ('boolean') {
+          <ion-toggle
+            [checked]="fieldValue(field) === true"
+            (ionChange)="onFieldChange(field, $any($event).detail.checked)"
+          >
+            {{ field.label }}
+          </ion-toggle>
+        }
+        @case ('select') {
+          <ion-select
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          >
+            @for (option of field.options ?? []; track option.value) {
+              <ion-select-option [value]="option.value">
+                {{ option.label }}
+              </ion-select-option>
+            }
+          </ion-select>
+        }
+        @case ('string-list') {
+          <ion-input
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="listAsText(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+        @case ('number') {
+          <ion-input
+            type="number"
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+        @default {
+          <ion-input
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+      }
+    </ion-item>
+
+    @if (field.hint) {
+      <ion-note class="media-edit__hint">{{ field.hint }}</ion-note>
+    }
+  }
+</ion-content>

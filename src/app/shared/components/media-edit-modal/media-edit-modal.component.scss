@@ -1,0 +1,18 @@
+// ==========================================================================
+// COMPONENT - Media Edit Modal (BEM)
+// ==========================================================================
+
+.media-edit {
+  // Element: Field
+  &__field {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+  }
+
+  // Element: Hint
+  &__hint {
+    display: block;
+    padding: 4px 16px 12px;
+    font-size: 0.75em;
+  }
+}
