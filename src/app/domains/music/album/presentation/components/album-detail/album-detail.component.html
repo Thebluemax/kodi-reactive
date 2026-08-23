@@ -61,19 +61,3 @@
     </div>
   </div>
 </ion-content>
-
-<ion-modal
-  [isOpen]="isEditOpen()"
-  (ionModalDidDismiss)="onEditCancelled()"
->
-  <ng-template>
-    <app-media-edit-modal
-      [title]="'Editar ' + album().title"
-      [schema]="editSchema"
-      [value]="editValue()"
-      [saving]="isSaving()"
-      (save)="onEditSave($event)"
-      (cancelled)="onEditCancelled()"
-    />
-  </ng-template>
-</ion-modal>

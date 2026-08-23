@@ -7,6 +7,7 @@ import { Subject, of } from 'rxjs';
 import { AlbumListComponent } from './album-list.component';
 import { GetAlbumsUseCase } from '../../../application/use-cases/get-albums.use-case';
 import { GetAlbumDetailUseCase } from '../../../application/use-cases/get-album-detail.use-case';
+import { UpdateAlbumUseCase } from '../../../application/use-cases/update-album.use-case';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 
 const PAGE_SIZE = 40;
@@ -44,6 +45,10 @@ describe('AlbumListComponent', () => {
         {
           provide: AddAlbumToPlaylistUseCase,
           useValue: jasmine.createSpyObj('AddAlbumToPlaylistUseCase', ['execute'])
+        },
+        {
+          provide: UpdateAlbumUseCase,
+          useValue: jasmine.createSpyObj('UpdateAlbumUseCase', ['execute'])
         },
         { provide: Router, useValue: { events: new Subject(), url: '/music/albums' } }
       ]
