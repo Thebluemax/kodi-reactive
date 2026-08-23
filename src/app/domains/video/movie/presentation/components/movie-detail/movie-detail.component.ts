@@ -50,6 +50,11 @@ export class MovieDetailComponent {
   readonly playMovie = output<void>();
   readonly addToQueue = output<void>();
   readonly actorSelected = output<string>();
+  /**
+   * El modal no se monta aqui: este componente se proyecta dentro del panel
+   * lateral, que se saca a si mismo a document.body. Lo presenta el contenedor.
+   */
+  readonly editRequested = output<Movie>();
 
   onPlay(): void {
     this.playMovie.emit();

@@ -6,6 +6,8 @@ import { Subject, of } from 'rxjs';
 
 import { MovieListComponent } from './movie-list.component';
 import { GetMoviesUseCase } from '../../../application/use-cases/get-movies.use-case';
+import { UpdateMovieUseCase } from '../../../application/use-cases/update-movie.use-case';
+import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { GetMovieDetailUseCase } from '../../../application/use-cases/get-movie-detail.use-case';
 import { AddMovieToPlaylistUseCase } from '../../../application/use-cases/add-movie-to-playlist.use-case';
 import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-cases/get-movies-by-actor.use-case';
@@ -50,7 +52,11 @@ describe('MovieListComponent', () => {
           provide: GetMoviesByActorUseCase,
           useValue: jasmine.createSpyObj('GetMoviesByActorUseCase', ['execute'])
         },
-        { provide: Router, useValue: { events: new Subject(), url: '/video/movies' } }
+        { provide: Router, useValue: { events: new Subject(), url: '/video/movies' } },
+        {
+          provide: UpdateMovieUseCase,
+          useValue: jasmine.createSpyObj('UpdateMovieUseCase', ['execute'])
+        }
       ]
     }).compileComponents();
 
@@ -69,5 +75,59 @@ describe('MovieListComponent', () => {
     expect(lastParams()).toEqual(
       jasmine.objectContaining({ start: PAGE_SIZE, end: PAGE_SIZE * 2 })
     );
+  });
+
+  // ========================================================================
+  // Edicion
+  // ========================================================================
+
+  describe('edicion', () => {
+    it('da valor a todas las claves que el esquema declara', () => {
+      // Una clave declarada sin valor sale como caja vacia sobre un campo que
+      // en Kodi si tiene contenido, y el usuario lo pisa sin querer.
+      const movie = {
+        movieId: 11,
+        title: 'El Padrino',
+        genre: ['Drama'],
+        year: 1972,
+        rating: 9.2,
+        runtime: 10500,
+        plot: '',
+        director: [],
+        cast: [],
+        thumbnail: '',
+        fanart: '',
+        playCount: 0,
+        dateAdded: '',
+        file: '',
+        tagline: '',
+        studio: [],
+        country: [],
+        originalTitle: 'The Godfather',
+        sortTitle: '',
+        plotOutline: '',
+        writer: [],
+        tag: [],
+        showlink: [],
+        premiered: '1972-03-24',
+        mpaa: '',
+        imdbNumber: '',
+        votes: '',
+        top250: 1,
+        userRating: 0,
+        trailer: '',
+        set: '',
+        art: {}
+      };
+
+      component.onEditRequested(movie);
+      const value = component.editValue();
+
+      const sinValor = MOVIE_EDIT_SCHEMA
+        .map(field => field.key)
+        .filter(key => !(key in value));
+
+      expect(sinValor).toEqual([]);
+    });
   });
 });

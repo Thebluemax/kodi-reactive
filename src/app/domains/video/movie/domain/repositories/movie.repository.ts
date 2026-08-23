@@ -3,7 +3,7 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
-import { Movie, MovieListResult, MovieSearchParams } from '../entities/movie.entity';
+import { Movie, MovieListResult, MovieSearchParams, MovieUpdate } from '../entities/movie.entity';
 
 /**
  * Movie Repository Interface
@@ -27,4 +27,11 @@ export abstract class MovieRepository {
    * @param playImmediately - If true, starts playing immediately
    */
   abstract addToPlaylist(movieId: number, playImmediately: boolean): Observable<void>;
+
+  /**
+   * Update a movie with a partial patch
+   * @param movieId - Movie ID
+   * @param patch - Only the fields to change; anything absent is left untouched
+   */
+  abstract updateMovie(movieId: number, patch: MovieUpdate): Observable<void>;
 }
