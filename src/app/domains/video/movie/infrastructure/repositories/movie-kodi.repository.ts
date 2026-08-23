@@ -82,6 +82,26 @@ const UPDATE_PARAM_NAMES: Record<keyof MovieUpdate, string> = {
   uniqueId: 'uniqueid'
 };
 
+/**
+ * Los parametros del refresco son opcionales en la API y tienen sus propios
+ * valores por defecto: sin `title` Kodi lo deduce del archivo, y `ignorenfo` es
+ * false. Mandarlos vacios no aporta nada, asi que solo viaja lo que se indica.
+ */
+function toRefreshParams(options: MediaRefreshOptions): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+  const title = options.title?.trim() ?? '';
+
+  if (title.length > 0) {
+    params['title'] = title;
+  }
+
+  if (options.ignoreNfo) {
+    params['ignorenfo'] = true;
+  }
+
+  return params;
+}
+
 /** El detalle alimenta el editor: pide todo lo que SetMovieDetails escribe. */
 const MOVIE_DETAIL_PROPERTIES = [
   'title', 'originaltitle', 'sorttitle', 'genre', 'year', 'premiered',
@@ -236,10 +256,7 @@ export class MovieKodiRepository extends MovieRepository {
       method: Methods.VideoLibraryRefreshMovie,
       params: {
         movieid: movieId,
-        ignorenfo: options.ignoreNfo ?? false,
-        // Cadena vacia significa "deducelo del archivo", que es el
-        // comportamiento por defecto de Kodi.
-        title: options.title?.trim() ?? ''
+        ...toRefreshParams(options)
       },
       id: this.getNextId()
     };

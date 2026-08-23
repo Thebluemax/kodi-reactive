@@ -149,10 +149,16 @@ describe('TVShowKodiRepository', () => {
       expect(expectRefreshRequest()['title']).toBe('Los Soprano');
     });
 
-    it('no arrastra a los episodios salvo que se pida', () => {
+    it('sin opciones manda solo el identificador', () => {
       repository.refreshTVShow(5, {}).subscribe();
 
-      expect(expectRefreshRequest()['refreshepisodes']).toBeFalse();
+      expect(Object.keys(expectRefreshRequest())).toEqual(['tvshowid']);
+    });
+
+    it('no arrastra a los episodios salvo que se pida', () => {
+      repository.refreshTVShow(5, { refreshEpisodes: false }).subscribe();
+
+      expect('refreshepisodes' in expectRefreshRequest()).toBeFalse();
     });
 
     it('arrastra a los episodios cuando se pide', () => {

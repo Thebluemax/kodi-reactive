@@ -164,12 +164,26 @@ describe('MovieKodiRepository', () => {
       expect(expectRefreshRequest()['title']).toBe('El Padrino');
     });
 
-    it('sin título manda cadena vacía, que es «dedúcelo del archivo»', () => {
+    it('sin opciones manda solo el identificador', () => {
+      // Los parametros son opcionales y Kodi ya tiene sus valores por defecto:
+      // sin title lo deduce del archivo, e ignorenfo es false.
       repository.refreshMovie(11, {}).subscribe();
+
+      expect(Object.keys(expectRefreshRequest())).toEqual(['movieid']);
+    });
+
+    it('no manda ignorenfo cuando no se pide', () => {
+      repository.refreshMovie(11, { title: 'El Padrino', ignoreNfo: false }).subscribe();
       const params = expectRefreshRequest();
 
-      expect(params['title']).toBe('');
-      expect(params['ignorenfo']).toBeFalse();
+      expect('ignorenfo' in params).toBeFalse();
+      expect(params['title']).toBe('El Padrino');
+    });
+
+    it('un título en blanco cuenta como ausente', () => {
+      repository.refreshMovie(11, { title: '   ' }).subscribe();
+
+      expect(Object.keys(expectRefreshRequest())).toEqual(['movieid']);
     });
 
     it('traslada la opción de ignorar el NFO', () => {

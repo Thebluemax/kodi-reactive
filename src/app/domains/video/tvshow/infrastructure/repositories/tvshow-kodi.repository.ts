@@ -91,6 +91,30 @@ const UPDATE_PARAM_NAMES: Record<keyof TVShowUpdate, string> = {
   art: 'art'
 };
 
+/**
+ * Los parametros del refresco son opcionales en la API y tienen sus propios
+ * valores por defecto: sin `title` Kodi lo deduce del archivo, y `ignorenfo` y
+ * `refreshepisodes` son false. Solo viaja lo que se indica.
+ */
+function toRefreshParams(options: MediaRefreshOptions): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+  const title = options.title?.trim() ?? '';
+
+  if (title.length > 0) {
+    params['title'] = title;
+  }
+
+  if (options.ignoreNfo) {
+    params['ignorenfo'] = true;
+  }
+
+  if (options.refreshEpisodes) {
+    params['refreshepisodes'] = true;
+  }
+
+  return params;
+}
+
 /** El detalle alimenta el editor: pide todo lo que SetTVShowDetails escribe. */
 const TVSHOW_DETAIL_PROPERTIES = [
   'title', 'originaltitle', 'sorttitle', 'genre', 'year', 'premiered',
@@ -290,9 +314,7 @@ export class TVShowKodiRepository extends TVShowRepository {
       method: Methods.VideoLibraryRefreshTVShow,
       params: {
         tvshowid: tvshowId,
-        ignorenfo: options.ignoreNfo ?? false,
-        refreshepisodes: options.refreshEpisodes ?? false,
-        title: options.title?.trim() ?? ''
+        ...toRefreshParams(options)
       },
       id: this.getNextId()
     };
