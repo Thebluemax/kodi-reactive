@@ -52,6 +52,11 @@ export class TVShowDetailComponent {
   readonly seasonSelected = output<number>();
   readonly playEpisode = output<number>();
   readonly addEpisodeToQueue = output<number>();
+  /**
+   * El modal no se monta aqui: este componente se proyecta dentro del panel
+   * lateral, que se saca a si mismo a document.body. Lo presenta el contenedor.
+   */
+  readonly editRequested = output<TVShow>();
 
   // Local state
   readonly selectedSeasonNumber = signal<number>(1);

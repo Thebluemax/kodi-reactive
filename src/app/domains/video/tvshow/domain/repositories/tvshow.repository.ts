@@ -8,8 +8,7 @@ import {
   TVShowListResult,
   TVShowSearchParams,
   Season,
-  Episode
-} from '../entities/tvshow.entity';
+  Episode, TVShowUpdate } from '../entities/tvshow.entity';
 
 /**
  * TVShow Repository Interface
@@ -43,4 +42,11 @@ export abstract class TVShowRepository {
    * @param playImmediately - If true, starts playing immediately
    */
   abstract addEpisodeToPlaylist(episodeId: number, playImmediately: boolean): Observable<void>;
+
+  /**
+   * Update a TV show with a partial patch
+   * @param tvshowId - TV show ID
+   * @param patch - Only the fields to change; anything absent is left untouched
+   */
+  abstract updateTVShow(tvshowId: number, patch: TVShowUpdate): Observable<void>;
 }

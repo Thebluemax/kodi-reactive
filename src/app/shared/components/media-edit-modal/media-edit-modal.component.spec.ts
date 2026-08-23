@@ -111,6 +111,15 @@ describe('MediaEditModalComponent', () => {
     expect(component.isDirty()).toBeFalse();
   });
 
+  it('el select solo ofrece los valores declarados en el esquema', () => {
+    // El status de la serie es un enumerado cerrado: texto libre lo rechaza
+    // Kodi, asi que el esquema tiene que poder restringirlo.
+    expect(fieldOf('status').options?.map(option => option.value)).toEqual([
+      'ended',
+      'cancelled'
+    ]);
+  });
+
   it('emite el booleano y el select', () => {
     component.onFieldChange(fieldOf('isBoxSet'), true);
     component.onFieldChange(fieldOf('status'), 'cancelled');

@@ -29,6 +29,13 @@
           <strong>Estudio:</strong> {{ tvshow().studio | arrayToString }}
         </div>
       }
+
+      <div class="tvshow-detail__actions">
+        <ion-button fill="outline" (click)="editRequested.emit(tvshow())">
+          <ion-icon slot="start" name="create" />
+          Editar
+        </ion-button>
+      </div>
     </div>
 
     @if (tvshow().plot) {
