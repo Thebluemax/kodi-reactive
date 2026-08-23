@@ -76,7 +76,13 @@
               ]
             },
             "ci": {
-              "progress": false
+              "progress": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -91,7 +97,8 @@
               "buildTarget": "app:build:development"
             },
             "ci": {
-              "progress": false
+              "progress": false,
+              "buildTarget": "app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -107,6 +114,12 @@
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
+            "fileReplacements": [
+              {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.test.ts"
+              }
+            ],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
