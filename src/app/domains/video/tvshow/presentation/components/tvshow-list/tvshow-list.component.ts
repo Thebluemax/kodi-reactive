@@ -254,6 +254,10 @@ export class TVShowListComponent {
    * refresco debe arrastrar a los episodios.
    */
   async onRefreshRequested(tvshow: TVShow): Promise<void> {
+    // El panel se aparta igual que al editar: se saca a si mismo a
+    // document.body en su ngOnInit, fuera de ion-app.
+    this.isPanelOpen.set(false);
+
     const alert = await this.alertController.create({
       header: 'Volver a buscar los datos',
       message:
@@ -304,6 +308,9 @@ export class TVShowListComponent {
     });
 
     await alert.present();
+    await alert.onDidDismiss();
+
+    this.restoreDetail(tvshow);
   }
 
   onReloadRequested(tvshow: TVShow): void {

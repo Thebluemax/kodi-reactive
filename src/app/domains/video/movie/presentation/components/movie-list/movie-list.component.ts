@@ -138,6 +138,11 @@ export class MovieListComponent {
    * partida es el titulo actual; si esta mal, es justo lo que hay que corregir.
    */
   async onRefreshRequested(movie: Movie): Promise<void> {
+    // El panel se aparta igual que al editar: se saca a si mismo a
+    // document.body en su ngOnInit, fuera de ion-app, asi que ninguna capa
+    // montada dentro de la aplicacion queda por encima de el.
+    this.isPanelOpen.set(false);
+
     const alert = await this.alertController.create({
       header: 'Volver a buscar los datos',
       message:
@@ -172,6 +177,9 @@ export class MovieListComponent {
     });
 
     await alert.present();
+    await alert.onDidDismiss();
+
+    this.restoreDetail(movie);
   }
 
   onReloadRequested(movie: Movie): void {
