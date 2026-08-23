@@ -24,7 +24,8 @@ describe('TVShowFactory', () => {
     episode: 86,
     thumbnail: 'image://poster/',
     fanart: '',
-    art: { poster: 'image://poster/' }
+    art: { poster: 'image://poster/' },
+    file: 'smb://nas/series/Los Soprano/'
   };
 
   it('mapea los campos que el editor sabe escribir', () => {
@@ -36,6 +37,10 @@ describe('TVShowFactory', () => {
     expect(tvshow.episodeGuide).toBe('https://guia');
     expect(tvshow.status).toBe('ended');
     expect(tvshow.art).toEqual({ poster: 'image://poster/' });
+  });
+
+  it('lleva la carpeta de la serie, que la API expone y no se escribe', () => {
+    expect(TVShowFactory.fromKodiResponse(RAW).file).toBe('smb://nas/series/Los Soprano/');
   });
 
   it('conserva los votos como cadena', () => {

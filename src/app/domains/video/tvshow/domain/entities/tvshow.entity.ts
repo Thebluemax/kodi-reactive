@@ -44,6 +44,8 @@ export interface TVShow {
   /** En segundos. */
   readonly runtime: number;
   readonly art: MediaArtworkSet;
+  /** Carpeta de la serie. Solo lectura: la API no admite escribirla. */
+  readonly file: string;
 }
 
 /** Valores que VideoLibrary.SetTVShowDetails admite en `status`. */
@@ -179,7 +181,8 @@ export class TVShowFactory {
       tag: raw.tag || [],
       status: raw.status || '',
       runtime: raw.runtime || 0,
-      art: raw.art ?? {}
+      art: raw.art ?? {},
+      file: raw.file || ''
     };
   }
 
@@ -269,6 +272,7 @@ export interface KodiTVShowResponse {
   status?: string;
   runtime?: number;
   art?: Record<string, string>;
+  file?: string;
 }
 
 export interface KodiSeasonResponse {

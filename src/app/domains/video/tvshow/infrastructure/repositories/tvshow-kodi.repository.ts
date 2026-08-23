@@ -95,7 +95,8 @@ const TVSHOW_DETAIL_PROPERTIES = [
   'title', 'originaltitle', 'sorttitle', 'genre', 'year', 'premiered',
   'rating', 'userrating', 'votes', 'plot', 'studio', 'tag', 'mpaa',
   'imdbnumber', 'episodeguide', 'status', 'runtime', 'cast',
-  'thumbnail', 'fanart', 'art', 'season', 'episode', 'playcount', 'dateadded'
+  'thumbnail', 'fanart', 'art', 'season', 'episode', 'playcount', 'dateadded',
+  'file'
 ];
 
 /**

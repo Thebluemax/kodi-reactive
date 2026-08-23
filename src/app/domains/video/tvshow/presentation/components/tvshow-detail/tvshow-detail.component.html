@@ -30,6 +30,12 @@
         </div>
       }
 
+      <app-media-path
+        label="Carpeta"
+        [path]="tvshow().file"
+        emptyMessage="Kodi no ha devuelto la carpeta de esta serie"
+      />
+
       <div class="tvshow-detail__actions">
         <ion-button fill="outline" (click)="editRequested.emit(tvshow())">
           <ion-icon slot="start" name="create" />
@@ -71,6 +77,11 @@
             />
             <ion-label>
               <h3>{{ ep.episode }}. {{ ep.title }}</h3>
+              @if (ep.file) {
+                <p class="tvshow-detail__episode-file" [title]="ep.file">
+                  {{ episodeFileName(ep) }}
+                </p>
+              }
               @if (ep.runtime) {
                 <p>{{ formatRuntime(ep.runtime) }}</p>
               }

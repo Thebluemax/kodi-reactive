@@ -206,6 +206,16 @@
 }
 
 .tvshow-detail {
+  // Element: Episode file
+  &__episode-file {
+    margin: 2px 0 0;
+    font-size: 0.7em;
+    color: var(--ion-color-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   // Element: Actions
   &__actions {
     display: flex;

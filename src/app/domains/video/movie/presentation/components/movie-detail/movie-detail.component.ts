@@ -20,6 +20,7 @@ import {
 import { Movie } from '../../../domain/entities/movie.entity';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
+import { MediaPathComponent } from '@shared/components/media-path/media-path.component';
 
 @Component({
   selector: 'app-movie-detail',
@@ -35,6 +36,7 @@ import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
     IonIcon,
     IonChip,
     AssetsPipe,
+    MediaPathComponent,
     ArrayToStringPipe,
     DecimalPipe
   ],
