@@ -204,3 +204,12 @@
     }
   }
 }
+
+.tvshow-detail {
+  // Element: Actions
+  &__actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+  }
+}

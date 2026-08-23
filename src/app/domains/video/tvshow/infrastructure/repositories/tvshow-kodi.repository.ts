@@ -19,10 +19,10 @@ import {
   EpisodeFactory,
   KodiTVShowResponse,
   KodiSeasonResponse,
-  KodiEpisodeResponse
-} from '../../domain/entities/tvshow.entity';
+  KodiEpisodeResponse, TVShowUpdate } from '../../domain/entities/tvshow.entity';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { Methods } from '@shared/enums/methods';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -60,10 +60,50 @@ interface KodiEpisodesResponse {
   };
 }
 
-const TVSHOW_PROPERTIES = [
-  'title', 'genre', 'year', 'rating', 'plot',
-  'cast', 'thumbnail', 'fanart', 'season', 'episode',
-  'playcount', 'dateadded', 'studio'
+/** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
+interface KodiJsonRpcEnvelope {
+  result?: unknown;
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+
+/** Traduccion del vocabulario del dominio al de VideoLibrary.SetTVShowDetails. */
+const UPDATE_PARAM_NAMES: Record<keyof TVShowUpdate, string> = {
+  title: 'title',
+  originalTitle: 'originaltitle',
+  sortTitle: 'sorttitle',
+  plot: 'plot',
+  genre: 'genre',
+  studio: 'studio',
+  tag: 'tag',
+  premiered: 'premiered',
+  runtime: 'runtime',
+  rating: 'rating',
+  userRating: 'userrating',
+  votes: 'votes',
+  mpaa: 'mpaa',
+  imdbNumber: 'imdbnumber',
+  episodeGuide: 'episodeguide',
+  status: 'status',
+  art: 'art'
+};
+
+/** El detalle alimenta el editor: pide todo lo que SetTVShowDetails escribe. */
+const TVSHOW_DETAIL_PROPERTIES = [
+  'title', 'originaltitle', 'sorttitle', 'genre', 'year', 'premiered',
+  'rating', 'userrating', 'votes', 'plot', 'studio', 'tag', 'mpaa',
+  'imdbnumber', 'episodeguide', 'status', 'runtime', 'cast',
+  'thumbnail', 'fanart', 'art', 'season', 'episode', 'playcount', 'dateadded'
+];
+
+/**
+ * La lista pagina y sus tarjetas solo pintan titulo, generos, fanart y año.
+ * Al abrir el detalle la serie se recarga entera de todas formas.
+ */
+const TVSHOW_LIST_PROPERTIES = [
+  'title', 'genre', 'fanart', 'year'
 ];
 
 const SEASON_PROPERTIES = [
@@ -103,7 +143,7 @@ export class TVShowKodiRepository extends TVShowRepository {
       method: 'VideoLibrary.GetTVShowDetails',
       params: {
         tvshowid: tvshowId,
-        properties: TVSHOW_PROPERTIES
+        properties: TVSHOW_DETAIL_PROPERTIES
       },
       id: this.getNextId()
     };
@@ -177,7 +217,7 @@ export class TVShowKodiRepository extends TVShowRepository {
           start: params.start,
           end: params.end
         },
-        properties: TVSHOW_PROPERTIES,
+        properties: TVSHOW_LIST_PROPERTIES,
         sort: { order: 'ascending', method: 'title' }
       },
       id: this.getNextId()
@@ -196,5 +236,49 @@ export class TVShowKodiRepository extends TVShowRepository {
 
   private getNextId(): number {
     return this.requestId++;
+  }
+
+  updateTVShow(tvshowId: number, patch: TVShowUpdate): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.VideoLibrarySetTVShowDetails,
+      params: {
+        tvshowid: tvshowId,
+        ...this.toKodiParams(patch)
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi rechazo la actualizacion: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
+  }
+
+  /**
+   * Solo viajan los campos presentes. `undefined` significa "no tocar" y se
+   * descarta; `null` si viaja, porque en las listas y el artwork borra el valor.
+   */
+  private toKodiParams(patch: TVShowUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof TVShowUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
   }
 }

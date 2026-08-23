@@ -15,6 +15,7 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonProgressBar,
+  IonModal,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 import { EMPTY, Subject, catchError, forkJoin, switchMap } from 'rxjs';
@@ -29,6 +30,13 @@ import { GetEpisodesUseCase } from '../../../application/use-cases/get-episodes.
 import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-episode-to-playlist.use-case';
 import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { UpdateTVShowUseCase } from '../../../application/use-cases/update-tvshow.use-case';
+import { TVShowUpdate } from '../../../domain/entities/tvshow.entity';
+import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
+import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { TVSHOW_EDIT_SCHEMA } from '../../schemas/tvshow-edit.schema';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
@@ -43,7 +51,9 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     IonProgressBar,
     MediaTileComponent,
     LateralPanelComponent,
-    TVShowDetailComponent
+    TVShowDetailComponent,
+    IonModal,
+    MediaEditModalComponent
   ],
   templateUrl: './tvshow-list.component.html',
   styleUrl: './tvshow-list.component.scss',
@@ -53,6 +63,8 @@ export class TVShowListComponent {
   // Use Cases
   private readonly getTVShowsUseCase = inject(GetTVShowsUseCase);
   private readonly getTVShowDetailUseCase = inject(GetTVShowDetailUseCase);
+  private readonly updateTVShowUseCase = inject(UpdateTVShowUseCase);
+  private readonly notifications = inject(NotificationService);
   private readonly getSeasonsUseCase = inject(GetSeasonsUseCase);
   private readonly getEpisodesUseCase = inject(GetEpisodesUseCase);
   private readonly addEpisodeToPlaylistUseCase = inject(AddEpisodeToPlaylistUseCase);
@@ -191,6 +203,97 @@ export class TVShowListComponent {
   onAddEpisodeToQueue(episodeId: number): void {
     this.addEpisodeToPlaylistUseCase.execute(episodeId, false).subscribe({
       error: (err) => console.error('Error adding episode to queue:', err)
+    });
+  }
+
+  // Edicion. El panel lateral se saca a si mismo a document.body, fuera de
+  // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
+  readonly editSchema = TVSHOW_EDIT_SCHEMA;
+  readonly tvshowBeingEdited = signal<TVShow | null>(null);
+  readonly isSaving = signal<boolean>(false);
+
+  /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
+    const tvshow = this.tvshowBeingEdited();
+
+    if (!tvshow) {
+      return {};
+    }
+
+    return {
+      title: tvshow.title,
+      originalTitle: tvshow.originalTitle,
+      sortTitle: tvshow.sortTitle,
+      plot: tvshow.plot,
+      status: tvshow.status,
+      genre: tvshow.genre,
+      studio: tvshow.studio,
+      tag: tvshow.tag,
+      premiered: tvshow.premiered,
+      runtime: tvshow.runtime,
+      rating: tvshow.rating,
+      userRating: tvshow.userRating,
+      votes: tvshow.votes,
+      mpaa: tvshow.mpaa,
+      imdbNumber: tvshow.imdbNumber,
+      episodeGuide: tvshow.episodeGuide
+    };
+  });
+
+  readonly editArtwork = computed<MediaArtworkSet | null>(
+    () => this.tvshowBeingEdited()?.art ?? null
+  );
+
+  onEditRequested(tvshow: TVShow): void {
+    this.tvshowBeingEdited.set(tvshow);
+    this.isPanelOpen.set(false);
+  }
+
+  onEditCancelled(): void {
+    const tvshow = this.tvshowBeingEdited();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingEdited.set(null);
+    this.restoreDetail(tvshow);
+  }
+
+  onEditSave(patch: MediaEditPatch): void {
+    const tvshow = this.tvshowBeingEdited();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    this.updateTVShowUseCase.execute(tvshow.tvshowId, patch as TVShowUpdate).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.tvshowBeingEdited.set(null);
+        void this.notifications.success('Serie actualizada');
+        this.restoreDetail(tvshow);
+        this.refreshSelectedTVShow(tvshow.tvshowId);
+      },
+      error: (error: Error) => {
+        this.isSaving.set(false);
+        void this.notifications.error(error.message);
+      }
+    });
+  }
+
+  /** Cerrar el panel emite panelClosed, que limpia la serie seleccionada. */
+  private restoreDetail(tvshow: TVShow): void {
+    this.selectedTVShow.set(tvshow);
+    this.isPanelOpen.set(true);
+  }
+
+  /** Tras guardar, el detalle debe mostrar lo que Kodi tiene ahora. */
+  private refreshSelectedTVShow(tvshowId: number): void {
+    this.getTVShowDetailUseCase.execute(tvshowId).subscribe({
+      next: detail => this.selectedTVShow.set(detail)
     });
   }
 
