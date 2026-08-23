@@ -16,6 +16,8 @@ describe('AlbumListComponent', () => {
   let fixture: ComponentFixture<AlbumListComponent>;
   let component: AlbumListComponent;
   let getAlbums: jasmine.SpyObj<GetAlbumsUseCase>;
+  let updateAlbum: jasmine.SpyObj<UpdateAlbumUseCase>;
+  let getAlbumDetail: jasmine.SpyObj<GetAlbumDetailUseCase>;
 
   function lastParams(): { start: number; end: number } {
     return getAlbums.execute.calls.mostRecent().args[0] as { start: number; end: number };
@@ -33,23 +35,22 @@ describe('AlbumListComponent', () => {
       of({ albums: [], total: 500, start: 0, end: PAGE_SIZE })
     );
 
+    updateAlbum = jasmine.createSpyObj<UpdateAlbumUseCase>('UpdateAlbumUseCase', ['execute']);
+    updateAlbum.execute.and.returnValue(of(void 0));
+
+    getAlbumDetail = jasmine.createSpyObj<GetAlbumDetailUseCase>('GetAlbumDetailUseCase', ['execute']);
+
     await TestBed.configureTestingModule({
       imports: [AlbumListComponent],
       providers: [
         provideZonelessChangeDetection(),
         { provide: GetAlbumsUseCase, useValue: getAlbums },
-        {
-          provide: GetAlbumDetailUseCase,
-          useValue: jasmine.createSpyObj('GetAlbumDetailUseCase', ['execute'])
-        },
+        { provide: GetAlbumDetailUseCase, useValue: getAlbumDetail },
         {
           provide: AddAlbumToPlaylistUseCase,
           useValue: jasmine.createSpyObj('AddAlbumToPlaylistUseCase', ['execute'])
         },
-        {
-          provide: UpdateAlbumUseCase,
-          useValue: jasmine.createSpyObj('UpdateAlbumUseCase', ['execute'])
-        },
+        { provide: UpdateAlbumUseCase, useValue: updateAlbum },
         { provide: Router, useValue: { events: new Subject(), url: '/music/albums' } }
       ]
     }).compileComponents();
@@ -103,5 +104,99 @@ describe('AlbumListComponent', () => {
     expect(lastParams()).toEqual(
       jasmine.objectContaining({ start: PAGE_SIZE * 2, end: PAGE_SIZE * 3 })
     );
+  });
+
+  // ========================================================================
+  // Edicion: el panel se aparta, y al hacerlo se lleva por delante el album
+  // seleccionado. El modal no puede depender de el.
+  // ========================================================================
+
+  describe('edicion', () => {
+    const ALBUM = {
+      albumId: 42,
+      title: 'Kid A',
+      label: 'Parlophone',
+      artists: ['Radiohead'],
+      artistIds: [1],
+      genres: ['Electronic'],
+      styles: [],
+      year: 2000,
+      thumbnail: '',
+      fanart: '',
+      dateAdded: '',
+      playCount: 0,
+      description: ''
+    };
+
+    /** Lo que hace el panel al cerrarse: emitir panelClosed. */
+    function panelEmitsClosed(): void {
+      component.onPanelClosed();
+    }
+
+    beforeEach(() => {
+      getAlbumDetail.execute.and.returnValue(of({ album: ALBUM, tracks: [], totalTracks: 0 }));
+      component.selectedAlbum.set(ALBUM);
+      component.isPanelOpen.set(true);
+    });
+
+    it('aparta el panel al pedir la edicion', () => {
+      component.onEditRequested(ALBUM);
+
+      expect(component.isPanelOpen()).toBeFalse();
+      expect(component.albumBeingEdited()).toBe(ALBUM);
+    });
+
+    it('conserva el album del modal aunque el panel limpie el seleccionado', () => {
+      component.onEditRequested(ALBUM);
+      panelEmitsClosed();
+
+      expect(component.selectedAlbum()).toBeNull();
+      expect(component.albumBeingEdited()).toBe(ALBUM);
+    });
+
+    it('sigue mostrando los valores en el modal con el detalle ya limpio', () => {
+      component.onEditRequested(ALBUM);
+      panelEmitsClosed();
+
+      expect(component.editValue()).toEqual(
+        jasmine.objectContaining({ title: 'Kid A', year: 2000, label: 'Parlophone' })
+      );
+    });
+
+    it('guarda contra el album correcto con el detalle ya limpio', () => {
+      component.onEditRequested(ALBUM);
+      panelEmitsClosed();
+
+      component.onEditSave({ title: 'Amnesiac' });
+
+      expect(updateAlbum.execute).toHaveBeenCalledWith(42, { title: 'Amnesiac' });
+    });
+
+    it('repone el detalle tras guardar', () => {
+      component.onEditRequested(ALBUM);
+      panelEmitsClosed();
+      component.onEditSave({ title: 'Amnesiac' });
+
+      expect(component.isPanelOpen()).toBeTrue();
+      expect(component.selectedAlbum()).toBe(ALBUM);
+      expect(component.albumBeingEdited()).toBeNull();
+    });
+
+    it('repone el detalle al cancelar', () => {
+      component.onEditRequested(ALBUM);
+      panelEmitsClosed();
+
+      component.onEditCancelled();
+
+      expect(component.isPanelOpen()).toBeTrue();
+      expect(component.selectedAlbum()).toBe(ALBUM);
+    });
+
+    it('recarga el album desde Kodi tras guardar', () => {
+      component.onEditRequested(ALBUM);
+      component.onEditSave({ title: 'Amnesiac' });
+
+      expect(getAlbumDetail.execute).toHaveBeenCalledWith(42);
+    });
   });
 });
