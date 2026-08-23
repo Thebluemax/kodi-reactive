@@ -87,4 +87,60 @@
       <ion-note class="media-edit__hint">{{ field.hint }}</ion-note>
     }
   }
+
+  @if (hasArtwork()) {
+    <div class="media-edit__artwork">
+      <h2 class="media-edit__section">Imágenes</h2>
+      <ion-note class="media-edit__hint">
+        Kodi no recibe archivos: se le indica una URL y él la descarga y la
+        guarda. Vaciar una caja borra esa imagen.
+      </ion-note>
+
+      @for (key of artKeys(); track key) {
+        <div class="media-edit__art">
+          <div class="media-edit__art-preview">
+            @if (artValue(key)) {
+              <img
+                class="media-edit__art-image"
+                [src]="artValue(key) | assets"
+                [alt]="key"
+                (error)="onArtLoadError(key)"
+                (load)="onArtLoaded(key)"
+              />
+            } @else {
+              <span class="media-edit__art-empty">sin imagen</span>
+            }
+          </div>
+
+          <div class="media-edit__art-field">
+            <ion-input
+              labelPlacement="stacked"
+              placeholder="https://…"
+              [label]="key"
+              [ngModel]="artValue(key)"
+              (ngModelChange)="onArtChange(key, $event)"
+            />
+            @if (isArtBroken(key)) {
+              <ion-note class="media-edit__art-error" color="danger">
+                No se ha podido cargar esta imagen
+              </ion-note>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="media-edit__art-add">
+        <ion-input
+          labelPlacement="stacked"
+          label="Otro tipo de imagen"
+          placeholder="clearlogo, discart, landscape…"
+          [ngModel]="newArtKey()"
+          (ngModelChange)="newArtKey.set($event)"
+        />
+        <ion-button fill="clear" size="small" (click)="onAddArtKey()">
+          Añadir
+        </ion-button>
+      </div>
+    </div>
+  }
 </ion-content>

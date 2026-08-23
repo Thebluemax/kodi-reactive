@@ -32,6 +32,7 @@ import { UpdateAlbumUseCase } from '../../../application/use-cases/update-album.
 import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
 import { ALBUM_EDIT_SCHEMA } from '../../schemas/album-edit.schema';
 import { AlbumUpdate } from '../../../domain/entities/album.entity';
 import { GlobalSearchService } from '@shared/services/global-search.service';
@@ -209,6 +210,11 @@ export class AlbumListComponent {
       description: album.description ?? ''
     };
   });
+
+  /** Misma exigencia de referencia estable que editValue. */
+  readonly editArtwork = computed<MediaArtworkSet | null>(
+    () => this.albumBeingEdited()?.art ?? null
+  );
 
   onEditRequested(album: Album): void {
     // El panel se aparta mientras se edita. No es solo estetico: el panel se

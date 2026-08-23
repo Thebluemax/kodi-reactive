@@ -22,6 +22,8 @@ export interface Album {
   readonly dateAdded: string;
   readonly playCount: number;
   readonly description?: string;
+  /** Artwork tal cual lo devuelve Kodi: claves de Media.Artwork a ruta o URL. */
+  readonly art: MediaArtworkSet;
 }
 
 /**
@@ -103,7 +105,8 @@ export class AlbumFactory {
       fanart: raw.fanart || '',
       dateAdded: raw.dateadded || '',
       playCount: raw.playcount || 0,
-      description: raw.description
+      description: raw.description,
+      art: raw.art ?? {}
     };
   }
 
@@ -131,4 +134,5 @@ export interface KodiAlbumResponse {
   thumbnail?: string;
   description?: string;
   year?: number;
+  art?: Record<string, string>;
 }

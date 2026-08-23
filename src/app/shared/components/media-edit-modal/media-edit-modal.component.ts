@@ -15,6 +15,8 @@ import {
   signal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
+import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import {
   IonButton,
   IonButtons,
@@ -32,6 +34,7 @@ import {
   IonToolbar
 } from '@ionic/angular/standalone';
 
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
 import {
   MediaEditField,
   MediaEditPatch,
@@ -42,11 +45,19 @@ import {
 /** Separador de las listas de cadenas en la caja de texto. */
 const LIST_SEPARATOR = ',';
 
+/**
+ * Las cuatro claves que Media.Artwork.Set nombra. El tipo declara ademas
+ * additionalProperties, asi que clearlogo, discart o landscape tambien valen y
+ * el usuario puede anadirlas.
+ */
+const KNOWN_ART_KEYS = ['thumb', 'poster', 'fanart', 'banner'] as const;
+
 @Component({
   selector: 'app-media-edit-modal',
   standalone: true,
   imports: [
     FormsModule,
+    AssetsPipe,
     IonButton,
     IonButtons,
     IonContent,
@@ -80,6 +91,11 @@ export class MediaEditModalComponent {
    */
   readonly value = input.required<Record<string, MediaEditValue>>();
   readonly saving = input<boolean>(false);
+  /**
+   * Artwork actual del medio. Misma exigencia de referencia estable que `value`.
+   * Ausente oculta la seccion, para los medios que no la tengan.
+   */
+  readonly artwork = input<MediaArtworkSet | null>(null);
 
   /** Solo los campos que el usuario cambio. */
   readonly save = output<MediaEditPatch>();
@@ -88,14 +104,114 @@ export class MediaEditModalComponent {
   /** Estado del formulario, indexado por clave del esquema. */
   private readonly draft = signal<Record<string, MediaEditValue>>({});
 
+  /** Estado del artwork, indexado por clave de arte. `null` marca borrado. */
+  private readonly artDraft = signal<Record<string, string | null>>({});
+  /** Claves cuya URL el navegador no ha conseguido cargar. */
+  private readonly brokenArt = signal<Set<string>>(new Set());
+  readonly newArtKey = signal<string>('');
+
   constructor() {
     // Reabrir el modal sobre otro medio tiene que descartar lo tecleado antes.
     effect(() => {
       this.draft.set(this.toDraft(this.schema(), this.value()));
     });
+
+    effect(() => {
+      this.artDraft.set(this.toArtDraft(this.artwork()));
+      this.brokenArt.set(new Set());
+      this.newArtKey.set('');
+    });
   }
 
+  readonly hasArtwork = computed(() => this.artwork() !== null);
+
+  /** Las conocidas primero, y despues las que el medio o el usuario anadieron. */
+  readonly artKeys = computed(() => {
+    const present = Object.keys(this.artDraft());
+    const extra = present.filter(key => !KNOWN_ART_KEYS.includes(key as never)).sort();
+
+    return [...KNOWN_ART_KEYS, ...extra];
+  });
+
   readonly isDirty = computed(() => Object.keys(this.buildPatch()).length > 0);
+
+  artValue(key: string): string {
+    return this.artDraft()[key] ?? '';
+  }
+
+  isArtBroken(key: string): boolean {
+    return this.brokenArt().has(key);
+  }
+
+  onArtChange(key: string, raw: unknown): void {
+    const url = String(raw ?? '').trim();
+
+    this.artDraft.update(current => ({
+      ...current,
+      // Vaciar la caja borra ese artwork: null es como se quita en la API.
+      [key]: url.length > 0 ? url : null
+    }));
+    this.clearBroken(key);
+  }
+
+  onArtLoadError(key: string): void {
+    this.brokenArt.update(current => new Set(current).add(key));
+  }
+
+  onArtLoaded(key: string): void {
+    this.clearBroken(key);
+  }
+
+  onAddArtKey(): void {
+    const key = this.newArtKey().trim().toLowerCase();
+
+    if (key.length === 0 || key in this.artDraft()) {
+      return;
+    }
+
+    this.artDraft.update(current => ({ ...current, [key]: null }));
+    this.newArtKey.set('');
+  }
+
+  private clearBroken(key: string): void {
+    this.brokenArt.update(current => {
+      const next = new Set(current);
+      next.delete(key);
+      return next;
+    });
+  }
+
+  private toArtDraft(artwork: MediaArtworkSet | null): Record<string, string | null> {
+    const draft: Record<string, string | null> = {};
+
+    for (const key of KNOWN_ART_KEYS) {
+      draft[key] = artwork?.[key] ?? null;
+    }
+
+    for (const [key, value] of Object.entries(artwork ?? {})) {
+      draft[key] = value ?? null;
+    }
+
+    return draft;
+  }
+
+  /** Solo las claves de arte que cambiaron respecto a lo que el medio tenia. */
+  private buildArtPatch(): MediaArtworkSet | null {
+    const original = this.toArtDraft(this.artwork());
+    const draft = this.artDraft();
+    const patch: Record<string, string | null> = {};
+
+    for (const key of Object.keys(draft)) {
+      const before = original[key] ?? null;
+      const after = draft[key] ?? null;
+
+      if (before !== after) {
+        patch[key] = after;
+      }
+    }
+
+    return Object.keys(patch).length > 0 ? patch : null;
+  }
 
   fieldValue(field: MediaEditField): MediaEditValue {
     return this.draft()[field.key];
@@ -150,6 +266,11 @@ export class MediaEditModalComponent {
       }
 
       patch[field.key] = after;
+    }
+
+    const art = this.buildArtPatch();
+    if (art) {
+      patch['art'] = art;
     }
 
     return patch;
