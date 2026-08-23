@@ -127,4 +127,105 @@ describe('MediaEditModalComponent', () => {
     expect(component.fieldValue(fieldOf('title'))).toBe('In Rainbows');
     expect(component.isDirty()).toBeFalse();
   });
+
+  // ========================================================================
+  // Artwork
+  // ========================================================================
+
+  describe('artwork', () => {
+    const ART = { thumb: 'http://host/cover.jpg', clearlogo: 'http://host/logo.png' };
+
+    beforeEach(() => {
+      fixture.componentRef.setInput('artwork', ART);
+      fixture.detectChanges();
+    });
+
+    it('se oculta si el medio no trae artwork', () => {
+      fixture.componentRef.setInput('artwork', null);
+      fixture.detectChanges();
+
+      expect(component.hasArtwork()).toBeFalse();
+    });
+
+    it('ofrece siempre las cuatro claves conocidas', () => {
+      expect(component.artKeys()).toEqual(
+        jasmine.arrayContaining(['thumb', 'poster', 'fanart', 'banner'])
+      );
+    });
+
+    it('conserva las claves que el medio ya traía fuera de las conocidas', () => {
+      expect(component.artKeys()).toContain('clearlogo');
+    });
+
+    it('parte de las URLs actuales', () => {
+      expect(component.artValue('thumb')).toBe('http://host/cover.jpg');
+      expect(component.artValue('poster')).toBe('');
+    });
+
+    it('no está sucio hasta que se toca una imagen', () => {
+      expect(component.isDirty()).toBeFalse();
+    });
+
+    it('emite solo las claves de arte modificadas', () => {
+      component.onArtChange('poster', 'http://host/poster.jpg');
+
+      expect(capturePatch()).toEqual({
+        art: { poster: 'http://host/poster.jpg' }
+      });
+    });
+
+    it('vaciar una caja borra ese artwork con null', () => {
+      component.onArtChange('thumb', '  ');
+
+      expect(capturePatch()).toEqual({ art: { thumb: null } });
+    });
+
+    it('marca la imagen que el navegador no logra cargar', () => {
+      component.onArtLoadError('thumb');
+
+      expect(component.isArtBroken('thumb')).toBeTrue();
+    });
+
+    it('una imagen rota no impide guardar el resto', () => {
+      component.onArtLoadError('thumb');
+      component.onFieldChange(fieldOf('title'), 'Amnesiac');
+
+      expect(component.isDirty()).toBeTrue();
+      expect(capturePatch()).toEqual({ title: 'Amnesiac' });
+    });
+
+    it('deja de marcarla en cuanto carga', () => {
+      component.onArtLoadError('thumb');
+      component.onArtLoaded('thumb');
+
+      expect(component.isArtBroken('thumb')).toBeFalse();
+    });
+
+    it('permite añadir un tipo de imagen que el medio no traía', () => {
+      component.newArtKey.set('discart');
+      component.onAddArtKey();
+
+      expect(component.artKeys()).toContain('discart');
+    });
+
+    it('no duplica una clave existente ni acepta la cadena vacía', () => {
+      component.newArtKey.set('thumb');
+      component.onAddArtKey();
+      component.newArtKey.set('   ');
+      component.onAddArtKey();
+
+      expect(component.artKeys().filter(k => k === 'thumb').length).toBe(1);
+      expect(component.artKeys()).not.toContain('');
+    });
+
+    it('combina campos y artwork en el mismo patch', () => {
+      component.onFieldChange(fieldOf('title'), 'Amnesiac');
+      component.onArtChange('fanart', 'http://host/fan.jpg');
+
+      expect(capturePatch()).toEqual({
+        title: 'Amnesiac',
+        art: { fanart: 'http://host/fan.jpg' }
+      });
+    });
+  });
 });

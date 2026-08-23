@@ -12,6 +12,8 @@
 //   enumerados cerrados        -> select
 // ==========================================================================
 
+import { MediaArtworkSet } from './media-artwork.type';
+
 export type MediaEditFieldKind =
   | 'text'
   | 'textarea'
@@ -21,7 +23,14 @@ export type MediaEditFieldKind =
   | 'select';
 
 /** Valores que un campo del formulario puede tomar. */
-export type MediaEditValue = string | number | boolean | string[] | null | undefined;
+export type MediaEditValue =
+  | string
+  | number
+  | boolean
+  | string[]
+  | MediaArtworkSet
+  | null
+  | undefined;
 
 export interface MediaEditOption {
   readonly value: string;

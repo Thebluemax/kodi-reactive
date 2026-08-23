@@ -90,6 +90,16 @@ describe('AlbumKodiRepository', () => {
       expect('genre' in params).toBeTrue();
     });
 
+    it('pide el artwork entre las propiedades del detalle', () => {
+      repository.getAlbumById(7).subscribe();
+
+      const req = httpMock.expectOne(JSON_RPC_URL);
+      const body = req.request.body as { params: { properties: string[] } };
+
+      expect(body.params.properties).toContain('art');
+      req.flush({ id: 1, jsonrpc: '2.0', result: { albumdetails: { albumid: 7 } } });
+    });
+
     it('pasa el artwork tal cual, incluidas las claves no nombradas', () => {
       repository.updateAlbum(7, {
         art: { thumb: 'http://host/cover.jpg', clearlogo: null }

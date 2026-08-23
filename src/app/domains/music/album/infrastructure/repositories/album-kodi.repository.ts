@@ -128,7 +128,7 @@ export class AlbumKodiRepository extends AlbumRepository {
         properties: [
           'thumbnail', 'playcount', 'artistid', 'artist', 'genre',
           'albumlabel', 'year', 'dateadded', 'style', 'fanart',
-          'mood', 'description', 'rating', 'type', 'theme'
+          'mood', 'description', 'rating', 'type', 'theme', 'art'
         ]
       },
       id: this.getNextId()
@@ -237,7 +237,7 @@ export class AlbumKodiRepository extends AlbumRepository {
         properties: [
           'title', 'description', 'artist', 'genre', 'theme', 'mood',
           'style', 'type', 'albumlabel', 'rating', 'year',
-          'fanart', 'thumbnail', 'playcount', 'artistid', 'dateadded'
+          'fanart', 'thumbnail', 'playcount', 'artistid', 'dateadded', 'art'
         ],
         sort: { order: 'ascending', method: 'album' }
       },

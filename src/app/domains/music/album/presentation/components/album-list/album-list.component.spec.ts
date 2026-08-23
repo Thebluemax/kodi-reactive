@@ -125,7 +125,8 @@ describe('AlbumListComponent', () => {
       fanart: '',
       dateAdded: '',
       playCount: 0,
-      description: ''
+      description: '',
+      art: { thumb: 'image://cover/', fanart: '' }
     };
 
     /** Lo que hace el panel al cerrarse: emitir panelClosed. */
