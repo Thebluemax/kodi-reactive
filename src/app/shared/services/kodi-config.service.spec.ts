@@ -6,11 +6,11 @@ import { KodiConfigService } from './kodi-config.service';
 const WS_PORT_STORAGE_KEY = 'kodi-ws-port';
 
 /**
- * Regresion de #195: la configuracion `ci` compilaba y testeaba con el archivo
- * base de entornos, que declaraba `production: true` con valores de desarrollo.
- * El servicio tomaba entonces la rama de `window.location`, que bajo Karma es el
- * servidor de Karma. Estos specs inyectan el servicio real —sin sustituirlo— para
- * fijar que local y CI resuelven lo mismo.
+ * Regresion de #195: los tests corrian con `production: true`, asi que el
+ * servicio tomaba la rama de produccion —la que deriva la conexion de
+ * `window.location`— en lugar de la de desarrollo. Ningun spec lo notaba porque
+ * todos sustituyen el servicio; estos lo inyectan de verdad para fijar en que
+ * modo corre la suite.
  */
 describe('KodiConfigService', () => {
   let service: KodiConfigService;
@@ -28,19 +28,12 @@ describe('KodiConfigService', () => {
     localStorage.removeItem(WS_PORT_STORAGE_KEY);
   });
 
-  it('resuelve los puertos del entorno de tests, no los de window.location', () => {
-    // Karma sirve en localhost, asi que el host no distingue: lo que delata la
-    // rama de produccion es el puerto, que seria el del servidor de Karma.
-    expect(service.host).toBe('localhost');
-    expect(service.httpPort).toBe(8080);
-    expect(service.httpPort).not.toBe(Number(window.location.port));
-  });
-
-  it('apunta el JSON-RPC al proxy de desarrollo', () => {
+  it('toma la rama de desarrollo, no la de produccion', () => {
     expect(service.jsonRpcUrl).toBe('http://localhost:8008/jsonrpc');
   });
 
-  it('compone la base HTTP con el puerto de Kodi', () => {
+  it('compone la base HTTP con host y puerto del entorno', () => {
+    expect(service.host).toBe('localhost');
     expect(service.httpBaseUrl).toBe('http://localhost:8080');
   });
 
@@ -57,5 +50,12 @@ describe('KodiConfigService', () => {
     });
 
     expect(TestBed.inject(KodiConfigService).wsUrl()).toBe('ws://localhost:9999/jsonrpc');
+  });
+
+  it('persiste el puerto WS al cambiarlo', () => {
+    service.setWsPort(9091);
+
+    expect(localStorage.getItem(WS_PORT_STORAGE_KEY)).toBe('9091');
+    expect(service.wsUrl()).toBe('ws://localhost:9091/jsonrpc');
   });
 });
