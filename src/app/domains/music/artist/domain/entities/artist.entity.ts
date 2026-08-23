@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { Track } from '@domains/music/track/domain/entities/track.entity';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
 
 /**
  * Artist Entity
@@ -24,7 +25,43 @@ export interface Artist {
   readonly yearsActive: string[];
   readonly instruments: string[];
   readonly description?: string;
+  /**
+   * Kodi lo devuelve como lista, pero SetArtistDetails solo admite escribir una
+   * cadena. La asimetria es de la API, no del dominio.
+   */
   readonly musicBrainzId?: string[];
+  readonly sortName: string;
+  readonly type: string;
+  readonly gender: string;
+  readonly disambiguation: string;
+  readonly art: MediaArtworkSet;
+}
+
+/**
+ * Artist Update
+ * Campos que AudioLibrary.SetArtistDetails admite escribir, en el vocabulario
+ * del dominio. Todos opcionales: un campo ausente le dice a Kodi que no lo
+ * toque.
+ */
+export interface ArtistUpdate {
+  readonly name?: string;
+  readonly instruments?: string[] | null;
+  readonly styles?: string[] | null;
+  readonly moods?: string[] | null;
+  readonly born?: string;
+  readonly formed?: string;
+  readonly description?: string;
+  readonly genres?: string[] | null;
+  readonly died?: string;
+  readonly disbanded?: string;
+  readonly yearsActive?: string[] | null;
+  /** Cadena unica al escribir, aunque se lea como lista. */
+  readonly musicBrainzId?: string;
+  readonly sortName?: string;
+  readonly type?: string;
+  readonly gender?: string;
+  readonly disambiguation?: string;
+  readonly art?: MediaArtworkSet | null;
 }
 
 /**
@@ -81,7 +118,12 @@ export class ArtistFactory {
       yearsActive: raw.yearsactive || [],
       instruments: raw.instrument || [],
       description: raw.description,
-      musicBrainzId: raw.musicbrainzartistid
+      musicBrainzId: raw.musicbrainzartistid,
+      sortName: raw.sortname || '',
+      type: raw.type || '',
+      gender: raw.gender || '',
+      disambiguation: raw.disambiguation || '',
+      art: raw.art ?? {}
     };
   }
 
@@ -111,4 +153,9 @@ export interface KodiArtistResponse {
   style?: string[];
   thumbnail?: string;
   yearsactive?: string[];
+  sortname?: string;
+  type?: string;
+  gender?: string;
+  disambiguation?: string;
+  art?: Record<string, string>;
 }

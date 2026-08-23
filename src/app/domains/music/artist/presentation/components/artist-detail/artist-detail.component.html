@@ -50,6 +50,14 @@
             <ion-icon slot="start" name="add" />
             Add to Playlist
           </ion-button>
+          <ion-button
+            fill="outline"
+            (click)="editRequested.emit(artist)"
+            title="Editar artista"
+          >
+            <ion-icon slot="start" name="create" />
+            Editar
+          </ion-button>
         </div>
       </div>
 

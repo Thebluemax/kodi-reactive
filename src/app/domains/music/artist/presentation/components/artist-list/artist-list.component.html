@@ -38,5 +38,30 @@
   [customWidth]="'60%'"
   (closeSlideBar)="onClosePanel()"
 >
-  <app-artist-detail [artist]="selectedArtist()" [albums]="albums()" />
+  <app-artist-detail
+    [artist]="selectedArtist()"
+    [albums]="albums()"
+    (editRequested)="onEditRequested($event)"
+  />
 </app-lateral-slide>
+
+<!--
+  Fuera del cajon lateral: se saca a si mismo a document.body, asi que ningun
+  modal montado dentro de la aplicacion queda por encima de el.
+-->
+<ion-modal
+  [isOpen]="artistBeingEdited() !== null"
+  (ionModalDidDismiss)="onEditCancelled()"
+>
+  <ng-template>
+    <app-media-edit-modal
+      [title]="'Editar ' + (artistBeingEdited()?.name ?? '')"
+      [schema]="editSchema"
+      [value]="editValue()"
+      [artwork]="editArtwork()"
+      [saving]="isSaving()"
+      (save)="onEditSave($event)"
+      (cancelled)="onEditCancelled()"
+    />
+  </ng-template>
+</ion-modal>

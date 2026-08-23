@@ -3,7 +3,7 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
-import { Artist, ArtistListResult, ArtistSearchParams, ArtistAlbumGroup } from '../entities/artist.entity';
+import { Artist, ArtistListResult, ArtistSearchParams, ArtistAlbumGroup , ArtistUpdate } from '../entities/artist.entity';
 
 /**
  * Artist Repository Interface
@@ -44,4 +44,11 @@ export abstract class ArtistRepository {
    * @param songId - Track/Song ID
    */
   abstract addTrackToPlaylist(songId: number): Observable<void>;
+
+  /**
+   * Update an artist with a partial patch
+   * @param artistId - Artist ID
+   * @param patch - Only the fields to change; anything absent is left untouched
+   */
+  abstract updateArtist(artistId: number, patch: ArtistUpdate): Observable<void>;
 }
