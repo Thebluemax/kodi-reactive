@@ -23,7 +23,6 @@ import {
 import { ThemeService, ThemePreference } from '@shared/services/theme.service';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { NotificationService } from '@shared/services/notification.service';
-import { MediaImportPanelComponent } from '@domains/media-import/presentation/components/media-import-panel/media-import-panel.component';
 import { LibraryFacade } from '@domains/library/application/library.facade';
 import {
   LibraryType,
@@ -58,8 +57,7 @@ const OPERATION_LABELS: Record<LibraryOperation, string> = {
     IonRadio,
     IonInput,
     IonButton,
-    IonSpinner,
-    MediaImportPanelComponent
+    IonSpinner
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

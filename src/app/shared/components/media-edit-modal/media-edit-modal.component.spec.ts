@@ -261,4 +261,55 @@ describe('MediaEditModalComponent', () => {
       });
     });
   });
+
+  // ========================================================================
+  // Exportar / importar la ficha
+  // ========================================================================
+
+  describe('transferencia', () => {
+    it('exporta las claves del esquema con los valores actuales', () => {
+      expect(component.exportFields()).toEqual({
+        title: 'Kid A',
+        year: 2000,
+        genres: ['Electronic', 'Rock'],
+        isBoxSet: false,
+        status: 'ended'
+      });
+    });
+
+    it('lo importado rellena el formulario, no se guarda', () => {
+      let saved = false;
+      component.save.subscribe(() => (saved = true));
+
+      component.onImported({ title: 'Amnesiac' });
+
+      expect(component.fieldValue(fieldOf('title'))).toBe('Amnesiac');
+      expect(saved).toBeFalse();
+    });
+
+    it('pasa por el mismo diff que una edición a mano', () => {
+      component.onImported({ title: 'Amnesiac', year: 2000 });
+
+      // year ya coincide: no viaja.
+      expect(capturePatch()).toEqual({ title: 'Amnesiac' });
+    });
+
+    it('ignora las claves que el medio no tiene', () => {
+      component.onImported({ title: 'Amnesiac', inventado: 'x' });
+
+      expect(capturePatch()).toEqual({ title: 'Amnesiac' });
+    });
+
+    it('exporta lo tecleado, no lo que había al abrir', () => {
+      component.onFieldChange(fieldOf('title'), 'Amnesiac');
+
+      expect(component.exportFields()['title']).toBe('Amnesiac');
+    });
+
+    it('normaliza las listas que llegan del archivo', () => {
+      component.onImported({ genres: ['Jazz'] });
+
+      expect(capturePatch()).toEqual({ genres: ['Jazz'] });
+    });
+  });
 });
