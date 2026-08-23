@@ -150,7 +150,10 @@ $transition-normal: 0.3s ease;
 $transition-slow: 0.55s ease;
 
 // --- Lateral panel: z-index ---
-$lateral-panel-z-index: 40000;
+// Por debajo de los overlays de Ionic, que se montan a partir de 20000. Con el
+// panel por encima, cualquier modal, alert o action sheet abierto desde dentro
+// del panel quedaba oculto tras el.
+$lateral-panel-z-index: 10000;
 
 // ==========================================================================
 // Media Tile Tokens

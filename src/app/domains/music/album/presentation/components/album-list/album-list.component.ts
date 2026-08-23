@@ -16,6 +16,7 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonProgressBar,
+  IonModal,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
@@ -27,6 +28,12 @@ import { GetAlbumsUseCase } from '../../../application/use-cases/get-albums.use-
 import { GetAlbumDetailUseCase } from '../../../application/use-cases/get-album-detail.use-case';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
 import { AlbumDetailComponent } from '../album-detail/album-detail.component';
+import { UpdateAlbumUseCase } from '../../../application/use-cases/update-album.use-case';
+import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
+import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { ALBUM_EDIT_SCHEMA } from '../../schemas/album-edit.schema';
+import { AlbumUpdate } from '../../../domain/entities/album.entity';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
@@ -42,7 +49,9 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     IonProgressBar,
     MediaTileComponent,
     LateralPanelComponent,
-    AlbumDetailComponent
+    AlbumDetailComponent,
+    IonModal,
+    MediaEditModalComponent
   ],
   templateUrl: './album-list.component.html',
   styleUrl: './album-list.component.scss',
@@ -53,6 +62,8 @@ export class AlbumListComponent {
   private readonly getAlbumsUseCase = inject(GetAlbumsUseCase);
   private readonly getAlbumDetailUseCase = inject(GetAlbumDetailUseCase);
   private readonly addToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
+  private readonly updateAlbumUseCase = inject(UpdateAlbumUseCase);
+  private readonly notifications = inject(NotificationService);
   private readonly globalSearch = inject(GlobalSearchService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -62,6 +73,12 @@ export class AlbumListComponent {
   readonly tracks = signal<Track[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly isPanelOpen = signal<boolean>(false);
+
+  // Edicion. El modal vive aqui, no en el detalle: el detalle se proyecta
+  // dentro del panel lateral, y un ion-modal inline se queda donde se declara.
+  readonly editSchema = ALBUM_EDIT_SCHEMA;
+  readonly albumBeingEdited = signal<Album | null>(null);
+  readonly isSaving = signal<boolean>(false);
   readonly totalAlbums = signal<number>(9999);
 
   // Pagination
@@ -164,6 +181,91 @@ export class AlbumListComponent {
     this.addToPlaylistUseCase.execute(album.albumId, event.playMedia).subscribe({
       next: () => console.log('Album added to playlist'),
       error: (err) => console.error('Error adding to playlist:', err)
+    });
+  }
+
+  /**
+   * El modal solo conoce claves y valores; el mapeo a la API es del repositorio.
+   *
+   * Es un computed y no un metodo a proposito: la plantilla lo lee en cada
+   * ciclo de deteccion, y un metodo devolveria un objeto nuevo cada vez. El
+   * input del modal lo tomaria por un valor distinto y repondria el borrador,
+   * borrando lo que el usuario acabara de teclear.
+   */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
+    const album = this.albumBeingEdited();
+
+    if (!album) {
+      return {};
+    }
+
+    return {
+      title: album.title,
+      artists: album.artists,
+      genres: album.genres,
+      styles: album.styles,
+      label: album.label,
+      year: album.year,
+      description: album.description ?? ''
+    };
+  });
+
+  onEditRequested(album: Album): void {
+    // El panel se aparta mientras se edita. No es solo estetico: el panel se
+    // saca a si mismo a document.body en ngOnInit, fuera de ion-app, asi que no
+    // hay sitio dentro de la aplicacion desde el que un modal quede por encima.
+    this.albumBeingEdited.set(album);
+    this.isPanelOpen.set(false);
+  }
+
+  onEditCancelled(): void {
+    const album = this.albumBeingEdited();
+
+    if (!album) {
+      return;
+    }
+
+    this.albumBeingEdited.set(null);
+    this.restoreDetail(album);
+  }
+
+  /**
+   * Cerrar el panel hace que emita panelClosed, que limpia el album
+   * seleccionado, asi que volver al detalle exige reponerlo.
+   */
+  private restoreDetail(album: Album): void {
+    this.selectedAlbum.set(album);
+    this.isPanelOpen.set(true);
+  }
+
+  onEditSave(patch: MediaEditPatch): void {
+    const album = this.albumBeingEdited();
+
+    if (!album) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    this.updateAlbumUseCase.execute(album.albumId, patch as AlbumUpdate).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.albumBeingEdited.set(null);
+        void this.notifications.success('Álbum actualizado');
+        this.restoreDetail(album);
+        this.refreshSelectedAlbum(album.albumId);
+      },
+      error: (error: Error) => {
+        this.isSaving.set(false);
+        void this.notifications.error(error.message);
+      }
+    });
+  }
+
+  /** Tras guardar, el panel debe mostrar lo que Kodi tiene ahora, no lo enviado. */
+  private refreshSelectedAlbum(albumId: number): void {
+    this.getAlbumDetailUseCase.execute(albumId).subscribe({
+      next: result => this.selectedAlbum.set(result.album)
     });
   }
 

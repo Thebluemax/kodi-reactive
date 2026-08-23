@@ -24,6 +24,10 @@
           <ion-icon slot="start" name="duplicate-outline" />
           Agregar a cola
         </ion-button>
+        <ion-button fill="outline" (click)="onEdit()">
+          <ion-icon slot="start" name="create" />
+          Editar
+        </ion-button>
       </div>
       @if (album().description) {
         <div class="album-detail__description">

@@ -39,6 +39,27 @@
       [album]="selectedAlbum()!"
       [tracks]="tracks()"
       (trackSelected)="onTrackAddToPlaylist($event)"
+      (editRequested)="onEditRequested($event)"
     />
   }
 </app-lateral-panel>
+
+<!--
+  Fuera del panel lateral a proposito: un ion-modal inline se queda donde se
+  declara, y dentro del panel heredaba su contexto de apilamiento y su overflow.
+-->
+<ion-modal
+  [isOpen]="albumBeingEdited() !== null"
+  (ionModalDidDismiss)="onEditCancelled()"
+>
+  <ng-template>
+    <app-media-edit-modal
+      [title]="'Editar ' + (albumBeingEdited()?.title ?? '')"
+      [schema]="editSchema"
+      [value]="editValue()"
+      [saving]="isSaving()"
+      (save)="onEditSave($event)"
+      (cancelled)="onEditCancelled()"
+    />
+  </ng-template>
+</ion-modal>

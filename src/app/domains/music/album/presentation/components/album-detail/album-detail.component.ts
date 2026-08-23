@@ -57,6 +57,17 @@ export class AlbumDetailComponent {
 
   // Outputs
   readonly trackSelected = output<Track>();
+  /**
+   * El modal no se monta aqui: este componente se proyecta dentro del panel
+   * lateral, y un ion-modal inline se queda donde se declara, heredando su
+   * contexto de apilamiento y su overflow. Lo abre el contenedor, que si esta
+   * fuera del panel.
+   */
+  readonly editRequested = output<Album>();
+
+  onEdit(): void {
+    this.editRequested.emit(this.album());
+  }
 
   onPlayTrack(track: Track): void {
     this.playTrackUseCase.execute(track.songId).subscribe({
