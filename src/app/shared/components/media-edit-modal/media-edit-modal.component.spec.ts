@@ -218,6 +218,30 @@ describe('MediaEditModalComponent', () => {
       expect(component.artKeys()).not.toContain('');
     });
 
+    it('el navegador de Kodi entra y sale sin tocar el borrador', () => {
+      component.onFieldChange(fieldOf('title'), 'Amnesiac');
+
+      component.onBrowse('poster');
+
+      expect(component.isBrowsing()).toBeTrue();
+
+      component.onBrowseCancelled();
+
+      expect(component.isBrowsing()).toBeFalse();
+      expect(component.fieldValue(fieldOf('title'))).toBe('Amnesiac');
+    });
+
+    it('la ruta elegida en Kodi va al campo de arte que se estaba buscando', () => {
+      component.onBrowse('poster');
+      component.onFilePicked('smb://nas/fotos/cover.jpg');
+
+      expect(component.isBrowsing()).toBeFalse();
+      expect(component.artValue('poster')).toBe('smb://nas/fotos/cover.jpg');
+      expect(capturePatch()).toEqual({
+        art: { poster: 'smb://nas/fotos/cover.jpg' }
+      });
+    });
+
     it('combina campos y artwork en el mismo patch', () => {
       component.onFieldChange(fieldOf('title'), 'Amnesiac');
       component.onArtChange('fanart', 'http://host/fan.jpg');

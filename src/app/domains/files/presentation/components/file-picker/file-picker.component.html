@@ -1,0 +1,56 @@
+<div class="file-picker">
+  <div class="file-picker__bar">
+    <ion-button
+      fill="clear"
+      size="small"
+      [disabled]="!canGoBack()"
+      (click)="onBack()"
+    >
+      <ion-icon slot="start" name="chevron-back-outline" />
+      Atrás
+    </ion-button>
+    <span class="file-picker__path">{{ currentLabel() }}</span>
+    <ion-button fill="clear" size="small" (click)="onCancel()">Cerrar</ion-button>
+  </div>
+
+  @if (preview(); as chosen) {
+    <div class="file-picker__preview">
+      <img class="file-picker__preview-image" [src]="chosen.url" [alt]="chosen.item.label" />
+      <p class="file-picker__preview-name">{{ chosen.item.label }}</p>
+      <div class="file-picker__preview-actions">
+        <ion-button size="small" (click)="onConfirm()">Usar esta imagen</ion-button>
+        <ion-button size="small" fill="clear" (click)="onDiscardPreview()">
+          Seguir buscando
+        </ion-button>
+      </div>
+    </div>
+  } @else {
+    @if (isLoading() || isPreviewLoading()) {
+      <div class="file-picker__status">
+        <ion-spinner name="dots" />
+      </div>
+    }
+
+    @if (error()) {
+      <ion-note class="file-picker__error" color="danger">{{ error() }}</ion-note>
+    }
+
+    @if (isEmpty()) {
+      <ion-note class="file-picker__status">
+        Aquí no hay carpetas ni imágenes que Kodi pueda leer
+      </ion-note>
+    }
+
+    <ion-list>
+      @for (item of items(); track item.path) {
+        <ion-item button="true" (click)="onOpen(item)">
+          <ion-icon
+            slot="start"
+            [name]="item.isDirectory ? 'folder-outline' : 'image-outline'"
+          />
+          <ion-label>{{ item.label }}</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</div>

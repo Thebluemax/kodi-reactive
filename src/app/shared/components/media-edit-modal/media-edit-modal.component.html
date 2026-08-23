@@ -8,19 +8,27 @@
       >
         <ion-icon slot="icon-only" name="close" />
       </ion-button>
-      <ion-button
-        aria-label="Guardar"
-        [disabled]="saving() || !isDirty()"
-        (click)="onSave()"
-      >
-        <ion-icon slot="icon-only" name="save-outline" />
-      </ion-button>
+      @if (!isBrowsing()) {
+        <ion-button
+          aria-label="Guardar"
+          [disabled]="saving() || !isDirty()"
+          (click)="onSave()"
+        >
+          <ion-icon slot="icon-only" name="save-outline" />
+        </ion-button>
+      }
     </ion-buttons>
     <ion-title slot="end" class="media-edit__title">{{ title() }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="media-edit">
+  @if (isBrowsing()) {
+    <app-file-picker
+      (selected)="onFilePicked($event)"
+      (cancelled)="onBrowseCancelled()"
+    />
+  } @else {
   @for (field of schema(); track field.key) {
     <ion-item class="media-edit__field">
       @switch (field.kind) {
@@ -125,6 +133,15 @@
                 No se ha podido cargar esta imagen
               </ion-note>
             }
+            <ion-button
+              class="media-edit__art-browse"
+              fill="clear"
+              size="small"
+              (click)="onBrowse(key)"
+            >
+              <ion-icon slot="start" name="folder-outline" />
+              Buscar en Kodi
+            </ion-button>
           </div>
         </div>
       }
@@ -142,5 +159,6 @@
         </ion-button>
       </div>
     </div>
+  }
   }
 </ion-content>
