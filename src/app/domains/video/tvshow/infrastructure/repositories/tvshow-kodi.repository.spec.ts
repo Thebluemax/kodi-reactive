@@ -127,4 +127,57 @@ describe('TVShowKodiRepository', () => {
       result: { tvshows: [], limits: { start: 0, end: 0, total: 0 } }
     });
   });
+
+  // ========================================================================
+  // refreshTVShow
+  // ========================================================================
+
+  describe('refreshTVShow', () => {
+    function expectRefreshRequest(): Record<string, unknown> {
+      const req = httpMock.expectOne(JSON_RPC_URL);
+      const body = req.request.body as { method: string; params: Record<string, unknown> };
+
+      expect(body.method).toBe(Methods.VideoLibraryRefreshTVShow);
+
+      req.flush({ id: 1, jsonrpc: '2.0', result: 'OK' });
+      return body.params;
+    }
+
+    it('manda el título con el que buscar', () => {
+      repository.refreshTVShow(5, { title: 'Los Soprano' }).subscribe();
+
+      expect(expectRefreshRequest()['title']).toBe('Los Soprano');
+    });
+
+    it('sin opciones manda solo el identificador', () => {
+      repository.refreshTVShow(5, {}).subscribe();
+
+      expect(Object.keys(expectRefreshRequest())).toEqual(['tvshowid']);
+    });
+
+    it('no arrastra a los episodios salvo que se pida', () => {
+      repository.refreshTVShow(5, { refreshEpisodes: false }).subscribe();
+
+      expect('refreshepisodes' in expectRefreshRequest()).toBeFalse();
+    });
+
+    it('arrastra a los episodios cuando se pide', () => {
+      repository.refreshTVShow(5, { refreshEpisodes: true }).subscribe();
+
+      expect(expectRefreshRequest()['refreshepisodes']).toBeTrue();
+    });
+
+    it('propaga el fallo del scraper, que llega con HTTP 200', () => {
+      let caught: Error | undefined;
+      repository.refreshTVShow(5, {}).subscribe({ error: (err: Error) => (caught = err) });
+
+      httpMock.expectOne(JSON_RPC_URL).flush({
+        id: 1,
+        jsonrpc: '2.0',
+        error: { code: -32100, message: 'Scraper failed' }
+      });
+
+      expect(caught?.message).toContain('Scraper failed');
+    });
+  });
 });

@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 import { Movie, MovieListResult, MovieSearchParams, MovieUpdate } from '../entities/movie.entity';
 
 /**
@@ -34,4 +35,11 @@ export abstract class MovieRepository {
    * @param patch - Only the fields to change; anything absent is left untouched
    */
   abstract updateMovie(movieId: number, patch: MovieUpdate): Observable<void>;
+
+  /**
+   * Ask Kodi to scrape the movie again
+   * @param movieId - Movie ID
+   * @param options - Title to search with, and whether to ignore a local NFO
+   */
+  abstract refreshMovie(movieId: number, options: MediaRefreshOptions): Observable<void>;
 }

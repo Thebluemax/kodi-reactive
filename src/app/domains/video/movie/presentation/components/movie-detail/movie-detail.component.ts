@@ -57,6 +57,13 @@ export class MovieDetailComponent {
    * lateral, que se saca a si mismo a document.body. Lo presenta el contenedor.
    */
   readonly editRequested = output<Movie>();
+  /** Volver a pedir los datos al scraper, indicandole con que titulo buscar. */
+  readonly refreshRequested = output<Movie>();
+  /**
+   * Traer de Kodi lo que tenga ahora. El re-scrapeo es asincrono: el metodo
+   * vuelve enseguida y el trabajo lo hace Kodi por detras.
+   */
+  readonly reloadRequested = output<Movie>();
 
   onPlay(): void {
     this.playMovie.emit();

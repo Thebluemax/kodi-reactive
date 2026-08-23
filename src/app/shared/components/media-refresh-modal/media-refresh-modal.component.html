@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button [disabled]="saving()" (click)="onCancel()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button strong="true" [disabled]="saving()" (click)="onConfirm()">
+        Buscar
+      </ion-button>
+    </ion-buttons>
+    <ion-title slot="end" class="media-refresh__title">Volver a buscar</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="media-refresh">
+  <ion-note class="media-refresh__warning" color="warning">
+    Kodi buscará de nuevo en el scraper y reescribirá los campos de este medio,
+    incluidas las correcciones hechas a mano.
+  </ion-note>
+
+  <ion-item>
+    <ion-input
+      labelPlacement="stacked"
+      label="Título con el que buscar"
+      placeholder="Déjalo vacío para deducirlo del archivo"
+      [ngModel]="title()"
+      (ngModelChange)="title.set($event)"
+    />
+  </ion-item>
+
+  @if (showYear()) {
+    <ion-item>
+      <ion-input
+        labelPlacement="stacked"
+        label="Año"
+        placeholder="Separa títulos homónimos"
+        [ngModel]="year()"
+        (ngModelChange)="year.set($event)"
+      />
+    </ion-item>
+    <ion-note class="media-refresh__hint">
+      Se añade al título entre paréntesis, que es como Kodi lee los nombres de
+      archivo.
+    </ion-note>
+  }
+
+  @if (showUniqueId()) {
+    <ion-item>
+      <ion-input
+        labelPlacement="stacked"
+        [label]="uniqueIdLabel()"
+        placeholder="tt0068646"
+        [ngModel]="uniqueId()"
+        (ngModelChange)="uniqueId.set($event)"
+      />
+    </ion-item>
+    <ion-note class="media-refresh__hint">
+      Si el año no basta. Se guarda antes de buscar, y el scraper lo respeta en
+      vez de volver a buscar por título.
+    </ion-note>
+  }
+
+  <ion-item>
+    <ion-toggle
+      [checked]="ignoreNfo()"
+      (ionChange)="ignoreNfo.set($any($event).detail.checked)"
+    >
+      Ignorar el archivo NFO local
+    </ion-toggle>
+  </ion-item>
+  <ion-note class="media-refresh__hint">
+    Kodi usa el NFO que haya junto al medio en lugar de buscar en línea. Actívalo
+    si es el NFO lo que está mal.
+  </ion-note>
+
+  @if (showRefreshEpisodes()) {
+    <ion-item>
+      <ion-toggle
+        [checked]="refreshEpisodes()"
+        (ionChange)="refreshEpisodes.set($any($event).detail.checked)"
+      >
+        Refrescar también todos los episodios
+      </ion-toggle>
+    </ion-item>
+    <ion-note class="media-refresh__hint">
+      Más lento, pero es lo que hace falta si los títulos de episodio también
+      están mal.
+    </ion-note>
+  }
+
+  <div class="media-refresh__preview">
+    <span class="media-refresh__preview-label">Se buscará</span>
+    <span class="media-refresh__preview-value">{{ searchPreview() }}</span>
+  </div>
+</ion-content>

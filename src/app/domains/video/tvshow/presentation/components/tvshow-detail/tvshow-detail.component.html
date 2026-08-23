@@ -41,6 +41,13 @@
           <ion-icon slot="start" name="create" />
           Editar
         </ion-button>
+        <ion-button fill="outline" (click)="refreshRequested.emit(tvshow())">
+          <ion-icon slot="start" name="refresh-outline" />
+          Volver a buscar
+        </ion-button>
+        <ion-button fill="clear" (click)="reloadRequested.emit(tvshow())" title="Recargar datos">
+          <ion-icon slot="icon-only" name="reload-outline" />
+        </ion-button>
       </div>
     </div>
 

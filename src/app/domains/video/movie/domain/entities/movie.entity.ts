@@ -82,6 +82,13 @@ export interface MovieUpdate {
   readonly trailer?: string;
   readonly set?: string;
   readonly art?: MediaArtworkSet | null;
+  /**
+   * Identificadores por proveedor: `{ imdb: 'tt0068646', tmdb: '238' }`. No
+   * figura en el esquema del editor porque es un diccionario y no un campo
+   * plano, pero escribirlo antes de un re-scrapeo es lo que desambigua dos
+   * peliculas homonimas.
+   */
+  readonly uniqueId?: Record<string, string>;
 }
 
 export interface CastMember {

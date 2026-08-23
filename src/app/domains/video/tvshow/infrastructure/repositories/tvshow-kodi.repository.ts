@@ -23,6 +23,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -89,6 +90,30 @@ const UPDATE_PARAM_NAMES: Record<keyof TVShowUpdate, string> = {
   status: 'status',
   art: 'art'
 };
+
+/**
+ * Los parametros del refresco son opcionales en la API y tienen sus propios
+ * valores por defecto: sin `title` Kodi lo deduce del archivo, y `ignorenfo` y
+ * `refreshepisodes` son false. Solo viaja lo que se indica.
+ */
+function toRefreshParams(options: MediaRefreshOptions): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+  const title = options.title?.trim() ?? '';
+
+  if (title.length > 0) {
+    params['title'] = title;
+  }
+
+  if (options.ignoreNfo) {
+    params['ignorenfo'] = true;
+  }
+
+  if (options.refreshEpisodes) {
+    params['refreshepisodes'] = true;
+  }
+
+  return params;
+}
 
 /** El detalle alimenta el editor: pide todo lo que SetTVShowDetails escribe. */
 const TVSHOW_DETAIL_PROPERTIES = [
@@ -281,5 +306,28 @@ export class TVShowKodiRepository extends TVShowRepository {
     }
 
     return params;
+  }
+
+  refreshTVShow(tvshowId: number, options: MediaRefreshOptions): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.VideoLibraryRefreshTVShow,
+      params: {
+        tvshowid: tvshowId,
+        ...toRefreshParams(options)
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi no ha podido volver a buscar los datos: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
   }
 }

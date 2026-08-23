@@ -48,6 +48,12 @@ export enum Methods {
   VideoLibraryGetEpisodes = 'VideoLibrary.GetEpisodes',
   VideoLibraryGetGenres = 'VideoLibrary.GetGenres',
 
+  // VideoLibrary - Re-scrapeo
+  VideoLibraryRefreshMovie = 'VideoLibrary.RefreshMovie',
+  VideoLibraryRefreshTVShow = 'VideoLibrary.RefreshTVShow',
+  VideoLibraryRefreshEpisode = 'VideoLibrary.RefreshEpisode',
+  VideoLibraryRefreshMusicVideo = 'VideoLibrary.RefreshMusicVideo',
+
   // VideoLibrary - Escritura
   VideoLibrarySetMovieDetails = 'VideoLibrary.SetMovieDetails',
   VideoLibrarySetTVShowDetails = 'VideoLibrary.SetTVShowDetails',

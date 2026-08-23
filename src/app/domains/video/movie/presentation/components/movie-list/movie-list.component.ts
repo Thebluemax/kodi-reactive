@@ -32,11 +32,17 @@ import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-ca
 import { ActorDetailComponent } from '@domains/video/actor/presentation/components/actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { UpdateMovieUseCase } from '../../../application/use-cases/update-movie.use-case';
+import { RefreshMovieUseCase } from '../../../application/use-cases/refresh-movie.use-case';
 import { MovieUpdate } from '../../../domain/entities/movie.entity';
 import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
 import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
+import {
+  MediaRefreshModalComponent,
+  MediaRefreshRequest
+} from '@shared/components/media-refresh-modal/media-refresh-modal.component';
 import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
@@ -55,7 +61,8 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     MovieDetailComponent,
     ActorDetailComponent,
     IonModal,
-    MediaEditModalComponent
+    MediaEditModalComponent,
+    MediaRefreshModalComponent
   ],
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.scss',
@@ -66,6 +73,7 @@ export class MovieListComponent {
   private readonly getMoviesUseCase = inject(GetMoviesUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
   private readonly updateMovieUseCase = inject(UpdateMovieUseCase);
+  private readonly refreshMovieUseCase = inject(RefreshMovieUseCase);
   private readonly notifications = inject(NotificationService);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
@@ -86,6 +94,20 @@ export class MovieListComponent {
   // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
   readonly editSchema = MOVIE_EDIT_SCHEMA;
   readonly movieBeingEdited = signal<Movie | null>(null);
+  readonly movieBeingRefreshed = signal<Movie | null>(null);
+
+  /** Referencia estable, como editValue. */
+  readonly refreshValue = computed<MediaRefreshRequest>(() => {
+    const movie = this.movieBeingRefreshed();
+
+    return {
+      title: movie?.title ?? '',
+      year: movie && movie.year > 0 ? String(movie.year) : '',
+      uniqueId: movie?.imdbNumber ?? '',
+      ignoreNfo: false,
+      refreshEpisodes: false
+    };
+  });
   readonly isSaving = signal<boolean>(false);
 
   /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
@@ -127,6 +149,78 @@ export class MovieListComponent {
   readonly editArtwork = computed<MediaArtworkSet | null>(
     () => this.movieBeingEdited()?.art ?? null
   );
+
+  /**
+   * El panel se aparta mientras se pide el titulo: se saca a si mismo a
+   * document.body en su ngOnInit, fuera de ion-app, asi que ninguna capa
+   * montada dentro de la aplicacion queda por encima de el.
+   */
+  onRefreshRequested(movie: Movie): void {
+    this.movieBeingRefreshed.set(movie);
+    this.isPanelOpen.set(false);
+  }
+
+  onRefreshCancelled(): void {
+    const movie = this.movieBeingRefreshed();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingRefreshed.set(null);
+    this.restoreDetail(movie);
+  }
+
+  onRefreshConfirmed(request: MediaRefreshRequest): void {
+    const movie = this.movieBeingRefreshed();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingRefreshed.set(null);
+    this.restoreDetail(movie);
+    this.refreshMovie(
+      movie,
+      {
+        title: buildSearchTitle(request.title, request.year),
+        ignoreNfo: request.ignoreNfo
+      },
+      request.uniqueId
+    );
+  }
+
+  onReloadRequested(movie: Movie): void {
+    this.refreshSelectedMovie(movie.movieId);
+    void this.notifications.info('Datos recargados desde Kodi');
+  }
+
+  /**
+   * El identificador unico, si se indica, se escribe antes de refrescar: es lo
+   * unico que desambigua con garantias, porque el scraper lo respeta en vez de
+   * volver a buscar por titulo.
+   */
+  private refreshMovie(movie: Movie, options: MediaRefreshOptions, imdb: string): void {
+    const refresh$ = this.refreshMovieUseCase.execute(movie.movieId, options);
+
+    const request$ =
+      imdb.length > 0 && imdb !== movie.imdbNumber
+        ? this.updateMovieUseCase
+            .execute(movie.movieId, { imdbNumber: imdb, uniqueId: { imdb } })
+            .pipe(switchMap(() => refresh$))
+        : refresh$;
+
+    request$.subscribe({
+      next: () => {
+        // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras, asi
+        // que recargar aqui devolveria los datos viejos.
+        void this.notifications.info(
+          'Kodi está buscando los datos. Usa «recargar» cuando termine.'
+        );
+      },
+      error: (error: Error) => void this.notifications.error(error.message)
+    });
+  }
 
   onEditRequested(movie: Movie): void {
     this.movieBeingEdited.set(movie);

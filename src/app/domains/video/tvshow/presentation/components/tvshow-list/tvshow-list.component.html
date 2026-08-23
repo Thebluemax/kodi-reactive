@@ -42,6 +42,8 @@
       (playEpisode)="onPlayEpisode($event)"
       (addEpisodeToQueue)="onAddEpisodeToQueue($event)"
       (editRequested)="onEditRequested($event)"
+      (refreshRequested)="onRefreshRequested($event)"
+      (reloadRequested)="onReloadRequested($event)"
     />
   }
 </app-lateral-panel>
@@ -63,6 +65,21 @@
       [saving]="isSaving()"
       (save)="onEditSave($event)"
       (cancelled)="onEditCancelled()"
+    />
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  [isOpen]="tvshowBeingRefreshed() !== null"
+  (ionModalDidDismiss)="onRefreshCancelled()"
+>
+  <ng-template>
+    <app-media-refresh-modal
+      [initial]="refreshValue()"
+      [showYear]="true"
+      [showRefreshEpisodes]="true"
+      (confirmed)="onRefreshConfirmed($event)"
+      (cancelled)="onRefreshCancelled()"
     />
   </ng-template>
 </ion-modal>

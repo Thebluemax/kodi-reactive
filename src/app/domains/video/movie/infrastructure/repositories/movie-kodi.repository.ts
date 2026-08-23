@@ -17,6 +17,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -77,8 +78,29 @@ const UPDATE_PARAM_NAMES: Record<keyof MovieUpdate, string> = {
   imdbNumber: 'imdbnumber',
   trailer: 'trailer',
   set: 'set',
-  art: 'art'
+  art: 'art',
+  uniqueId: 'uniqueid'
 };
+
+/**
+ * Los parametros del refresco son opcionales en la API y tienen sus propios
+ * valores por defecto: sin `title` Kodi lo deduce del archivo, y `ignorenfo` es
+ * false. Mandarlos vacios no aporta nada, asi que solo viaja lo que se indica.
+ */
+function toRefreshParams(options: MediaRefreshOptions): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+  const title = options.title?.trim() ?? '';
+
+  if (title.length > 0) {
+    params['title'] = title;
+  }
+
+  if (options.ignoreNfo) {
+    params['ignorenfo'] = true;
+  }
+
+  return params;
+}
 
 /** El detalle alimenta el editor: pide todo lo que SetMovieDetails escribe. */
 const MOVIE_DETAIL_PROPERTIES = [
@@ -226,5 +248,28 @@ export class MovieKodiRepository extends MovieRepository {
     }
 
     return params;
+  }
+
+  refreshMovie(movieId: number, options: MediaRefreshOptions): Observable<void> {
+    const request: KodiJsonRpcRequest = {
+      jsonrpc: environment.jsonrpcVersion,
+      method: Methods.VideoLibraryRefreshMovie,
+      params: {
+        movieid: movieId,
+        ...toRefreshParams(options)
+      },
+      id: this.getNextId()
+    };
+
+    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(
+            `Kodi no ha podido volver a buscar los datos: ${response.error.message} (codigo ${response.error.code})`
+          );
+        }
+        return void 0;
+      })
+    );
   }
 }

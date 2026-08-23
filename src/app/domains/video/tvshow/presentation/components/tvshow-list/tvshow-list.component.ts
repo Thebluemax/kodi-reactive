@@ -31,6 +31,12 @@ import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-
 import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { UpdateTVShowUseCase } from '../../../application/use-cases/update-tvshow.use-case';
+import { RefreshTVShowUseCase } from '../../../application/use-cases/refresh-tvshow.use-case';
+import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
+import {
+  MediaRefreshModalComponent,
+  MediaRefreshRequest
+} from '@shared/components/media-refresh-modal/media-refresh-modal.component';
 import { TVShowUpdate } from '../../../domain/entities/tvshow.entity';
 import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
 import { NotificationService } from '@shared/services/notification.service';
@@ -53,7 +59,8 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     LateralPanelComponent,
     TVShowDetailComponent,
     IonModal,
-    MediaEditModalComponent
+    MediaEditModalComponent,
+    MediaRefreshModalComponent
   ],
   templateUrl: './tvshow-list.component.html',
   styleUrl: './tvshow-list.component.scss',
@@ -64,6 +71,7 @@ export class TVShowListComponent {
   private readonly getTVShowsUseCase = inject(GetTVShowsUseCase);
   private readonly getTVShowDetailUseCase = inject(GetTVShowDetailUseCase);
   private readonly updateTVShowUseCase = inject(UpdateTVShowUseCase);
+  private readonly refreshTVShowUseCase = inject(RefreshTVShowUseCase);
   private readonly notifications = inject(NotificationService);
   private readonly getSeasonsUseCase = inject(GetSeasonsUseCase);
   private readonly getEpisodesUseCase = inject(GetEpisodesUseCase);
@@ -210,6 +218,20 @@ export class TVShowListComponent {
   // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
   readonly editSchema = TVSHOW_EDIT_SCHEMA;
   readonly tvshowBeingEdited = signal<TVShow | null>(null);
+  readonly tvshowBeingRefreshed = signal<TVShow | null>(null);
+
+  /** Referencia estable, como editValue. */
+  readonly refreshValue = computed<MediaRefreshRequest>(() => {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    return {
+      title: tvshow?.title ?? '',
+      year: tvshow && tvshow.year > 0 ? String(tvshow.year) : '',
+      uniqueId: '',
+      ignoreNfo: false,
+      refreshEpisodes: false
+    };
+  });
   readonly isSaving = signal<boolean>(false);
 
   /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
@@ -243,6 +265,59 @@ export class TVShowListComponent {
   readonly editArtwork = computed<MediaArtworkSet | null>(
     () => this.tvshowBeingEdited()?.art ?? null
   );
+
+  /**
+   * El panel se aparta mientras se pide el titulo: se saca a si mismo a
+   * document.body en su ngOnInit, fuera de ion-app.
+   */
+  onRefreshRequested(tvshow: TVShow): void {
+    this.tvshowBeingRefreshed.set(tvshow);
+    this.isPanelOpen.set(false);
+  }
+
+  onRefreshCancelled(): void {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingRefreshed.set(null);
+    this.restoreDetail(tvshow);
+  }
+
+  onRefreshConfirmed(request: MediaRefreshRequest): void {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingRefreshed.set(null);
+    this.restoreDetail(tvshow);
+    this.refreshTVShow(tvshow, {
+      title: buildSearchTitle(request.title, request.year),
+      ignoreNfo: request.ignoreNfo,
+      refreshEpisodes: request.refreshEpisodes
+    });
+  }
+
+  onReloadRequested(tvshow: TVShow): void {
+    this.refreshSelectedTVShow(tvshow.tvshowId);
+    void this.notifications.info('Datos recargados desde Kodi');
+  }
+
+  private refreshTVShow(tvshow: TVShow, options: MediaRefreshOptions): void {
+    this.refreshTVShowUseCase.execute(tvshow.tvshowId, options).subscribe({
+      next: () => {
+        // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras.
+        void this.notifications.info(
+          'Kodi está buscando los datos. Usa «recargar» cuando termine.'
+        );
+      },
+      error: (error: Error) => void this.notifications.error(error.message)
+    });
+  }
 
   onEditRequested(tvshow: TVShow): void {
     this.tvshowBeingEdited.set(tvshow);

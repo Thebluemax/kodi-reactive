@@ -71,6 +71,14 @@ describe('MovieKodiRepository', () => {
       expect(params['userrating']).toBe(10);
     });
 
+    it('envía el identificador único, que el editor no expone', () => {
+      // Escribirlo antes de un re-scrapeo es lo que desambigua dos peliculas
+      // homonimas: el scraper lo respeta en vez de volver a buscar por titulo.
+      repository.updateMovie(11, { uniqueId: { imdb: 'tt0068646' } }).subscribe();
+
+      expect(expectUpdateRequest()['uniqueid']).toEqual({ imdb: 'tt0068646' });
+    });
+
     it('envía los votos como cadena', () => {
       // Optional.String para pelicula, a diferencia de album.
       repository.updateMovie(11, { votes: '1.900.000' }).subscribe();
@@ -126,6 +134,75 @@ describe('MovieKodiRepository', () => {
       id: 1,
       jsonrpc: '2.0',
       result: { movies: [], limits: { start: 0, end: 0, total: 0 } }
+    });
+  });
+
+  // ========================================================================
+  // refreshMovie
+  // ========================================================================
+
+  describe('refreshMovie', () => {
+    function expectRefreshRequest(): Record<string, unknown> {
+      const req = httpMock.expectOne(JSON_RPC_URL);
+      const body = req.request.body as { method: string; params: Record<string, unknown> };
+
+      expect(body.method).toBe(Methods.VideoLibraryRefreshMovie);
+
+      req.flush({ id: 1, jsonrpc: '2.0', result: 'OK' });
+      return body.params;
+    }
+
+    it('manda el título con el que buscar en vez del nombre del archivo', () => {
+      repository.refreshMovie(11, { title: 'El Padrino' }).subscribe();
+
+      expect(expectRefreshRequest()['title']).toBe('El Padrino');
+    });
+
+    it('recorta el título, que viene de un campo de texto', () => {
+      repository.refreshMovie(11, { title: '  El Padrino  ' }).subscribe();
+
+      expect(expectRefreshRequest()['title']).toBe('El Padrino');
+    });
+
+    it('sin opciones manda solo el identificador', () => {
+      // Los parametros son opcionales y Kodi ya tiene sus valores por defecto:
+      // sin title lo deduce del archivo, e ignorenfo es false.
+      repository.refreshMovie(11, {}).subscribe();
+
+      expect(Object.keys(expectRefreshRequest())).toEqual(['movieid']);
+    });
+
+    it('no manda ignorenfo cuando no se pide', () => {
+      repository.refreshMovie(11, { title: 'El Padrino', ignoreNfo: false }).subscribe();
+      const params = expectRefreshRequest();
+
+      expect('ignorenfo' in params).toBeFalse();
+      expect(params['title']).toBe('El Padrino');
+    });
+
+    it('un título en blanco cuenta como ausente', () => {
+      repository.refreshMovie(11, { title: '   ' }).subscribe();
+
+      expect(Object.keys(expectRefreshRequest())).toEqual(['movieid']);
+    });
+
+    it('traslada la opción de ignorar el NFO', () => {
+      repository.refreshMovie(11, { ignoreNfo: true }).subscribe();
+
+      expect(expectRefreshRequest()['ignorenfo']).toBeTrue();
+    });
+
+    it('propaga el fallo del scraper, que llega con HTTP 200', () => {
+      let caught: Error | undefined;
+      repository.refreshMovie(11, {}).subscribe({ error: (err: Error) => (caught = err) });
+
+      httpMock.expectOne(JSON_RPC_URL).flush({
+        id: 1,
+        jsonrpc: '2.0',
+        error: { code: -32100, message: 'Scraper failed' }
+      });
+
+      expect(caught?.message).toContain('Scraper failed');
     });
   });
 });

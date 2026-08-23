@@ -60,6 +60,10 @@ export class TVShowDetailComponent {
    * lateral, que se saca a si mismo a document.body. Lo presenta el contenedor.
    */
   readonly editRequested = output<TVShow>();
+  /** Volver a pedir los datos al scraper, indicandole con que titulo buscar. */
+  readonly refreshRequested = output<TVShow>();
+  /** Traer de Kodi lo que tenga ahora: el re-scrapeo es asincrono. */
+  readonly reloadRequested = output<TVShow>();
 
   // Local state
   readonly selectedSeasonNumber = signal<number>(1);

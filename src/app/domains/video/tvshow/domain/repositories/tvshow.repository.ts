@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 import {
   TVShow,
   TVShowListResult,
@@ -49,4 +50,12 @@ export abstract class TVShowRepository {
    * @param patch - Only the fields to change; anything absent is left untouched
    */
   abstract updateTVShow(tvshowId: number, patch: TVShowUpdate): Observable<void>;
+
+  /**
+   * Ask Kodi to scrape the TV show again
+   * @param tvshowId - TV show ID
+   * @param options - Title, whether to ignore a local NFO, and whether to
+   *                  cascade the refresh to every episode
+   */
+  abstract refreshTVShow(tvshowId: number, options: MediaRefreshOptions): Observable<void>;
 }
