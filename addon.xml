@@ -17,6 +17,11 @@
         <source>https://github.com/Thebluemax/kodi-reactive</source>
         <assets>
             <icon>icon.png</icon>
+            <screenshot>resources/screenshot-01-movies-dark.jpg</screenshot>
+            <screenshot>resources/screenshot-02-albums-dark.jpg</screenshot>
+            <screenshot>resources/screenshot-03-remote-control.jpg</screenshot>
+            <screenshot>resources/screenshot-04-albums-light.jpg</screenshot>
+            <screenshot>resources/screenshot-05-play-queue.jpg</screenshot>
         </assets>
     </extension>
 </addon >
