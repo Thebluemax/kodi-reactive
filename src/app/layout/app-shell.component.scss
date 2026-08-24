@@ -183,3 +183,25 @@ app-album {
         height: 87%;
     }
 }
+
+.app-shell {
+  // Element: Offline
+  // Se ve en la barra sin robar sitio: un icono siempre, y el texto solo
+  // cuando la ventana da para ello.
+  &__offline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-inline: 8px;
+    color: var(--ion-color-warning);
+    font-size: 0.8em;
+  }
+
+  &__offline-text {
+    display: none;
+
+    @media (min-width: 768px) {
+      display: inline;
+    }
+  }
+}

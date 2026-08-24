@@ -96,14 +96,6 @@ export class SettingsPageComponent {
   }
 
   // El WebSocket solo se mantiene abierto mientras la página está visible
-  ionViewWillEnter(): void {
-    this.library.connect();
-  }
-
-  ionViewWillLeave(): void {
-    this.library.disconnect();
-  }
-
   onThemeChange(event: CustomEvent): void {
     this.themeService.setTheme(event.detail.value as ThemePreference);
   }
