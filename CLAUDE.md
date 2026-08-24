@@ -8,24 +8,28 @@
 
 ## Estado del Proyecto
 
-**Fase actual**: Prototipo en migracion
+**Fase actual**: v1.0.0
 
-Este proyecto es un **prototipo funcional** que esta siendo migrado hacia una arquitectura DDD completa. El MVP debe poder instalarse manualmente en Kodi y funcionar como interfaz alternativa.
+El prototipo quedo atras: la arquitectura DDD cubre todos los dominios, la
+configuracion se resuelve en tiempo de ejecucion y el add-on se publica por su
+propio repositorio Kodi, con actualizaciones automaticas.
 
 ### Deuda Tecnica Conocida
 
-- URLs y puertos hardcodeados (deben moverse a configuracion)
-- Entidades del dominio por refactorizar segun estandares DDD
-- Typos en codigo legacy (`albunDetail`, `setSeeek`)
-- Cobertura de tests por mejorar
+- Interfaz solo en castellano; queda migrar a i18n con ingles (#242)
+- Angular 20; la migracion a 22 esta pendiente (#237)
+- Edicion de canciones sueltas sin interfaz (#204)
+- Favoritos de Kodi sin soportar (#217)
 
 ## Especificaciones Tecnicas
 
-- **Framework**: Angular 17 + Ionic 8 (meta: migrar a Angular 21)
-- **Arquitectura**: DDD (Domain-Driven Design) - en migracion
-- **Comunicacion**: Sistema hibrido:
-  - **WebSockets**: Para comunicacion en tiempo real (puerto 9090)
-  - **API REST (JSON-RPC)**: Para peticiones puntuales y gestion de biblioteca (puerto 8008)
+- **Framework**: Angular 20 + Ionic 8, standalone y zoneless (meta: migrar a Angular 22)
+- **Arquitectura**: DDD (Domain-Driven Design)
+- **Comunicacion**: Sistema hibrido, con un unico punto de contacto por canal:
+  - **WebSockets**: Tiempo real, via `KodiSocketService` (puerto 9090 por defecto, ajustable en Ajustes)
+  - **JSON-RPC sobre HTTP**: Lecturas y escrituras de biblioteca, via `KodiRpcService`
+    (en produccion el add-on lo sirve el propio Kodi y la conexion se deriva de
+    `window.location`; en desarrollo pasa por `ops/proxy.js`, que añade CORS)
 
 ## Interfaz y Experiencia (UI/UX)
 
@@ -42,25 +46,33 @@ Este proyecto es un **prototipo funcional** que esta siendo migrado hacia una ar
 
 ```text
 src/app/
-├── components/        # Componentes UI reutilizables
-├── core/              # Servicios, modelos, infraestructura legacy
-│   ├── models/        # Entidades actuales (en migracion)
-│   ├── services/      # Servicios HTTP y WebSocket
-│   └── enums/         # Metodos JSON-RPC y acciones
-├── domains/           # Nueva estructura DDD
-│   └── music/
-│       └── playlist/
-│           └── infrastructure/
-└── shared/            # Modulo compartido
+├── domains/           # Un contexto por carpeta
+│   ├── music/         # Album, Artist, Genre, Track, Player, Playlist, Playback
+│   ├── video/         # Movie, TVShow, Actor
+│   ├── library/       # Eventos de escaneo y limpieza
+│   ├── files/         # Navegador de ficheros de Kodi
+│   ├── remote/        # Mando a distancia
+│   └── settings/      # Ajustes de conexion
+├── layout/            # Shell de la aplicacion
+└── shared/            # Servicios RPC y socket, componentes, pipes, utilidades
 ```
+
+Cada dominio repite las cuatro capas: `domain/` (entidades e interfaces de
+repositorio, sin Angular ni HTTP), `application/` (casos de uso y facades),
+`infrastructure/` (repositorios que hablan JSON-RPC) y `presentation/`
+(componentes standalone, OnPush, con signals).
 
 ## Roadmap
 
-- [ ] Migrar a Angular 21
-- [ ] Completar arquitectura DDD (domain models, application services, repositories)
-- [ ] Externalizar configuracion (eliminar hardcoded values)
-- [ ] Empaquetar como Add-on oficial de Kodi
-- [ ] Expandir soporte: Video (Movies, TV Shows) ademas de Music
+- [x] Completar arquitectura DDD (domain models, application services, repositories)
+- [x] Externalizar configuracion (eliminar hardcoded values)
+- [x] Empaquetar como Add-on de Kodi, con repositorio propio y releases automaticas
+- [x] Expandir soporte: Video (Movies, TV Shows, Actors) ademas de Music
+- [x] Edicion de biblioteca: metadatos, artwork, re-scrapeo, exportar/importar
+- [ ] i18n: castellano e ingles (#242)
+- [ ] Migrar a Angular 22 (#237)
+- [ ] Edicion de canciones (#204)
+- [ ] Favoritos (#217)
 
 ## Rol de la IA (Claude)
 
