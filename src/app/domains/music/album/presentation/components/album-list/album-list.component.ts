@@ -85,6 +85,14 @@ export class AlbumListComponent {
 
   // Pagination
   private readonly limit = 40;
+  /**
+   * Motivo del ultimo fallo de carga, o cadena vacia si fue bien.
+   *
+   * Sin esto una lista vacia por un fallo de red se anunciaba como biblioteca
+   * vacia: el catchError devolvia EMPTY y el empty state decia lo mismo que
+   * diria sin elementos.
+   */
+  readonly loadError = signal<string>('');
   private readonly reachedEnd = signal<boolean>(false);
   private readonly start = signal<number>(0);
   private readonly end = signal<number>(this.limit);
@@ -111,8 +119,10 @@ export class AlbumListComponent {
       .pipe(
         switchMap(params =>
           this.getAlbumsUseCase.execute(params).pipe(
-            catchError(err => {
-              console.error('Error loading albums:', err);
+            catchError((err: Error) => {
+              this.loadError.set(
+                err.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               return EMPTY;
             })
@@ -157,12 +167,18 @@ export class AlbumListComponent {
 
   loadAlbums(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
       start: this.start(),
       end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
+  }
+
+  /** Vuelve a pedir la pagina que fallo, sin perder lo ya cargado. */
+  onRetry(): void {
+    this.loadAlbums();
   }
 
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
@@ -190,7 +206,7 @@ export class AlbumListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading album detail:', err);
+        void this.notifications.error('No se ha podido cargar el álbum');
         this.isLoading.set(false);
       }
     });
@@ -199,8 +215,7 @@ export class AlbumListComponent {
   onAddToPlaylist(event: { media: unknown; playMedia: boolean }): void {
     const album = event.media as Album;
     this.addToPlaylistUseCase.execute(album.albumId, event.playMedia).subscribe({
-      next: () => console.log('Album added to playlist'),
-      error: (err) => console.error('Error adding to playlist:', err)
+      error: () => void this.notifications.error('No se ha podido añadir a la cola')
     });
   }
 
@@ -315,6 +330,5 @@ export class AlbumListComponent {
 
   onTrackAddToPlaylist(track: Track): void {
     // TODO: Implement track add to playlist use case
-    console.log('Add track to playlist:', track);
   }
 }

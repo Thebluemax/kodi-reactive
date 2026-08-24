@@ -31,6 +31,12 @@
     opacity: 0.6;
   }
 
+  // Modifier: el fallo se distingue de un listado vacio de un vistazo
+  &__icon--error {
+    color: var(--ion-color-danger);
+    opacity: 0.8;
+  }
+
   // Element: Message
   &__message {
     margin: 0;

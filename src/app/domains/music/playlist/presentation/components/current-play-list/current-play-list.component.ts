@@ -77,13 +77,13 @@ export class CurrentPlayListComponent {
       next: () => {
         this.playlistChanged.emit();
       },
-      error: (err) => console.error('Failed to clear playlist:', err)
+      error: () => void this.notifications.error('No se ha podido vaciar la cola')
     });
   }
 
   playItem(position: number): void {
     this.playPlaylistItemUseCase.execute(position, this.playlistId()).subscribe({
-      error: (err) => console.error('Failed to play item:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir el elemento')
     });
   }
 
@@ -93,7 +93,7 @@ export class CurrentPlayListComponent {
       next: () => {
         this.playlistChanged.emit();
       },
-      error: (err) => console.error('Failed to remove item:', err)
+      error: () => void this.notifications.error('No se ha podido quitar el elemento de la cola')
     });
   }
 
@@ -108,7 +108,7 @@ export class CurrentPlayListComponent {
         this.playlistChanged.emit();
       },
       error: (err) => {
-        console.error('Failed to reorder playlist:', err);
+        void this.notifications.error('No se ha podido reordenar la cola');
         this.playlistChanged.emit();
       }
     });

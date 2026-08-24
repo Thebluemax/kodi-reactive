@@ -17,7 +17,11 @@
       />
     } @empty {
       @if (!isLoading()) {
-        <app-empty-state icon="tv" message="No hay series en la biblioteca" />
+        <app-empty-state
+          icon="tv" message="No hay series en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
       }
     }
   </ion-list>

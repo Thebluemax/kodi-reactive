@@ -15,7 +15,11 @@
       />
     } @empty {
       @if (!isLoading()) {
-        <app-empty-state icon="people" message="No hay actores en la biblioteca" />
+        <app-empty-state
+          icon="people" message="No hay actores en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
       }
     }
   </ion-list>

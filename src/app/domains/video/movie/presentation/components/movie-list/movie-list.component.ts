@@ -284,6 +284,14 @@ export class MovieListComponent {
 
   // Pagination
   private readonly limit = 40;
+  /**
+   * Motivo del ultimo fallo de carga, o cadena vacia si fue bien.
+   *
+   * Sin esto una lista vacia por un fallo de red se anunciaba como biblioteca
+   * vacia: el catchError devolvia EMPTY y el empty state decia lo mismo que
+   * diria sin elementos.
+   */
+  readonly loadError = signal<string>('');
   private readonly reachedEnd = signal<boolean>(false);
   private readonly start = signal<number>(0);
   private readonly end = signal<number>(this.limit);
@@ -316,8 +324,10 @@ export class MovieListComponent {
       .pipe(
         switchMap(params =>
           this.getMoviesUseCase.execute(params).pipe(
-            catchError(err => {
-              console.error('Error loading movies:', err);
+            catchError((err: Error) => {
+              this.loadError.set(
+                err.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               return EMPTY;
             })
@@ -362,12 +372,18 @@ export class MovieListComponent {
 
   loadMovies(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
       start: this.start(),
       end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
+  }
+
+  /** Vuelve a pedir la pagina que fallo, sin perder lo ya cargado. */
+  onRetry(): void {
+    this.loadMovies();
   }
 
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
@@ -395,7 +411,7 @@ export class MovieListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movie detail:', err);
+        void this.notifications.error('No se ha podido cargar la película');
         this.isLoading.set(false);
       }
     });
@@ -426,7 +442,7 @@ export class MovieListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading actor movies:', err);
+        void this.notifications.error('No se han podido cargar las películas del actor');
         this.isLoading.set(false);
       }
     });
@@ -443,7 +459,7 @@ export class MovieListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movie detail:', err);
+        void this.notifications.error('No se ha podido cargar la película');
         this.isLoading.set(false);
       }
     });
@@ -451,14 +467,14 @@ export class MovieListComponent {
 
   onPlayMovieFromActor(movieId: number): void {
     this.addToPlaylistUseCase.execute(movieId, true).subscribe({
-      error: (err) => console.error('Error playing movie:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir la película')
     });
   }
 
   onAddToPlaylist(event: { media: unknown; playMedia: boolean }): void {
     const movie = event.media as Movie;
     this.addToPlaylistUseCase.execute(movie.movieId, event.playMedia).subscribe({
-      error: (err) => console.error('Error adding to playlist:', err)
+      error: () => void this.notifications.error('No se ha podido añadir a la cola')
     });
   }
 

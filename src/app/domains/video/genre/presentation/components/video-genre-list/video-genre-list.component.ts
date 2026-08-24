@@ -46,6 +46,11 @@ export class VideoGenreListComponent implements OnInit {
   private readonly allGenres = signal<VideoGenre[]>([]);
   readonly selectedGenre = signal<VideoGenre | null>(null);
   readonly isLoading = signal<boolean>(false);
+  /**
+   * Motivo del ultimo fallo de carga. Sin esto una lista vacia por un fallo de
+   * red se anunciaba como biblioteca vacia.
+   */
+  readonly loadError = signal<string>('');
   readonly isPanelOpen = signal<boolean>(false);
 
   // Computed
@@ -82,10 +87,15 @@ export class VideoGenreListComponent implements OnInit {
         this.allGenres.set(result.genres);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Error loading genres:', err);
+      error: (err: Error) => {
+        this.loadError.set(err.message || 'No se ha podido contactar con Kodi');
         this.isLoading.set(false);
       }
     });
+  }
+
+  /** Vuelve a intentar la carga que fallo. */
+  onRetry(): void {
+    this.loadGenres();
   }
 }

@@ -18,7 +18,11 @@
       />
     } @empty {
       @if (!isLoading()) {
-        <app-empty-state icon="film-outline" message="No hay películas en la biblioteca" />
+        <app-empty-state
+          icon="film-outline" message="No hay películas en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
       }
     }
   </ion-list>

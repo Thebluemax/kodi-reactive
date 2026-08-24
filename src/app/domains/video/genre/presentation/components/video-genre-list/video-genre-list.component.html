@@ -14,7 +14,11 @@
       />
     } @empty {
       @if (!isLoading()) {
-        <app-empty-state icon="bookmark" message="No hay géneros en la biblioteca" />
+        <app-empty-state
+          icon="bookmark" message="No hay géneros en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
       }
     }
   </ion-list>

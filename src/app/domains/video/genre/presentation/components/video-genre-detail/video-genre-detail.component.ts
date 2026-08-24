@@ -27,6 +27,7 @@ import { VideoGenre } from '../../../domain/entities/video-genre.entity';
 import { GetMoviesByGenreUseCase } from '../../../application/use-cases/get-movies-by-genre.use-case';
 import { Movie, MovieSearchParams, AddMovieToPlaylistUseCase } from '@domains/video/movie';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-video-genre-detail',
@@ -50,6 +51,7 @@ import { AssetsPipe } from '@shared/pipes/assets.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VideoGenreDetailComponent implements OnInit {
+  private readonly notifications = inject(NotificationService);
   private readonly getMoviesByGenreUseCase = inject(GetMoviesByGenreUseCase);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
 
@@ -88,13 +90,13 @@ export class VideoGenreDetailComponent implements OnInit {
 
   onPlayMovie(movieId: number): void {
     this.addToPlaylistUseCase.execute(movieId, true).subscribe({
-      error: (err) => console.error('Error playing movie:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir la película')
     });
   }
 
   onAddToQueue(movieId: number): void {
     this.addToPlaylistUseCase.execute(movieId, false).subscribe({
-      error: (err) => console.error('Error adding movie to queue:', err)
+      error: () => void this.notifications.error('No se ha podido añadir la película a la cola')
     });
   }
 
@@ -120,7 +122,7 @@ export class VideoGenreDetailComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movies by genre:', err);
+        void this.notifications.error('No se han podido cargar las películas del género');
         this.isLoading.set(false);
       }
     });

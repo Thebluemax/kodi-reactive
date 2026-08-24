@@ -1,4 +1,11 @@
-import { Component, ChangeDetectionStrategy, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  computed,
+  inject,
+  input,
+  output
+} from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 
 import { GlobalSearchService } from '@shared/services/global-search.service';
@@ -18,6 +25,13 @@ export class EmptyStateComponent {
   readonly message = input<string>('No hay nada que mostrar');
   /** Linea secundaria opcional, para sugerir una accion al usuario */
   readonly hint = input<string>('');
+  /**
+   * Motivo por el que la carga fallo, si fallo.
+   *
+   * Sin esto una lista vacia por un fallo de conexion se anunciaba como
+   * biblioteca vacia, que es mentira y parece un fallo del add-on.
+   */
+  readonly error = input<string>('');
 
   /**
    * Distingue "la biblioteca esta vacia" de "el filtro no encontro nada".
@@ -26,11 +40,22 @@ export class EmptyStateComponent {
    */
   readonly isFiltered = computed(
     () =>
+      !this.hasError() &&
       this.globalSearch.isSearchVisible() &&
       this.globalSearch.debouncedSearchTerm().length > 0
   );
 
+  /** Reintentar la carga que fallo. */
+  readonly retry = output<void>();
+
+  /** El fallo manda: sin datos no se puede afirmar que no haya nada. */
+  readonly hasError = computed(() => this.error().length > 0);
+
   onClearSearch(): void {
     this.globalSearch.clearSearch();
+  }
+
+  onRetry(): void {
+    this.retry.emit();
   }
 }
