@@ -1,26 +1,81 @@
-# ReaKtive
-
-> A modern, reactive web interface to control your Kodi media center.
-
 <p align="center">
-  <img src="src/assets/site/dark.basic.png" alt="ReaKtive Dark Theme" width="400" />
-  <img src="src/assets/site/light.basic.png" alt="ReaKtive Light Theme" width="400" />
+  <img src="src/assets/site/logo.png" alt="ReaKtive" width="140" />
 </p>
 
-**ReaKtive** is a web-based frontend built with **Angular** and **Ionic** that lets you remotely browse, manage and control your Kodi media library and playback in real time. It is designed to be packaged as an official **Kodi Add-on** (`webinterface.reaktive`).
+<h1 align="center">ReaKtive</h1>
+
+<p align="center">
+  A modern, reactive web interface to control your Kodi media center.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Angular-20-dd0031" alt="Angular 20" />
+  <img src="https://img.shields.io/badge/Ionic-8-3880ff" alt="Ionic 8" />
+  <img src="https://img.shields.io/badge/Kodi%20add--on-webinterface.reaktive-17b2b9" alt="Kodi add-on" />
+</p>
+
+<p align="center">
+  <img src="resources/screenshot-01-movies-dark.jpg" alt="ReaKtive browsing a movie library" width="900" />
+</p>
+
+**ReaKtive** is a web frontend built with **Angular** and **Ionic** that lets you
+browse, fix and control your Kodi media library from any browser, in real time.
+It ships as a Kodi add-on (`webinterface.reaktive`): install it once and Kodi
+serves it itself, no separate server and no configuration.
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="resources/screenshot-02-albums-dark.jpg" alt="Album grid in dark theme" />
+      <p align="center"><em>Music library — dark theme</em></p>
+    </td>
+    <td width="50%">
+      <img src="resources/screenshot-04-albums-light.jpg" alt="Album grid in light theme" />
+      <p align="center"><em>The same library — light theme</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="resources/screenshot-03-remote-control.jpg" alt="Remote control over the current media artwork" />
+      <p align="center"><em>Remote control, over the artwork of what is playing</em></p>
+    </td>
+    <td width="50%">
+      <img src="resources/screenshot-05-play-queue.jpg" alt="Play queue drawer" />
+      <p align="center"><em>Play queue, reorderable</em></p>
+    </td>
+  </tr>
+</table>
+
 ## Features
 
-- **Music & Video browsing** - Albums, Artists, Genres, Movies, TV Shows and Actors
-- **Real-time playback control** - Play, pause, stop, seek, volume, shuffle, repeat and party mode
-- **Remote control** - Full D-Pad navigation to operate Kodi from any browser
-- **Playlist management** - View, reorder and save playlists
-- **Global search** - Search across your entire media library
-- **Light & Dark themes** - Automatic detection of OS preference with manual toggle
+### Browse and play
+
+- **Music & Video libraries** - Albums, Artists, Genres, Movies, TV Shows and Actors, with infinite scroll over paginated JSON-RPC queries
+- **Real-time playback control** - Play, pause, stop, seek, volume, shuffle, repeat and party mode, kept in sync over WebSocket
+- **Remote control** - Full D-Pad navigation to drive Kodi from any browser, over the artwork of whatever is playing
+- **Play queue** - View, reorder and save the current playlist
+- **Global search** - One search box across the whole library
+
+### Fix your library
+
+Scrapers get things wrong. ReaKtive lets you correct them without leaving the browser:
+
+- **Metadata editing** - Albums, artists, movies and TV shows, with schema-driven forms that mirror what the JSON-RPC API actually accepts
+- **Artwork** - Set poster, fanart, thumb and banner by URL or by picking a file through Kodi's own file browser
+- **Re-scrape a single item** - Refresh one movie or show against its scraper, optionally passing the right title, year or IMDb id when the filename misleads it
+- **Export / import** - Take one item's metadata out as JSON, edit it, and bring it back in
+- **File paths** - See the real path and filename behind every item, so you know which file the wrong data belongs to
+
+### Everyday quality
+
+- **Light & Dark themes** - Follows the OS preference, with a manual toggle
 - **Responsive design** - Desktop and mobile layouts
-- **Background blur** - Album art blur effect on the player bar and remote view
+- **Connection aware** - Live connection status, automatic WebSocket reconnection with backoff, and library scan/clean progress
+- **Honest error states** - A failed request says so and offers a retry, instead of pretending the library is empty
 
 ## Tech Stack
 
@@ -29,8 +84,8 @@
 | Framework      | Angular 20                          |
 | UI Components  | Ionic 8                             |
 | Architecture   | Domain-Driven Design (DDD)          |
-| Real-time      | WebSockets (port 9090)              |
-| API            | JSON-RPC over HTTP (port 8008)      |
+| Real-time      | WebSockets (Kodi's port, `9090` by default) |
+| API            | JSON-RPC over HTTP (Kodi's web server port) |
 | State          | Angular Signals (zoneless)          |
 | Styling        | SCSS with ITCSS methodology         |
 | Linting        | ESLint + Husky + lint-staged        |
@@ -42,8 +97,12 @@
 - [npm](https://www.npmjs.com/) >= 9
 - A running **Kodi** instance with:
   - **Web interface** enabled (_Settings > Services > Control > Allow remote control via HTTP_)
-  - **WebSocket** access on port `9090`
-  - **HTTP JSON-RPC** access on port `8008`
+  - **WebSocket** access (port `9090` by default; configurable from _Settings_ inside the app)
+  - **HTTP JSON-RPC** access on Kodi's web server port (`8080` by default)
+
+> **Do not expose these ports to the internet unprotected.** Kodi's JSON-RPC API
+> can read, modify and delete your whole library. Reach it over your LAN, a VPN,
+> or a reverse proxy with authentication.
 
 ## Installation
 
@@ -55,11 +114,19 @@ cd kodi-reactive
 # Install dependencies
 npm install
 
-# Start development server
+# Point the dev proxy at your Kodi box and start it (leave it running)
+KODI_URL=http://192.168.1.50:8080 npm run proxy
+
+# In another terminal, start the development server
 npm start
 ```
 
 The app will be available at `http://localhost:4200`.
+
+In development the browser talks to `ops/proxy.js` on port `8008`, which forwards
+to Kodi and adds the CORS headers Kodi does not send. In production none of that
+applies: the add-on is served by Kodi itself, so the app derives protocol, host
+and port from `window.location` and calls `/jsonrpc` directly.
 
 ## Build
 
@@ -122,6 +189,7 @@ npm run repo:index
 | Command                | Description                                     |
 | ---------------------- | ----------------------------------------------- |
 | `npm start`            | Start the development server                    |
+| `npm run proxy`        | CORS proxy to Kodi for development (`KODI_URL`) |
 | `npm run build`        | Production build                                |
 | `npm run lint`         | Run ESLint                                      |
 | `npm test`             | Run unit tests                                  |
@@ -132,41 +200,42 @@ npm run repo:index
 
 ```
 src/app/
-├── components/        # Reusable UI components
-├── core/              # Services, models, legacy infrastructure
-│   ├── models/        # Current entities (being migrated)
-│   ├── services/      # HTTP and WebSocket services
-│   └── enums/         # JSON-RPC methods and actions
-├── domains/           # DDD structure
-│   ├── music/         # Albums, Artists, Genres, Player, Playlist
+├── domains/           # One folder per bounded context
+│   ├── music/         # Albums, Artists, Genres, Tracks, Player, Playlist, Playback
 │   ├── video/         # Movies, TV Shows, Actors
-│   └── remote/        # Remote control
+│   ├── library/       # Scan and clean events
+│   ├── files/         # Kodi file browser (sources, directories, downloads)
+│   ├── remote/        # Remote control
+│   └── settings/      # Connection settings
 ├── layout/            # App shell and main layout
-└── shared/            # Shared module (pipes, components, services)
+└── shared/            # Cross-domain code (RPC and socket services, components, pipes, utils)
 ```
+
+Every domain follows the same four layers:
+
+```
+<domain>/
+├── domain/            # Entities and repository interfaces — no Angular, no HTTP
+├── application/       # Use cases and facades
+├── infrastructure/    # Repository implementations that speak JSON-RPC
+└── presentation/      # Standalone components, OnPush, signal-driven
+```
+
+Nothing talks to Kodi directly: `KodiRpcService` is the single JSON-RPC client
+and `KodiSocketService` the single WebSocket, both in `shared/services`.
 
 ## Roadmap
 
-- [ ] Migrate to Angular 21
-- [ ] Complete DDD architecture (domain models, application services, repositories)
-- [ ] Externalize configuration (remove hardcoded URLs and ports)
-- [ ] Official Kodi Add-on packaging with automated releases
-- [ ] Expand video support (Movies, TV Shows)
+- [x] DDD architecture across every domain (entities, use cases, repositories)
+- [x] Externalized configuration (connection derived at runtime, WS port editable in Settings)
+- [x] Kodi Add-on packaging with automated releases and a self-hosted repository
+- [x] Video support (Movies, TV Shows, Actors)
+- [x] Library editing: metadata, artwork, re-scraping, export/import
+- [ ] Internationalization (Spanish and English)
+- [ ] Migrate to Angular 22
+- [ ] Song-level editing UI
+- [ ] Favourites
 - [ ] Mobile-first improvements and PWA support
-
-## FAQ
-
-**Q: Does ReaKtive work on mobile devices?**
-A: Yes. The interface is fully responsive and adapts to both desktop and mobile screens.
-
-**Q: Which Kodi versions are supported?**
-A: ReaKtive targets Kodi 19 (Matrix) and later, using JSON-RPC API v6+.
-
-**Q: Can I use it outside my local network?**
-A: Yes, as long as you can reach your Kodi instance's ports (9090 and 8008). A reverse proxy with authentication is recommended for security.
-
-**Q: How do I change the Kodi connection settings?**
-A: Currently the ports are configured in the application. Externalizing the configuration is on the roadmap.
 
 ## Contributing
 
@@ -178,7 +247,8 @@ A: Currently the ports are configured in the application. Externalizing the conf
 
 ## License
 
-This project is distributed as a Kodi Add-on. See [addon.xml](addon.xml) for metadata.
+This project is distributed as a Kodi Add-on. See [addon.xml](addon.xml) for
+add-on metadata and [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Contact
 
