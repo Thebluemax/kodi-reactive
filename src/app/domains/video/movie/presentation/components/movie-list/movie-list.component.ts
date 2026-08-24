@@ -44,6 +44,7 @@ import {
   MediaRefreshRequest
 } from '@shared/components/media-refresh-modal/media-refresh-modal.component';
 import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
+import { appendPage } from '@shared/utils/paginated-list';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
@@ -283,6 +284,7 @@ export class MovieListComponent {
 
   // Pagination
   private readonly limit = 40;
+  private readonly reachedEnd = signal<boolean>(false);
   private readonly start = signal<number>(0);
   private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
@@ -291,7 +293,17 @@ export class MovieListComponent {
   private readonly loadRequest$ = new Subject<MovieSearchParams>();
 
   // Computed
-  readonly hasMoreMovies = computed(() => this.start() < this.totalMovies());
+  /**
+   * Corta por lo que hay cargado, no por `start`, que apunta al principio de la
+   * pagina ya pedida y no a la siguiente: comparandolo se pedia una pagina de
+   * mas, fuera de rango, y Kodi respondia con la lista entera.
+   *
+   * `reachedEnd` cubre el otro caso: una respuesta mas corta de lo que el total
+   * promete dejaria el scroll pidiendo indefinidamente.
+   */
+  readonly hasMoreMovies = computed(
+    () => !this.reachedEnd() && this.movies().length < this.totalMovies()
+  );
   readonly panelTitle = computed(() => {
     if (this.panelType() === 'actor' && this.selectedActor()) {
       return this.selectedActor()!.name;
@@ -315,7 +327,13 @@ export class MovieListComponent {
       )
       .subscribe(result => {
         this.totalMovies.set(result.total);
-        this.movies.update(current => [...current, ...result.movies]);
+        this.movies.update(current =>
+          appendPage(current, result.movies, item => item.movieId)
+        );
+
+        if (result.movies.length === 0) {
+          this.reachedEnd.set(true);
+        }
         this.isLoading.set(false);
       });
 
@@ -336,6 +354,7 @@ export class MovieListComponent {
   }
 
   private resetPagination(): void {
+    this.reachedEnd.set(false);
     this.start.set(0);
     this.end.set(this.limit);
     this.movies.set([]);

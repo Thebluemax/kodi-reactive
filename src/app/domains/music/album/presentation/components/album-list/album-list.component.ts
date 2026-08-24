@@ -36,6 +36,7 @@ import { MediaArtworkSet } from '@shared/types/media-artwork.type';
 import { ALBUM_EDIT_SCHEMA } from '../../schemas/album-edit.schema';
 import { AlbumUpdate } from '../../../domain/entities/album.entity';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { appendPage } from '@shared/utils/paginated-list';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
@@ -84,6 +85,7 @@ export class AlbumListComponent {
 
   // Pagination
   private readonly limit = 40;
+  private readonly reachedEnd = signal<boolean>(false);
   private readonly start = signal<number>(0);
   private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
@@ -92,7 +94,17 @@ export class AlbumListComponent {
   private readonly loadRequest$ = new Subject<AlbumSearchParams>();
 
   // Computed
-  readonly hasMoreAlbums = computed(() => this.start() < this.totalAlbums());
+  /**
+   * Corta por lo que hay cargado, no por `start`, que apunta al principio de la
+   * pagina ya pedida y no a la siguiente: comparandolo se pedia una pagina de
+   * mas, fuera de rango, y Kodi respondia con la lista entera.
+   *
+   * `reachedEnd` cubre el otro caso: una respuesta mas corta de lo que el total
+   * promete dejaria el scroll pidiendo indefinidamente.
+   */
+  readonly hasMoreAlbums = computed(
+    () => !this.reachedEnd() && this.albums().length < this.totalAlbums()
+  );
 
   constructor() {
     this.loadRequest$
@@ -110,7 +122,13 @@ export class AlbumListComponent {
       )
       .subscribe(result => {
         this.totalAlbums.set(result.total);
-        this.albums.update(current => [...current, ...result.albums]);
+        this.albums.update(current =>
+          appendPage(current, result.albums, item => item.albumId)
+        );
+
+        if (result.albums.length === 0) {
+          this.reachedEnd.set(true);
+        }
         this.isLoading.set(false);
       });
 
@@ -131,6 +149,7 @@ export class AlbumListComponent {
   }
 
   private resetPagination(): void {
+    this.reachedEnd.set(false);
     this.start.set(0);
     this.end.set(this.limit);
     this.albums.set([]);

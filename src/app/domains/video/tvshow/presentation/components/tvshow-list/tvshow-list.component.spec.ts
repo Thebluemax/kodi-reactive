@@ -12,8 +12,27 @@ import { GetTVShowDetailUseCase } from '../../../application/use-cases/get-tvsho
 import { GetSeasonsUseCase } from '../../../application/use-cases/get-seasons.use-case';
 import { GetEpisodesUseCase } from '../../../application/use-cases/get-episodes.use-case';
 import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-episode-to-playlist.use-case';
+import { TVShowListResult } from '../../../domain/entities/tvshow.entity';
 
 const PAGE_SIZE = 40;
+const TOTAL = 500;
+
+
+/**
+ * Pagina realista: `start` elementos ya servidos y otros tantos nuevos. Los
+ * mocks devolvian listas vacias con un total distinto de cero, que no puede
+ * pasar, y por eso el guard del scroll pudo estar mal sin que nadie se enterara.
+ */
+function page(start: number, total: number) {
+  const size = Math.max(0, Math.min(PAGE_SIZE, total - start));
+
+  return {
+    tvshows: Array.from({ length: size }, (_, i) => ({ tvshowId: start + i, title: `Serie ${start + i}`, genre: [], fanart: '', year: 2000 })),
+    total,
+    start,
+    end: start + size
+  };
+}
 
 describe('TVShowListComponent', () => {
   let fixture: ComponentFixture<TVShowListComponent>;
@@ -32,8 +51,9 @@ describe('TVShowListComponent', () => {
 
   beforeEach(async () => {
     getTVShows = jasmine.createSpyObj<GetTVShowsUseCase>('GetTVShowsUseCase', ['execute']);
-    getTVShows.execute.and.returnValue(
-      of({ tvshows: [], total: 500, start: 0, end: PAGE_SIZE })
+    // Cada llamada sirve la pagina que se le pide, como haria Kodi.
+    getTVShows.execute.and.callFake((params: { start: number }) =>
+      of(page(params.start, TOTAL) as unknown as TVShowListResult)
     );
 
     await TestBed.configureTestingModule({
@@ -84,5 +104,42 @@ describe('TVShowListComponent', () => {
     expect(lastParams()).toEqual(
       jasmine.objectContaining({ start: PAGE_SIZE, end: PAGE_SIZE * 2 })
     );
+  });
+
+  // ========================================================================
+  // Regresion: el scroll pedia una pagina de mas y duplicaba la lista
+  // ========================================================================
+
+  describe('final de la lista', () => {
+    const EXACT = PAGE_SIZE * 2;
+
+    beforeEach(() => {
+      getTVShows.execute.and.callFake((params: { start: number }) =>
+        of(page(params.start, EXACT) as unknown as TVShowListResult)
+      );
+      component.onInfiniteScroll(scrollEvent());
+    });
+
+    it('no pide ninguna pagina de mas con un total multiplo del tamaño de pagina', () => {
+      // El guard comparaba `start`, que apunta a la pagina ya pedida: con 80
+      // elementos pedia start=80, fuera de rango, y Kodi respondia con la lista
+      // entera.
+      const calls = getTVShows.execute.calls.count();
+      component.onInfiniteScroll(scrollEvent());
+
+      expect(getTVShows.execute.calls.count()).toBe(calls);
+    });
+
+    it('corta al tener todo cargado', () => {
+      expect(component.hasMoreTVShows()).toBeFalse();
+    });
+
+    it('no repite ningun elemento', () => {
+      const ids = component.tvshows().map(item => item.tvshowId);
+
+      expect(ids.length).toBe(EXACT);
+      expect(new Set(ids).size).toBe(EXACT);
+    });
+
   });
 });
