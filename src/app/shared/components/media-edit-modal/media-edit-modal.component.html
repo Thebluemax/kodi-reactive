@@ -1,0 +1,174 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button
+        aria-label="Cancelar"
+        [disabled]="saving()"
+        (click)="onCancel()"
+      >
+        <ion-icon slot="icon-only" name="close" />
+      </ion-button>
+      @if (!isBrowsing()) {
+        <ion-button
+          aria-label="Guardar"
+          [disabled]="saving() || !isDirty()"
+          (click)="onSave()"
+        >
+          <ion-icon slot="icon-only" name="save-outline" />
+        </ion-button>
+      }
+    </ion-buttons>
+    <ion-title slot="end" class="media-edit__title">{{ title() }}</ion-title>
+  </ion-toolbar>
+  @if (!isBrowsing()) {
+    <ion-toolbar>
+      <app-media-transfer
+        [fileName]="title()"
+        [fields]="exportFields()"
+        [disabled]="saving()"
+        (imported)="onImported($event)"
+      />
+    </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content class="media-edit">
+  @if (isBrowsing()) {
+    <app-file-picker
+      (selected)="onFilePicked($event)"
+      (cancelled)="onBrowseCancelled()"
+    />
+  } @else {
+  @for (field of schema(); track field.key) {
+    <ion-item class="media-edit__field">
+      @switch (field.kind) {
+        @case ('textarea') {
+          <ion-textarea
+            labelPlacement="stacked"
+            autoGrow="true"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+        @case ('boolean') {
+          <ion-toggle
+            [checked]="fieldValue(field) === true"
+            (ionChange)="onFieldChange(field, $any($event).detail.checked)"
+          >
+            {{ field.label }}
+          </ion-toggle>
+        }
+        @case ('select') {
+          <ion-select
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          >
+            @for (option of field.options ?? []; track option.value) {
+              <ion-select-option [value]="option.value">
+                {{ option.label }}
+              </ion-select-option>
+            }
+          </ion-select>
+        }
+        @case ('string-list') {
+          <ion-input
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="listAsText(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+        @case ('number') {
+          <ion-input
+            type="number"
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+        @default {
+          <ion-input
+            labelPlacement="stacked"
+            [label]="field.label"
+            [ngModel]="fieldValue(field)"
+            (ngModelChange)="onFieldChange(field, $event)"
+          />
+        }
+      }
+    </ion-item>
+
+    @if (field.hint) {
+      <ion-note class="media-edit__hint">{{ field.hint }}</ion-note>
+    }
+  }
+
+  @if (hasArtwork()) {
+    <div class="media-edit__artwork">
+      <h2 class="media-edit__section">Imágenes</h2>
+      <ion-note class="media-edit__hint">
+        Kodi no recibe archivos: se le indica una URL y él la descarga y la
+        guarda. Vaciar una caja borra esa imagen.
+      </ion-note>
+
+      @for (key of artKeys(); track key) {
+        <div class="media-edit__art">
+          <div class="media-edit__art-preview">
+            @if (artValue(key)) {
+              <img
+                class="media-edit__art-image"
+                [src]="artValue(key) | assets"
+                [alt]="key"
+                (error)="onArtLoadError(key)"
+                (load)="onArtLoaded(key)"
+              />
+            } @else {
+              <span class="media-edit__art-empty">sin imagen</span>
+            }
+          </div>
+
+          <div class="media-edit__art-field">
+            <ion-input
+              labelPlacement="stacked"
+              placeholder="https://…"
+              [label]="key"
+              [ngModel]="artValue(key)"
+              (ngModelChange)="onArtChange(key, $event)"
+            />
+            @if (isArtBroken(key)) {
+              <ion-note class="media-edit__art-error" color="danger">
+                No se ha podido cargar esta imagen
+              </ion-note>
+            }
+            <ion-button
+              class="media-edit__art-browse"
+              fill="clear"
+              size="small"
+              (click)="onBrowse(key)"
+            >
+              <ion-icon slot="start" name="folder-outline" />
+              Buscar en Kodi
+            </ion-button>
+          </div>
+        </div>
+      }
+
+      <div class="media-edit__art-add">
+        <ion-input
+          labelPlacement="stacked"
+          label="Otro tipo de imagen"
+          placeholder="clearlogo, discart, landscape…"
+          [ngModel]="newArtKey()"
+          (ngModelChange)="newArtKey.set($event)"
+        />
+        <ion-button fill="clear" size="small" (click)="onAddArtKey()">
+          Añadir
+        </ion-button>
+      </div>
+    </div>
+  }
+  }
+</ion-content>

@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -14,20 +13,39 @@ import {
   ArtistSearchParams,
   ArtistAlbumGroup,
   ArtistFactory,
-  KodiArtistResponse
-} from '../../domain/entities/artist.entity';
+  KodiArtistResponse, ArtistUpdate } from '../../domain/entities/artist.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
-import { environment } from 'src/environments/environment';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
+import { Methods } from '@shared/enums/methods';
 
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+/** Traduccion del vocabulario del dominio al de AudioLibrary.SetArtistDetails. */
+const UPDATE_PARAM_NAMES: Record<keyof ArtistUpdate, string> = {
+  name: 'artist',
+  instruments: 'instrument',
+  styles: 'style',
+  moods: 'mood',
+  born: 'born',
+  formed: 'formed',
+  description: 'description',
+  genres: 'genre',
+  died: 'died',
+  disbanded: 'disbanded',
+  yearsActive: 'yearsactive',
+  musicBrainzId: 'musicbrainzartistid',
+  sortName: 'sortname',
+  type: 'type',
+  gender: 'gender',
+  disambiguation: 'disambiguation',
+  art: 'art'
+};
 
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
+/** El detalle alimenta el editor: pide todo lo que SetArtistDetails escribe. */
+const ARTIST_DETAIL_PROPERTIES = [
+  'thumbnail', 'fanart', 'born', 'formed', 'description',
+  'died', 'disbanded', 'yearsactive', 'instrument', 'genre',
+  'style', 'mood', 'musicbrainzartistid', 'sortname', 'type',
+  'gender', 'disambiguation', 'art'
+];
 
 interface KodiArtistsResponse {
   result: {
@@ -61,135 +79,90 @@ interface KodiSongsResponse {
   providedIn: 'root'
 })
 export class ArtistKodiRepository extends ArtistRepository {
-  private readonly http = inject(HttpClient);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getArtists(params: ArtistSearchParams): Observable<ArtistListResult> {
-    const request = this.buildArtistsRequest(params);
-
-    return this.http.post<KodiArtistsResponse>(KODI_API_URL, request).pipe(
-      map(response => ({
-        artists: ArtistFactory.fromKodiResponseList(response.result.artists || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+    return this.rpc
+      .query<KodiArtistsResponse['result']>(
+        Methods.AudioLibraryGetArtists,
+        this.buildArtistsParams(params)
+      )
+      .pipe(
+      map(result => {
+        return {
+          artists: ArtistFactory.fromKodiResponseList(result.artists || []),
+          total: result.limits.total,
+          start: result.limits.start,
+          end: result.limits.end
+        };
+      })
     );
   }
 
   getArtistById(artistId: number): Observable<Artist> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'AudioLibrary.GetArtistDetails',
-      params: {
-        artistid: artistId,
-        properties: [
-          'thumbnail', 'fanart', 'born', 'formed', 'description',
-          'died', 'disbanded', 'yearsactive', 'instrument', 'genre',
-          'style', 'mood', 'musicbrainzartistid'
-        ]
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiArtistDetailResponse>(KODI_API_URL, request).pipe(
-      map(response => ArtistFactory.fromKodiResponse(response.result.artistdetails))
+    return this.rpc.query<KodiArtistDetailResponse['result']>('AudioLibrary.GetArtistDetails', {
+      artistid: artistId,
+      properties: ARTIST_DETAIL_PROPERTIES
+    }).pipe(
+      map(result =>
+        ArtistFactory.fromKodiResponse(result.artistdetails)
+      )
     );
   }
 
   getArtistAlbums(artistId: number): Observable<ArtistAlbumGroup[]> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'AudioLibrary.GetSongs',
-      params: {
-        filter: { artistid: artistId },
-        properties: [
-          'title', 'artist', 'albumartist', 'genre', 'year', 'rating',
-          'album', 'track', 'duration', 'playcount', 'lastplayed',
-          'thumbnail', 'file', 'artistid', 'albumid'
-        ],
-        sort: { order: 'ascending', method: 'track', ignorearticle: true }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiSongsResponse>(KODI_API_URL, request).pipe(
-      map(response => this.groupSongsByAlbumId(response.result.songs || []))
+    return this.rpc.query<KodiSongsResponse['result']>('AudioLibrary.GetSongs', {
+      filter: { artistid: artistId },
+      properties: [
+        'title', 'artist', 'albumartist', 'genre', 'year', 'rating',
+        'album', 'track', 'duration', 'playcount', 'lastplayed',
+        'thumbnail', 'file', 'artistid', 'albumid'
+      ],
+      sort: { order: 'ascending', method: 'track', ignorearticle: true }
+    }).pipe(
+      map(result => this.groupSongsByAlbumId(result.songs || []))
     );
   }
 
   addToPlaylist(artistId: number, playImmediately: boolean): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: playImmediately ? 'Player.Open' : 'Playlist.Add',
-      params: playImmediately
-        ? { item: { artistid: artistId } }
-        : { playlistid: 0, item: { artistid: artistId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return playImmediately
+      ? this.rpc.command(Methods.PlayerOpen, { item: { artistid: artistId } })
+      : this.rpc.command(Methods.PlaylistAdd, {
+          playlistid: 0,
+          item: { artistid: artistId }
+        });
   }
 
   playTrack(songId: number): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'Player.Open',
-      params: {
-        item: { songid: songId }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return this.rpc.command(Methods.PlayerOpen, { item: { songid: songId } });
   }
 
   addTrackToPlaylist(songId: number): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'Playlist.Add',
-      params: {
-        playlistid: 0,
-        item: { songid: songId }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return this.rpc.command(Methods.PlaylistAdd, {
+      playlistid: 0,
+      item: { songid: songId }
+    });
   }
 
-  private buildArtistsRequest(params: ArtistSearchParams): KodiJsonRpcRequest {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'AudioLibrary.GetArtists',
-      params: {
-        limits: {
-          start: params.start,
-          end: params.end
-        },
-        properties: [
-          'thumbnail', 'mood', 'genre', 'style'
-        ],
-        sort: { order: 'ascending', method: 'artist' }
+  private buildArtistsParams(params: ArtistSearchParams): Record<string, unknown> {
+    const query: Record<string, unknown> = {
+      limits: {
+        start: params.start,
+        end: params.end
       },
-      id: this.getNextId()
+      properties: ['thumbnail', 'mood', 'genre', 'style'],
+      sort: { order: 'ascending', method: 'artist' }
     };
 
     if (params.searchTerm) {
-      (request.params as Record<string, unknown>)['filter'] = {
+      query['filter'] = {
         field: 'artist',
         operator: 'contains',
         value: params.searchTerm
       };
     }
 
-    return request;
+    return query;
   }
 
   /**
@@ -222,7 +195,31 @@ export class ArtistKodiRepository extends ArtistRepository {
     return Object.values(albumGroups);
   }
 
-  private getNextId(): number {
-    return this.requestId++;
+  updateArtist(artistId: number, patch: ArtistUpdate): Observable<void> {
+    return this.rpc.command(Methods.AudioLibrarySetArtistDetails, {
+      artistid: artistId,
+      ...this.toKodiParams(patch)
+    });
+  }
+
+  /**
+   * Solo viajan los campos presentes. `undefined` significa "no tocar" y se
+   * descarta; `null` si viaja, porque en las listas y el artwork borra el valor.
+   */
+  private toKodiParams(patch: ArtistUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof ArtistUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
   }
 }

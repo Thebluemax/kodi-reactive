@@ -8,6 +8,7 @@
       <app-media-tile
         [title]="movie.title"
         [subtitle]="movie.genre.join(', ')"
+        imageFit="height"
         [thumbnail]="movie.fanart"
         [year]="movie.year"
         [item]="movie"
@@ -15,6 +16,14 @@
         (itemSelected)="onMovieSelected($event)"
         (addToPlaylist)="onAddToPlaylist($event)"
       />
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state
+          icon="film-outline" message="No hay películas en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
+      }
     }
   </ion-list>
 
@@ -40,6 +49,9 @@
         onAddToPlaylist({ media: selectedMovie()!, playMedia: false })
       "
       (actorSelected)="onActorSelectedFromMovie($event)"
+      (editRequested)="onEditRequested($event)"
+      (refreshRequested)="onRefreshRequested($event)"
+      (reloadRequested)="onReloadRequested($event)"
     />
   }
 
@@ -52,3 +64,39 @@
     />
   }
 </app-lateral-panel>
+
+<!--
+  Fuera del panel lateral: se saca a si mismo a document.body, asi que ningun
+  modal montado dentro de la aplicacion queda por encima de el.
+-->
+<ion-modal
+  [isOpen]="movieBeingEdited() !== null"
+  (ionModalDidDismiss)="onEditCancelled()"
+>
+  <ng-template>
+    <app-media-edit-modal
+      [title]="'Editar ' + (movieBeingEdited()?.title ?? '')"
+      [schema]="editSchema"
+      [value]="editValue()"
+      [artwork]="editArtwork()"
+      [saving]="isSaving()"
+      (save)="onEditSave($event)"
+      (cancelled)="onEditCancelled()"
+    />
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  [isOpen]="movieBeingRefreshed() !== null"
+  (ionModalDidDismiss)="onRefreshCancelled()"
+>
+  <ng-template>
+    <app-media-refresh-modal
+      [initial]="refreshValue()"
+      [showYear]="true"
+      [showUniqueId]="true"
+      (confirmed)="onRefreshConfirmed($event)"
+      (cancelled)="onRefreshCancelled()"
+    />
+  </ng-template>
+</ion-modal>

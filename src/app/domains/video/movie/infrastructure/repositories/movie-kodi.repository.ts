@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -13,19 +12,10 @@ import {
   MovieListResult,
   MovieSearchParams,
   MovieFactory,
-  KodiMovieResponse
-} from '../../domain/entities/movie.entity';
-import { environment } from 'src/environments/environment';
-
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
-
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
+  KodiMovieResponse, MovieUpdate } from '../../domain/entities/movie.entity';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
+import { Methods } from '@shared/enums/methods';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 
 interface KodiMoviesResponse {
   result: {
@@ -44,95 +34,170 @@ interface KodiMovieDetailResponse {
   };
 }
 
-const MOVIE_PROPERTIES = [
-  'title', 'genre', 'year', 'rating', 'runtime', 'plot',
-  'director', 'cast', 'thumbnail', 'fanart', 'playcount',
-  'dateadded', 'file', 'tagline', 'studio', 'country'
+/** Traduccion del vocabulario del dominio al de VideoLibrary.SetMovieDetails. */
+const UPDATE_PARAM_NAMES: Record<keyof MovieUpdate, string> = {
+  title: 'title',
+  originalTitle: 'originaltitle',
+  sortTitle: 'sorttitle',
+  tagline: 'tagline',
+  plot: 'plot',
+  plotOutline: 'plotoutline',
+  genre: 'genre',
+  director: 'director',
+  writer: 'writer',
+  studio: 'studio',
+  country: 'country',
+  tag: 'tag',
+  showlink: 'showlink',
+  year: 'year',
+  premiered: 'premiered',
+  runtime: 'runtime',
+  rating: 'rating',
+  userRating: 'userrating',
+  votes: 'votes',
+  top250: 'top250',
+  mpaa: 'mpaa',
+  imdbNumber: 'imdbnumber',
+  trailer: 'trailer',
+  set: 'set',
+  art: 'art',
+  uniqueId: 'uniqueid'
+};
+
+/**
+ * Los parametros del refresco son opcionales en la API y tienen sus propios
+ * valores por defecto: sin `title` Kodi lo deduce del archivo, y `ignorenfo` es
+ * false. Mandarlos vacios no aporta nada, asi que solo viaja lo que se indica.
+ */
+function toRefreshParams(options: MediaRefreshOptions): Record<string, unknown> {
+  const params: Record<string, unknown> = {};
+  const title = options.title?.trim() ?? '';
+
+  if (title.length > 0) {
+    params['title'] = title;
+  }
+
+  if (options.ignoreNfo) {
+    params['ignorenfo'] = true;
+  }
+
+  return params;
+}
+
+/** El detalle alimenta el editor: pide todo lo que SetMovieDetails escribe. */
+const MOVIE_DETAIL_PROPERTIES = [
+  'title', 'originaltitle', 'sorttitle', 'genre', 'year', 'premiered',
+  'rating', 'userrating', 'votes', 'top250', 'runtime', 'plot', 'plotoutline',
+  'director', 'writer', 'cast', 'studio', 'country', 'tag', 'showlink',
+  'mpaa', 'imdbnumber', 'trailer', 'set', 'tagline',
+  'thumbnail', 'fanart', 'art', 'playcount', 'dateadded', 'file'
+];
+
+/**
+ * La lista pagina y sus tarjetas solo pintan titulo, generos, fanart y año.
+ * Al abrir el detalle la pelicula se recarga entera de todas formas.
+ */
+const MOVIE_LIST_PROPERTIES = [
+  'title', 'genre', 'fanart', 'year'
 ];
 
 @Injectable({
   providedIn: 'root'
 })
 export class MovieKodiRepository extends MovieRepository {
-  private readonly http = inject(HttpClient);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getMovies(params: MovieSearchParams): Observable<MovieListResult> {
-    const request = this.buildMoviesRequest(params);
-
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
-      map(response => ({
-        movies: MovieFactory.fromKodiResponseList(response.result.movies || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+    return this.rpc
+      .query<KodiMoviesResponse['result']>(
+        Methods.VideoLibraryGetMovies,
+        this.buildMoviesParams(params)
+      )
+      .pipe(
+      map(result => {
+        return {
+        movies: MovieFactory.fromKodiResponseList(result.movies || []),
+        total: result.limits.total,
+        start: result.limits.start,
+        end: result.limits.end
+        };
+      })
     );
   }
 
   getMovieById(movieId: number): Observable<Movie> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetMovieDetails',
-      params: {
-        movieid: movieId,
-        properties: MOVIE_PROPERTIES
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiMovieDetailResponse>(KODI_API_URL, request).pipe(
-      map(response => {
-        if ((response as any).error) {
-          throw new Error((response as any).error.message || 'Unknown Kodi error');
-        }
-        return MovieFactory.fromKodiResponse(response.result.moviedetails);
+    return this.rpc.query<KodiMovieDetailResponse['result']>('VideoLibrary.GetMovieDetails', {
+      movieid: movieId,
+      properties: MOVIE_DETAIL_PROPERTIES
+    }).pipe(
+      map(result => {
+        return MovieFactory.fromKodiResponse(result.moviedetails);
       })
     );
   }
 
   addToPlaylist(movieId: number, playImmediately: boolean): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: playImmediately ? 'Player.Open' : 'Playlist.Add',
-      params: playImmediately
-        ? { item: { movieid: movieId } }
-        : { playlistid: 1, item: { movieid: movieId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return playImmediately
+      ? this.rpc.command(Methods.PlayerOpen, { item: { movieid: movieId } })
+      : this.rpc.command(Methods.PlaylistAdd, {
+          playlistid: 1,
+          item: { movieid: movieId }
+        });
   }
 
-  private buildMoviesRequest(params: MovieSearchParams): KodiJsonRpcRequest {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetMovies',
-      params: {
-        limits: {
-          start: params.start,
-          end: params.end
-        },
-        properties: MOVIE_PROPERTIES,
-        sort: { order: 'ascending', method: 'title' }
+  private buildMoviesParams(params: MovieSearchParams): Record<string, unknown> {
+    const query: Record<string, unknown> = {
+      limits: {
+        start: params.start,
+        end: params.end
       },
-      id: this.getNextId()
+      properties: MOVIE_LIST_PROPERTIES,
+      sort: { order: 'ascending', method: 'title' }
     };
 
     if (params.searchTerm) {
-      (request.params as Record<string, unknown>)['filter'] = {
+      query['filter'] = {
         field: params.field || 'title',
         operator: params.operator || 'contains',
         value: params.searchTerm
       };
     }
 
-    return request;
+    return query;
   }
 
-  private getNextId(): number {
-    return this.requestId++;
+  updateMovie(movieId: number, patch: MovieUpdate): Observable<void> {
+    return this.rpc.command(Methods.VideoLibrarySetMovieDetails, {
+      movieid: movieId,
+      ...this.toKodiParams(patch)
+    });
+  }
+
+  /**
+   * Solo viajan los campos presentes. `undefined` significa "no tocar" y se
+   * descarta; `null` si viaja, porque en las listas y el artwork borra el valor.
+   */
+  private toKodiParams(patch: MovieUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof MovieUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
+  }
+
+  refreshMovie(movieId: number, options: MediaRefreshOptions): Observable<void> {
+    return this.rpc.command(Methods.VideoLibraryRefreshMovie, {
+      movieid: movieId,
+      ...toRefreshParams(options)
+    });
   }
 }

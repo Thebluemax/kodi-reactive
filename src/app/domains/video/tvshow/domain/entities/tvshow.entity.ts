@@ -2,6 +2,8 @@
 // DOMAIN ENTITY - TVShow
 // ==========================================================================
 
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+
 import { CastMember, KodiCastResponse } from '@domains/video/movie';
 
 /**
@@ -23,6 +25,64 @@ export interface TVShow {
   readonly playCount: number;
   readonly dateAdded: string;
   readonly studio: string[];
+  readonly originalTitle: string;
+  readonly sortTitle: string;
+  /**
+   * Fecha de estreno. SetTVShowDetails no acepta `year`: el año que la entidad
+   * expone es de lectura y sale de aqui.
+   */
+  readonly premiered: string;
+  readonly mpaa: string;
+  readonly imdbNumber: string;
+  /** Cadena, no numero, igual que en pelicula. */
+  readonly votes: string;
+  readonly userRating: number;
+  readonly episodeGuide: string;
+  readonly tag: string[];
+  /** Enumerado cerrado de la API. */
+  readonly status: string;
+  /** En segundos. */
+  readonly runtime: number;
+  readonly art: MediaArtworkSet;
+  /** Carpeta de la serie. Solo lectura: la API no admite escribirla. */
+  readonly file: string;
+}
+
+/** Valores que VideoLibrary.SetTVShowDetails admite en `status`. */
+export const TVSHOW_STATUSES = [
+  'returning series',
+  'in production',
+  'planned',
+  'cancelled',
+  'ended'
+] as const;
+
+/**
+ * TVShow Update
+ * Campos que VideoLibrary.SetTVShowDetails admite escribir. Todos opcionales:
+ * un campo ausente le dice a Kodi que no lo toque.
+ *
+ * No incluye `year`, que la API no admite escribir para series, ni `cast`, que
+ * no es editable en ningun medio.
+ */
+export interface TVShowUpdate {
+  readonly title?: string;
+  readonly originalTitle?: string;
+  readonly sortTitle?: string;
+  readonly plot?: string;
+  readonly genre?: string[] | null;
+  readonly studio?: string[] | null;
+  readonly tag?: string[] | null;
+  readonly premiered?: string;
+  readonly runtime?: number;
+  readonly rating?: number;
+  readonly userRating?: number;
+  readonly votes?: string;
+  readonly mpaa?: string;
+  readonly imdbNumber?: string;
+  readonly episodeGuide?: string;
+  readonly status?: string;
+  readonly art?: MediaArtworkSet | null;
 }
 
 /**
@@ -109,7 +169,20 @@ export class TVShowFactory {
       episode: raw.episode || 0,
       playCount: raw.playcount || 0,
       dateAdded: raw.dateadded || '',
-      studio: raw.studio || []
+      studio: raw.studio || [],
+      originalTitle: raw.originaltitle || '',
+      sortTitle: raw.sorttitle || '',
+      premiered: raw.premiered || '',
+      mpaa: raw.mpaa || '',
+      imdbNumber: raw.imdbnumber || '',
+      votes: raw.votes || '',
+      userRating: raw.userrating || 0,
+      episodeGuide: raw.episodeguide || '',
+      tag: raw.tag || [],
+      status: raw.status || '',
+      runtime: raw.runtime || 0,
+      art: raw.art ?? {},
+      file: raw.file || ''
     };
   }
 
@@ -187,6 +260,19 @@ export interface KodiTVShowResponse {
   playcount?: number;
   dateadded?: string;
   studio?: string[];
+  originaltitle?: string;
+  sorttitle?: string;
+  premiered?: string;
+  mpaa?: string;
+  imdbnumber?: string;
+  votes?: string;
+  userrating?: number;
+  episodeguide?: string;
+  tag?: string[];
+  status?: string;
+  runtime?: number;
+  art?: Record<string, string>;
+  file?: string;
 }
 
 export interface KodiSeasonResponse {

@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -14,16 +13,7 @@ import {
   MovieFactory,
   KodiMovieResponse
 } from '@domains/video/movie/domain/entities/movie.entity';
-import { environment } from 'src/environments/environment';
-
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
-
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
 
 interface KodiMoviesResponse {
   result: {
@@ -50,23 +40,17 @@ const MOVIE_PROPERTIES_FULL = [
   providedIn: 'root'
 })
 export class ActorKodiRepository extends ActorRepository {
-  private readonly http = inject(HttpClient);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getActors(): Observable<ActorListResult> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetMovies',
-      params: {
-        properties: MOVIE_PROPERTIES_FOR_ACTORS,
-        sort: { order: 'ascending', method: 'title' }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
-      map(response => {
-        const movies = MovieFactory.fromKodiResponseList(response.result.movies || []);
+    return this.rpc.query<KodiMoviesResponse['result']>('VideoLibrary.GetMovies', {
+      properties: MOVIE_PROPERTIES_FOR_ACTORS,
+      sort: { order: 'ascending', method: 'title' }
+    }).pipe(
+      map(result => {
+        const movies = MovieFactory.fromKodiResponseList(
+          result.movies || []
+        );
         const actors = ActorFactory.fromMovieCastData(movies);
         return {
           actors,
@@ -77,27 +61,18 @@ export class ActorKodiRepository extends ActorRepository {
   }
 
   getMoviesByActor(actorName: string): Observable<Movie[]> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetMovies',
-      params: {
-        properties: MOVIE_PROPERTIES_FULL,
-        filter: {
-          field: 'actor',
-          operator: 'is',
-          value: actorName
-        },
-        sort: { order: 'ascending', method: 'title' }
+    return this.rpc.query<KodiMoviesResponse['result']>('VideoLibrary.GetMovies', {
+      properties: MOVIE_PROPERTIES_FULL,
+      filter: {
+        field: 'actor',
+        operator: 'is',
+        value: actorName
       },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiMoviesResponse>(KODI_API_URL, request).pipe(
-      map(response => MovieFactory.fromKodiResponseList(response.result.movies || []))
+      sort: { order: 'ascending', method: 'title' }
+    }).pipe(
+      map(result =>
+        MovieFactory.fromKodiResponseList(result.movies || [])
+      )
     );
-  }
-
-  private getNextId(): number {
-    return this.requestId++;
   }
 }

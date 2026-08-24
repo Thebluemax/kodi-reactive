@@ -19,6 +19,11 @@ export enum Methods {
   ApplicationSetVolume = 'Application.SetVolume',
   ApplicationGetProperties = 'Application.GetProperties',
 
+  // AudioLibrary - Escritura
+  AudioLibrarySetAlbumDetails = 'AudioLibrary.SetAlbumDetails',
+  AudioLibrarySetArtistDetails = 'AudioLibrary.SetArtistDetails',
+  AudioLibrarySetSongDetails = 'AudioLibrary.SetSongDetails',
+
   // AudioLibrary - Maintenance
   AudioLibraryScan = 'AudioLibrary.Scan',
   AudioLibraryClean = 'AudioLibrary.Clean',
@@ -29,6 +34,22 @@ export enum Methods {
   AudioLibraryOnCleanStarted = 'AudioLibrary.OnCleanStarted',
   AudioLibraryOnCleanFinished = 'AudioLibrary.OnCleanFinished',
 
+  // Metodos que hasta ahora se escribian a mano en los repositorios
+  AudioLibraryGetAlbumDetails = 'AudioLibrary.GetAlbumDetails',
+  AudioLibraryGetArtistDetails = 'AudioLibrary.GetArtistDetails',
+  PlayerGetActivePlayers = 'Player.GetActivePlayers',
+  PlayerOpen = 'Player.Open',
+  PlaylistAdd = 'Playlist.Add',
+  PlaylistClear = 'Playlist.Clear',
+  PlaylistGetProperties = 'Playlist.GetProperties',
+  PlaylistRemove = 'Playlist.Remove',
+  PlaylistSwap = 'Playlist.Swap',
+
+  // Files
+  FilesGetSources = 'Files.GetSources',
+  FilesGetDirectory = 'Files.GetDirectory',
+  FilesPrepareDownload = 'Files.PrepareDownload',
+
   // VideoLibrary
   VideoLibraryGetMovies = 'VideoLibrary.GetMovies',
   VideoLibraryGetMovieDetails = 'VideoLibrary.GetMovieDetails',
@@ -37,6 +58,16 @@ export enum Methods {
   VideoLibraryGetSeasons = 'VideoLibrary.GetSeasons',
   VideoLibraryGetEpisodes = 'VideoLibrary.GetEpisodes',
   VideoLibraryGetGenres = 'VideoLibrary.GetGenres',
+
+  // VideoLibrary - Re-scrapeo
+  VideoLibraryRefreshMovie = 'VideoLibrary.RefreshMovie',
+  VideoLibraryRefreshTVShow = 'VideoLibrary.RefreshTVShow',
+  VideoLibraryRefreshEpisode = 'VideoLibrary.RefreshEpisode',
+  VideoLibraryRefreshMusicVideo = 'VideoLibrary.RefreshMusicVideo',
+
+  // VideoLibrary - Escritura
+  VideoLibrarySetMovieDetails = 'VideoLibrary.SetMovieDetails',
+  VideoLibrarySetTVShowDetails = 'VideoLibrary.SetTVShowDetails',
 
   // VideoLibrary - Maintenance
   VideoLibraryScan = 'VideoLibrary.Scan',

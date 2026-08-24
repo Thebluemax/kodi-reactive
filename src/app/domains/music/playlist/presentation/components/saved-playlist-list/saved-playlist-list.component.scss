@@ -17,27 +17,4 @@
       }
     }
   }
-
-  .empty-message {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 60%;
-    text-align: center;
-
-    ion-icon {
-      font-size: 3em;
-      margin-bottom: 12px;
-    }
-
-    p {
-      margin: 4px 0;
-      font-size: 0.95em;
-    }
-
-    .hint {
-      font-size: 0.8em;
-    }
-  }
 }

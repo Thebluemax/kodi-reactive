@@ -8,12 +8,21 @@
       <app-media-tile
         [title]="tvshow.title"
         [subtitle]="tvshow.genre.join(', ')"
+        imageFit="height"
         [thumbnail]="tvshow.fanart"
         [year]="tvshow.year"
         [item]="tvshow"
         [showActionButtons]="false"
         (itemSelected)="onTVShowSelected($event)"
       />
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state
+          icon="tv" message="No hay series en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
+      }
     }
   </ion-list>
 
@@ -37,6 +46,45 @@
       (seasonSelected)="onSeasonSelected($event)"
       (playEpisode)="onPlayEpisode($event)"
       (addEpisodeToQueue)="onAddEpisodeToQueue($event)"
+      (editRequested)="onEditRequested($event)"
+      (refreshRequested)="onRefreshRequested($event)"
+      (reloadRequested)="onReloadRequested($event)"
     />
   }
 </app-lateral-panel>
+
+<!--
+  Fuera del panel lateral: se saca a si mismo a document.body, asi que ningun
+  modal montado dentro de la aplicacion queda por encima de el.
+-->
+<ion-modal
+  [isOpen]="tvshowBeingEdited() !== null"
+  (ionModalDidDismiss)="onEditCancelled()"
+>
+  <ng-template>
+    <app-media-edit-modal
+      [title]="'Editar ' + (tvshowBeingEdited()?.title ?? '')"
+      [schema]="editSchema"
+      [value]="editValue()"
+      [artwork]="editArtwork()"
+      [saving]="isSaving()"
+      (save)="onEditSave($event)"
+      (cancelled)="onEditCancelled()"
+    />
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  [isOpen]="tvshowBeingRefreshed() !== null"
+  (ionModalDidDismiss)="onRefreshCancelled()"
+>
+  <ng-template>
+    <app-media-refresh-modal
+      [initial]="refreshValue()"
+      [showYear]="true"
+      [showRefreshEpisodes]="true"
+      (confirmed)="onRefreshConfirmed($event)"
+      (cancelled)="onRefreshCancelled()"
+    />
+  </ng-template>
+</ion-modal>

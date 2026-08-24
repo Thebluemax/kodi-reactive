@@ -37,6 +37,17 @@
           <ion-icon slot="start" name="duplicate-outline" />
           Agregar a cola
         </ion-button>
+        <ion-button fill="outline" (click)="editRequested.emit(movie())">
+          <ion-icon slot="start" name="create" />
+          Editar
+        </ion-button>
+        <ion-button fill="outline" (click)="refreshRequested.emit(movie())">
+          <ion-icon slot="start" name="refresh-outline" />
+          Volver a buscar
+        </ion-button>
+        <ion-button fill="clear" (click)="reloadRequested.emit(movie())" title="Recargar datos">
+          <ion-icon slot="icon-only" name="reload-outline" />
+        </ion-button>
       </div>
 
       @if (movie().director.length) {
@@ -81,5 +92,10 @@
         </ion-list>
       </div>
     }
+
+    <app-media-path
+      [path]="movie().file"
+      emptyMessage="Kodi no ha devuelto la ruta de este archivo"
+    />
   </div>
 </ion-content>

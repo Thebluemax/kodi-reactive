@@ -15,9 +15,7 @@ import {
   IonAvatar,
   IonLabel,
   IonReorder,
-  IonText,
   AlertController,
-  ToastController,
   ItemReorderEventDetail
 } from '@ionic/angular/standalone';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
@@ -27,11 +25,14 @@ import { RemovePlaylistItemUseCase } from '../../../application/use-cases/remove
 import { ReorderPlaylistUseCase } from '../../../application/use-cases/reorder-playlist.use-case';
 import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-playlist-item.use-case';
 import { SavePlaylistUseCase } from '../../../application/use-cases/save-playlist.use-case';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-current-play-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonToolbar,
     IonButtons,
     IonButton,
@@ -43,7 +44,6 @@ import { SavePlaylistUseCase } from '../../../application/use-cases/save-playlis
     IonAvatar,
     IonLabel,
     IonReorder,
-    IonText,
     AssetsPipe
   ],
   templateUrl: './current-play-list.component.html',
@@ -52,7 +52,7 @@ import { SavePlaylistUseCase } from '../../../application/use-cases/save-playlis
 })
 export class CurrentPlayListComponent {
   private readonly alertController = inject(AlertController);
-  private readonly toastController = inject(ToastController);
+  private readonly notifications = inject(NotificationService);
   private readonly clearPlaylistUseCase = inject(ClearPlaylistUseCase);
   private readonly removePlaylistItemUseCase = inject(RemovePlaylistItemUseCase);
   private readonly reorderPlaylistUseCase = inject(ReorderPlaylistUseCase);
@@ -75,13 +75,13 @@ export class CurrentPlayListComponent {
       next: () => {
         this.playlistChanged.emit();
       },
-      error: (err) => console.error('Failed to clear playlist:', err)
+      error: () => void this.notifications.error('No se ha podido vaciar la cola')
     });
   }
 
   playItem(position: number): void {
     this.playPlaylistItemUseCase.execute(position, this.playlistId()).subscribe({
-      error: (err) => console.error('Failed to play item:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir el elemento')
     });
   }
 
@@ -91,7 +91,7 @@ export class CurrentPlayListComponent {
       next: () => {
         this.playlistChanged.emit();
       },
-      error: (err) => console.error('Failed to remove item:', err)
+      error: () => void this.notifications.error('No se ha podido quitar el elemento de la cola')
     });
   }
 
@@ -106,7 +106,7 @@ export class CurrentPlayListComponent {
         this.playlistChanged.emit();
       },
       error: (err) => {
-        console.error('Failed to reorder playlist:', err);
+        void this.notifications.error('No se ha podido reordenar la cola');
         this.playlistChanged.emit();
       }
     });
@@ -145,14 +145,7 @@ export class CurrentPlayListComponent {
     await alert.present();
   }
 
-  private async showSaveToast(name: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message: `Playlist "${name}" guardada`,
-      duration: 2000,
-      position: 'bottom',
-      color: 'success',
-      icon: 'checkmark-circle'
-    });
-    await toast.present();
+  private showSaveToast(name: string): Promise<void> {
+    return this.notifications.success(`Playlist "${name}" guardada`);
   }
 }

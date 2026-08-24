@@ -1,0 +1,115 @@
+// ==========================================================================
+// COMPONENT - Media Edit Modal (BEM)
+// ==========================================================================
+
+// Host: el componente se proyecta dentro del <ng-template> del ion-modal, donde
+// no hay ion-page que le de altura. Sin esto el ion-content colapsa y los campos
+// quedan apretados en una franja en vez de ocupar el modal.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// Block
+.media-edit {
+  flex: 1;
+
+  // Element: Title
+  // A la derecha y discreto: las acciones mandan en la barra, y un titulo de
+  // album largo no debe empujarlas ni partir la barra en dos.
+  &__title {
+    padding-inline: 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-align: end;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Element: Field
+  &__field {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+  }
+
+  // Element: Section
+  &__section {
+    margin: 24px 16px 4px;
+    font-size: 0.95em;
+    font-weight: 600;
+  }
+
+  // Element: Artwork
+  &__artwork {
+    padding-bottom: 24px;
+  }
+
+  // Element: Art row
+  &__art {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 16px;
+  }
+
+  // Element: Art preview
+  &__art-preview {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.1));
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  &__art-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  &__art-empty {
+    color: var(--ion-color-medium);
+    font-size: 0.7em;
+  }
+
+  // Element: Art field
+  &__art-field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__art-error {
+    display: block;
+    padding-top: 4px;
+    font-size: 0.75em;
+  }
+
+  // Element: Browse
+  &__art-browse {
+    --padding-start: 0;
+    margin: 0;
+    font-size: 0.85em;
+  }
+
+  // Element: Add art key
+  &__art-add {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 16px 16px 0;
+  }
+
+  // Element: Hint
+  &__hint {
+    display: block;
+    padding: 4px 16px 12px;
+    font-size: 0.75em;
+  }
+}

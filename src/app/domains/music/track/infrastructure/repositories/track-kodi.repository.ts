@@ -5,57 +5,79 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 
 import { TrackRepository } from '../../domain/repositories/track.repository';
-import { environment } from 'src/environments/environment';
+import { TrackUpdate } from '../../domain/entities/track.entity';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
+import { Methods } from '@shared/enums/methods';
 
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
-
-interface KodiJsonRpcRequest {
-  jsonrpc: '2.0';
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
+/** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
+/** Traduccion del vocabulario del dominio al de AudioLibrary.SetSongDetails. */
+const UPDATE_PARAM_NAMES: Record<keyof TrackUpdate, string> = {
+  title: 'title',
+  artists: 'artist',
+  genres: 'genre',
+  year: 'year',
+  rating: 'rating',
+  userRating: 'userrating',
+  votes: 'votes',
+  trackNumber: 'track',
+  disc: 'disc',
+  discTitle: 'disctitle',
+  duration: 'duration',
+  comment: 'comment',
+  mood: 'mood',
+  displayArtist: 'displayartist',
+  sortArtist: 'sortartist',
+  musicBrainzTrackId: 'musicbrainztrackid',
+  musicBrainzArtistId: 'musicbrainzartistid',
+  releaseDate: 'releasedate',
+  originalDate: 'originaldate',
+  bpm: 'bpm',
+  art: 'art'
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrackKodiRepository extends TrackRepository {
-  private readonly http = inject(HttpClient);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   addToPlaylist(trackId: number, playImmediately: boolean): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: playImmediately ? 'Player.Open' : 'Playlist.Add',
-      params: playImmediately
-        ? { item: { songid: trackId } }
-        : { playlistid: 0, item: { songid: trackId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return playImmediately
+      ? this.rpc.command(Methods.PlayerOpen, { item: { songid: trackId } })
+      : this.rpc.command(Methods.PlaylistAdd, {
+          playlistid: 0,
+          item: { songid: trackId }
+        });
   }
 
   playTrack(trackId: number): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Player.Open',
-      params: { item: { songid: trackId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return this.rpc.command(Methods.PlayerOpen, { item: { songid: trackId } });
   }
 
-  private getNextId(): number {
-    return this.requestId++;
+  updateSong(songId: number, patch: TrackUpdate): Observable<void> {
+    return this.rpc.command(Methods.AudioLibrarySetSongDetails, {
+      songid: songId,
+      ...this.toKodiParams(patch)
+    });
+  }
+
+  /** Solo viajan los campos presentes; `null` si viaja, porque borra el valor. */
+  private toKodiParams(patch: TrackUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof TrackUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
   }
 }

@@ -10,10 +10,18 @@ import { Artist, ArtistAlbumGroup, ArtistSearchParams } from '../../../domain/en
 import { GetArtistsUseCase } from '../../../application/use-cases/get-artists.use-case';
 import { GetArtistDetailUseCase } from '../../../application/use-cases/get-artist-detail.use-case';
 
-import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArtistDetailComponent } from '../artist-detail/artist-detail.component';
+import { UpdateArtistUseCase } from '../../../application/use-cases/update-artist.use-case';
+import { ArtistUpdate } from '../../../domain/entities/artist.entity';
+import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
+import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { ARTIST_EDIT_SCHEMA } from '../../schemas/artist-edit.schema';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 const PAGE_SIZE = 40;
 
@@ -21,10 +29,12 @@ const PAGE_SIZE = 40;
   selector: 'app-artist-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonicModule,
 
-    LateralSlideComponent,
+    LateralPanelComponent,
     ArtistDetailComponent,
+    MediaEditModalComponent,
     AssetsPipe
   ],
   templateUrl: './artist-list.component.html',
@@ -34,6 +44,8 @@ const PAGE_SIZE = 40;
 export class ArtistListComponent implements OnDestroy {
   private readonly getArtistsUseCase = inject(GetArtistsUseCase);
   private readonly getArtistDetailUseCase = inject(GetArtistDetailUseCase);
+  private readonly updateArtistUseCase = inject(UpdateArtistUseCase);
+  private readonly notifications = inject(NotificationService);
   private readonly globalSearch = inject(GlobalSearchService);
   private readonly destroy$ = new Subject<void>();
 
@@ -42,7 +54,110 @@ export class ArtistListComponent implements OnDestroy {
   readonly selectedArtist = signal<Artist | null>(null);
   readonly albums = signal<ArtistAlbumGroup[]>([]);
   readonly isLoading = signal<boolean>(false);
+  /**
+   * Motivo del ultimo fallo de carga. Sin esto una lista vacia por un fallo de
+   * red se anunciaba como biblioteca vacia.
+   */
+  readonly loadError = signal<string>('');
   readonly isPanelOpen = signal<boolean>(false);
+
+  // Edicion. El cajon lateral se saca a si mismo a document.body, fuera de
+  // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
+  readonly editSchema = ARTIST_EDIT_SCHEMA;
+  readonly artistBeingEdited = signal<Artist | null>(null);
+  readonly isSaving = signal<boolean>(false);
+
+  /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
+    const artist = this.artistBeingEdited();
+
+    if (!artist) {
+      return {};
+    }
+
+    return {
+      name: artist.name,
+      sortName: artist.sortName,
+      type: artist.type,
+      gender: artist.gender,
+      disambiguation: artist.disambiguation,
+      description: artist.description ?? '',
+      genres: artist.genres,
+      styles: artist.styles,
+      moods: artist.moods,
+      instruments: artist.instruments,
+      born: artist.born ?? '',
+      formed: artist.formed ?? '',
+      died: artist.died ?? '',
+      disbanded: artist.disbanded ?? '',
+      yearsActive: artist.yearsActive,
+      // Se lee como lista y se escribe como cadena: se muestra el primero.
+      musicBrainzId: artist.musicBrainzId?.[0] ?? ''
+    };
+  });
+
+  readonly editArtwork = computed<MediaArtworkSet | null>(
+    () => this.artistBeingEdited()?.art ?? null
+  );
+
+  onEditRequested(artist: Artist): void {
+    this.artistBeingEdited.set(artist);
+    this.isPanelOpen.set(false);
+  }
+
+  onEditCancelled(): void {
+    const artist = this.artistBeingEdited();
+
+    if (!artist) {
+      return;
+    }
+
+    this.artistBeingEdited.set(null);
+    this.restoreDetail(artist);
+  }
+
+  onEditSave(patch: MediaEditPatch): void {
+    const artist = this.artistBeingEdited();
+
+    if (!artist) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    this.updateArtistUseCase.execute(artist.artistId, patch as ArtistUpdate).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.artistBeingEdited.set(null);
+        void this.notifications.success('Artista actualizado');
+        this.restoreDetail(artist);
+        this.refreshSelectedArtist(artist.artistId);
+      },
+      error: (error: Error) => {
+        this.isSaving.set(false);
+        void this.notifications.error(error.message);
+      }
+    });
+  }
+
+  /** Cerrar el cajon emite closeSlideBar, que limpia el artista seleccionado. */
+  private restoreDetail(artist: Artist): void {
+    this.selectedArtist.set(artist);
+    this.isPanelOpen.set(true);
+  }
+
+  /** Tras guardar, el detalle debe mostrar lo que Kodi tiene ahora. */
+  private refreshSelectedArtist(artistId: number): void {
+    this.getArtistDetailUseCase
+      .execute(artistId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: result => {
+          this.selectedArtist.set(result.artist);
+          this.albums.set(result.albums);
+        }
+      });
+  }
   readonly totalArtists = signal<number>(0);
 
   private currentSearchTerm: string | null = null;
@@ -64,8 +179,10 @@ export class ArtistListComponent implements OnDestroy {
       .pipe(
         switchMap(params =>
           this.getArtistsUseCase.execute(params).pipe(
-            catchError(error => {
-              console.error('Error loading artists:', error);
+            catchError((error: Error) => {
+              this.loadError.set(
+                error.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               this.completePendingScroll();
               return EMPTY;
@@ -111,6 +228,7 @@ export class ArtistListComponent implements OnDestroy {
 
   loadArtists(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
       start: this.start,
@@ -146,7 +264,7 @@ export class ArtistListComponent implements OnDestroy {
           this.isPanelOpen.set(true);
         },
         error: error => {
-          console.error('Error loading artist details:', error);
+          void this.notifications.error('No se ha podido cargar el artista');
           this.isLoading.set(false);
         }
       });
@@ -156,5 +274,10 @@ export class ArtistListComponent implements OnDestroy {
     this.selectedArtist.set(null);
     this.albums.set([]);
     this.isPanelOpen.set(false);
+  }
+
+  /** Vuelve a intentar la carga que fallo. */
+  onRetry(): void {
+    this.loadArtists();
   }
 }

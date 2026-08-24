@@ -1,12 +1,15 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
+// Archivo base. Todas las configuraciones de angular.json lo reemplazan por su
+// entorno concreto (environment.prod.ts, environment.development.ts o
+// environment.test.ts), así que estos valores no deberían llegar a ejecutarse.
+// Se mantienen inocuos —sin producción y sin hosts de una red concreta— para
+// que una configuración a la que se le olvide el fileReplacements falle contra
+// localhost en vez de contra la LAN de otra persona.
 
 export const environment = {
-  production: true,
-  serverUrl: 'http://192.168.0.178',
+  production: false,
+  serverUrl: 'http://localhost',
   serverApiUrl: 'http://localhost',
-  socketServer: '192.168.0.178',
+  socketServer: 'localhost',
   socketPort: 9090,
   kodiHttpPort: 8080,
   apiPort: 8008,

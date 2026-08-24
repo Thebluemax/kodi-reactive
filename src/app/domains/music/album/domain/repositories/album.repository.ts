@@ -3,7 +3,7 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
-import { Album, AlbumListResult, AlbumSearchParams } from '../entities/album.entity';
+import { Album, AlbumListResult, AlbumSearchParams, AlbumUpdate } from '../entities/album.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
 
 /**
@@ -33,4 +33,11 @@ export abstract class AlbumRepository {
    * @param playImmediately - If true, starts playing immediately
    */
   abstract addToPlaylist(albumId: number, playImmediately: boolean): Observable<void>;
+
+  /**
+   * Update an album with a partial patch
+   * @param albumId - Album ID
+   * @param patch - Only the fields to change; anything absent is left untouched
+   */
+  abstract updateAlbum(albumId: number, patch: AlbumUpdate): Observable<void>;
 }

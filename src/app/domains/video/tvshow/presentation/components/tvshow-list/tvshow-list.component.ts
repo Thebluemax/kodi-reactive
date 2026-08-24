@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   effect,
+  untracked,
   DestroyRef
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,6 +15,7 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonProgressBar,
+  IonModal,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 import { EMPTY, Subject, catchError, forkJoin, switchMap } from 'rxjs';
@@ -28,11 +30,27 @@ import { GetEpisodesUseCase } from '../../../application/use-cases/get-episodes.
 import { AddEpisodeToPlaylistUseCase } from '../../../application/use-cases/add-episode-to-playlist.use-case';
 import { TVShowDetailComponent } from '../tvshow-detail/tvshow-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { UpdateTVShowUseCase } from '../../../application/use-cases/update-tvshow.use-case';
+import { RefreshTVShowUseCase } from '../../../application/use-cases/refresh-tvshow.use-case';
+import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
+import {
+  MediaRefreshModalComponent,
+  MediaRefreshRequest
+} from '@shared/components/media-refresh-modal/media-refresh-modal.component';
+import { TVShowUpdate } from '../../../domain/entities/tvshow.entity';
+import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
+import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { TVSHOW_EDIT_SCHEMA } from '../../schemas/tvshow-edit.schema';
+import { appendPage } from '@shared/utils/paginated-list';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-tvshow-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,
@@ -40,7 +58,10 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
     IonProgressBar,
     MediaTileComponent,
     LateralPanelComponent,
-    TVShowDetailComponent
+    TVShowDetailComponent,
+    IonModal,
+    MediaEditModalComponent,
+    MediaRefreshModalComponent
   ],
   templateUrl: './tvshow-list.component.html',
   styleUrl: './tvshow-list.component.scss',
@@ -50,6 +71,9 @@ export class TVShowListComponent {
   // Use Cases
   private readonly getTVShowsUseCase = inject(GetTVShowsUseCase);
   private readonly getTVShowDetailUseCase = inject(GetTVShowDetailUseCase);
+  private readonly updateTVShowUseCase = inject(UpdateTVShowUseCase);
+  private readonly refreshTVShowUseCase = inject(RefreshTVShowUseCase);
+  private readonly notifications = inject(NotificationService);
   private readonly getSeasonsUseCase = inject(GetSeasonsUseCase);
   private readonly getEpisodesUseCase = inject(GetEpisodesUseCase);
   private readonly addEpisodeToPlaylistUseCase = inject(AddEpisodeToPlaylistUseCase);
@@ -67,15 +91,34 @@ export class TVShowListComponent {
 
   // Pagination
   private readonly limit = 40;
-  private start = 0;
-  private end = this.limit;
+  /**
+   * Motivo del ultimo fallo de carga, o cadena vacia si fue bien.
+   *
+   * Sin esto una lista vacia por un fallo de red se anunciaba como biblioteca
+   * vacia: el catchError devolvia EMPTY y el empty state decia lo mismo que
+   * diria sin elementos.
+   */
+  readonly loadError = signal<string>('');
+  private readonly reachedEnd = signal<boolean>(false);
+  private readonly start = signal<number>(0);
+  private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
 
   // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
   private readonly loadRequest$ = new Subject<TVShowSearchParams>();
 
   // Computed
-  readonly hasMoreTVShows = computed(() => this.start < this.totalTVShows());
+  /**
+   * Corta por lo que hay cargado, no por `start`, que apunta al principio de la
+   * pagina ya pedida y no a la siguiente: comparandolo se pedia una pagina de
+   * mas, fuera de rango, y Kodi respondia con la lista entera.
+   *
+   * `reachedEnd` cubre el otro caso: una respuesta mas corta de lo que el total
+   * promete dejaria el scroll pidiendo indefinidamente.
+   */
+  readonly hasMoreTVShows = computed(
+    () => !this.reachedEnd() && this.tvshows().length < this.totalTVShows()
+  );
   readonly panelTitle = computed(() => this.selectedTVShow()?.title ?? '');
 
   constructor() {
@@ -83,8 +126,10 @@ export class TVShowListComponent {
       .pipe(
         switchMap(params =>
           this.getTVShowsUseCase.execute(params).pipe(
-            catchError(err => {
-              console.error('Error loading TV shows:', err);
+            catchError((err: Error) => {
+              this.loadError.set(
+                err.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               return EMPTY;
             })
@@ -94,34 +139,53 @@ export class TVShowListComponent {
       )
       .subscribe(result => {
         this.totalTVShows.set(result.total);
-        this.tvshows.update(current => [...current, ...result.tvshows]);
+        this.tvshows.update(current =>
+          appendPage(current, result.tvshows, item => item.tvshowId)
+        );
+
+        if (result.tvshows.length === 0) {
+          this.reachedEnd.set(true);
+        }
         this.isLoading.set(false);
       });
 
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
-      if (this.currentSearchTerm !== term) {
-        this.currentSearchTerm = term;
-        this.resetPagination();
-        this.loadTVShows();
-      }
+
+      // El effect solo debe depender del termino: resetPagination y loadTVShows
+      // escriben y leen los signals de paginacion, que si no quedarian
+      // registrados como dependencias del propio effect.
+      untracked(() => {
+        if (this.currentSearchTerm !== term) {
+          this.currentSearchTerm = term;
+          this.resetPagination();
+          this.loadTVShows();
+        }
+      });
     });
   }
 
   private resetPagination(): void {
-    this.start = 0;
-    this.end = this.limit;
+    this.reachedEnd.set(false);
+    this.start.set(0);
+    this.end.set(this.limit);
     this.tvshows.set([]);
   }
 
   loadTVShows(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
-      start: this.start,
-      end: this.end,
+      start: this.start(),
+      end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
+  }
+
+  /** Vuelve a pedir la pagina que fallo, sin perder lo ya cargado. */
+  onRetry(): void {
+    this.loadTVShows();
   }
 
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
@@ -130,8 +194,8 @@ export class TVShowListComponent {
       return;
     }
 
-    this.start = this.end + 1;
-    this.end = this.end + this.limit;
+    this.start.set(this.end());
+    this.end.update(current => current + this.limit);
     this.loadTVShows();
 
     setTimeout(() => event.target.complete(), 500);
@@ -159,7 +223,7 @@ export class TVShowListComponent {
         }
       },
       error: (err) => {
-        console.error('Error loading TV show detail:', err);
+        void this.notifications.error('No se ha podido cargar la serie');
         this.isLoading.set(false);
       }
     });
@@ -175,13 +239,171 @@ export class TVShowListComponent {
 
   onPlayEpisode(episodeId: number): void {
     this.addEpisodeToPlaylistUseCase.execute(episodeId, true).subscribe({
-      error: (err) => console.error('Error playing episode:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir el episodio')
     });
   }
 
   onAddEpisodeToQueue(episodeId: number): void {
     this.addEpisodeToPlaylistUseCase.execute(episodeId, false).subscribe({
-      error: (err) => console.error('Error adding episode to queue:', err)
+      error: () => void this.notifications.error('No se ha podido añadir el episodio a la cola')
+    });
+  }
+
+  // Edicion. El panel lateral se saca a si mismo a document.body, fuera de
+  // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
+  readonly editSchema = TVSHOW_EDIT_SCHEMA;
+  readonly tvshowBeingEdited = signal<TVShow | null>(null);
+  readonly tvshowBeingRefreshed = signal<TVShow | null>(null);
+
+  /** Referencia estable, como editValue. */
+  readonly refreshValue = computed<MediaRefreshRequest>(() => {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    return {
+      title: tvshow?.title ?? '',
+      year: tvshow && tvshow.year > 0 ? String(tvshow.year) : '',
+      uniqueId: '',
+      ignoreNfo: false,
+      refreshEpisodes: false
+    };
+  });
+  readonly isSaving = signal<boolean>(false);
+
+  /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
+    const tvshow = this.tvshowBeingEdited();
+
+    if (!tvshow) {
+      return {};
+    }
+
+    return {
+      title: tvshow.title,
+      originalTitle: tvshow.originalTitle,
+      sortTitle: tvshow.sortTitle,
+      plot: tvshow.plot,
+      status: tvshow.status,
+      genre: tvshow.genre,
+      studio: tvshow.studio,
+      tag: tvshow.tag,
+      premiered: tvshow.premiered,
+      runtime: tvshow.runtime,
+      rating: tvshow.rating,
+      userRating: tvshow.userRating,
+      votes: tvshow.votes,
+      mpaa: tvshow.mpaa,
+      imdbNumber: tvshow.imdbNumber,
+      episodeGuide: tvshow.episodeGuide
+    };
+  });
+
+  readonly editArtwork = computed<MediaArtworkSet | null>(
+    () => this.tvshowBeingEdited()?.art ?? null
+  );
+
+  /**
+   * El panel se aparta mientras se pide el titulo: se saca a si mismo a
+   * document.body en su ngOnInit, fuera de ion-app.
+   */
+  onRefreshRequested(tvshow: TVShow): void {
+    this.tvshowBeingRefreshed.set(tvshow);
+    this.isPanelOpen.set(false);
+  }
+
+  onRefreshCancelled(): void {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingRefreshed.set(null);
+    this.restoreDetail(tvshow);
+  }
+
+  onRefreshConfirmed(request: MediaRefreshRequest): void {
+    const tvshow = this.tvshowBeingRefreshed();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingRefreshed.set(null);
+    this.restoreDetail(tvshow);
+    this.refreshTVShow(tvshow, {
+      title: buildSearchTitle(request.title, request.year),
+      ignoreNfo: request.ignoreNfo,
+      refreshEpisodes: request.refreshEpisodes
+    });
+  }
+
+  onReloadRequested(tvshow: TVShow): void {
+    this.refreshSelectedTVShow(tvshow.tvshowId);
+    void this.notifications.info('Datos recargados desde Kodi');
+  }
+
+  private refreshTVShow(tvshow: TVShow, options: MediaRefreshOptions): void {
+    this.refreshTVShowUseCase.execute(tvshow.tvshowId, options).subscribe({
+      next: () => {
+        // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras.
+        void this.notifications.info(
+          'Kodi está buscando los datos. Usa «recargar» cuando termine.'
+        );
+      },
+      error: (error: Error) => void this.notifications.error(error.message)
+    });
+  }
+
+  onEditRequested(tvshow: TVShow): void {
+    this.tvshowBeingEdited.set(tvshow);
+    this.isPanelOpen.set(false);
+  }
+
+  onEditCancelled(): void {
+    const tvshow = this.tvshowBeingEdited();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.tvshowBeingEdited.set(null);
+    this.restoreDetail(tvshow);
+  }
+
+  onEditSave(patch: MediaEditPatch): void {
+    const tvshow = this.tvshowBeingEdited();
+
+    if (!tvshow) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    this.updateTVShowUseCase.execute(tvshow.tvshowId, patch as TVShowUpdate).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.tvshowBeingEdited.set(null);
+        void this.notifications.success('Serie actualizada');
+        this.restoreDetail(tvshow);
+        this.refreshSelectedTVShow(tvshow.tvshowId);
+      },
+      error: (error: Error) => {
+        this.isSaving.set(false);
+        void this.notifications.error(error.message);
+      }
+    });
+  }
+
+  /** Cerrar el panel emite panelClosed, que limpia la serie seleccionada. */
+  private restoreDetail(tvshow: TVShow): void {
+    this.selectedTVShow.set(tvshow);
+    this.isPanelOpen.set(true);
+  }
+
+  /** Tras guardar, el detalle debe mostrar lo que Kodi tiene ahora. */
+  private refreshSelectedTVShow(tvshowId: number): void {
+    this.getTVShowDetailUseCase.execute(tvshowId).subscribe({
+      next: detail => this.selectedTVShow.set(detail)
     });
   }
 
@@ -199,7 +421,7 @@ export class TVShowListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading episodes:', err);
+        void this.notifications.error('No se han podido cargar los episodios');
         this.isLoading.set(false);
       }
     });

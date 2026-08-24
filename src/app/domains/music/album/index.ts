@@ -9,6 +9,7 @@ export {
   AlbumSearchParams,
   AlbumSearchField,
   AlbumSearchOperator,
+  AlbumUpdate,
   AlbumFactory
 } from './domain/entities/album.entity';
 
@@ -18,6 +19,7 @@ export { AlbumRepository } from './domain/repositories/album.repository';
 // Application - Use Cases
 export { GetAlbumsUseCase } from './application/use-cases/get-albums.use-case';
 export { GetAlbumDetailUseCase, AlbumDetailResult } from './application/use-cases/get-album-detail.use-case';
+export { UpdateAlbumUseCase } from './application/use-cases/update-album.use-case';
 export { AddAlbumToPlaylistUseCase } from './application/use-cases/add-album-to-playlist.use-case';
 
 // Presentation - Components

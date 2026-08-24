@@ -19,6 +19,14 @@
           <ion-card-title>{{ artist.name }}</ion-card-title>
         </ion-card-header>
       </ion-card>
+    } @empty {
+      @if (!isLoading()) {
+        <app-empty-state
+          icon="people" message="No hay artistas en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
+      }
     }
   </ion-list>
 
@@ -27,12 +35,37 @@
   </ion-infinite-scroll>
 </ion-content>
 
-<app-lateral-slide
-  [id]="'artistDetail'"
+<app-lateral-panel
+  [panelId]="'artistDetail'"
   [title]="selectedArtist()?.name ?? ''"
-  [openSlideBar]="isPanelOpen()"
+  [isOpen]="isPanelOpen()"
   [customWidth]="'60%'"
-  (closeSlideBar)="onClosePanel()"
+  (panelClosed)="onClosePanel()"
 >
-  <app-artist-detail [artist]="selectedArtist()" [albums]="albums()" />
-</app-lateral-slide>
+  <app-artist-detail
+    [artist]="selectedArtist()"
+    [albums]="albums()"
+    (editRequested)="onEditRequested($event)"
+  />
+</app-lateral-panel>
+
+<!--
+  Fuera del cajon lateral: se saca a si mismo a document.body, asi que ningun
+  modal montado dentro de la aplicacion queda por encima de el.
+-->
+<ion-modal
+  [isOpen]="artistBeingEdited() !== null"
+  (ionModalDidDismiss)="onEditCancelled()"
+>
+  <ng-template>
+    <app-media-edit-modal
+      [title]="'Editar ' + (artistBeingEdited()?.name ?? '')"
+      [schema]="editSchema"
+      [value]="editValue()"
+      [artwork]="editArtwork()"
+      [saving]="isSaving()"
+      (save)="onEditSave($event)"
+      (cancelled)="onEditCancelled()"
+    />
+  </ng-template>
+</ion-modal>

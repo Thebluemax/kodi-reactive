@@ -3,7 +3,8 @@
 // ==========================================================================
 
 import { Observable } from 'rxjs';
-import { Movie, MovieListResult, MovieSearchParams } from '../entities/movie.entity';
+import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
+import { Movie, MovieListResult, MovieSearchParams, MovieUpdate } from '../entities/movie.entity';
 
 /**
  * Movie Repository Interface
@@ -27,4 +28,18 @@ export abstract class MovieRepository {
    * @param playImmediately - If true, starts playing immediately
    */
   abstract addToPlaylist(movieId: number, playImmediately: boolean): Observable<void>;
+
+  /**
+   * Update a movie with a partial patch
+   * @param movieId - Movie ID
+   * @param patch - Only the fields to change; anything absent is left untouched
+   */
+  abstract updateMovie(movieId: number, patch: MovieUpdate): Observable<void>;
+
+  /**
+   * Ask Kodi to scrape the movie again
+   * @param movieId - Movie ID
+   * @param options - Title to search with, and whether to ignore a local NFO
+   */
+  abstract refreshMovie(movieId: number, options: MediaRefreshOptions): Observable<void>;
 }

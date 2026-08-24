@@ -42,22 +42,11 @@
     }
   }
 
+  // Ionic aplica estos dos desde su propio shadow DOM con mas peso que un
+  // estilo de componente: sin !important no hay forma de ganarle.
   .input-wrapper {
     align-self: center !important;
     text-overflow: unset !important;
     overflow: inherit;
-  }
-
-  .empty-message {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    text-align: center;
-
-    p {
-      margin: 0;
-      font-size: 0.9em;
-    }
   }
 }

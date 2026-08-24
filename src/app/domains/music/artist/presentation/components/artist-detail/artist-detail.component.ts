@@ -13,6 +13,7 @@ import { AddAlbumToPlaylistUseCase } from '@domains/music/album';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArrayToStringPipe } from '@shared/pipes/array-to-string.pipe';
 import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-artist-detail',
@@ -28,6 +29,7 @@ import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArtistDetailComponent {
+  private readonly notifications = inject(NotificationService);
   private readonly addArtistToPlaylistUseCase = inject(AddArtistToPlaylistUseCase);
   private readonly playTrackUseCase = inject(PlayTrackUseCase);
   private readonly addTrackToPlaylistUseCase = inject(AddTrackToPlaylistUseCase);
@@ -40,37 +42,37 @@ export class ArtistDetailComponent {
   // Outputs (signal-based)
   trackSelected = output<Track>();
   albumSelected = output<number>();
+  /**
+   * El modal no se monta aqui: este componente vive dentro del cajon lateral,
+   * que se saca a si mismo a document.body. Lo presenta el contenedor.
+   */
+  editRequested = output<Artist>();
 
   onPlayTrack(track: Track): void {
-    console.log('onPlayTrack called with track:', track);
-    console.log('songId:', track.songId);
     this.playTrackUseCase.execute(track.songId).subscribe({
       next: () => {
-        console.log('Track play success:', track.title);
         this.trackSelected.emit(track);
       },
-      error: error => console.error('Error playing track:', error)
+      error: () => void this.notifications.error('No se ha podido reproducir la pista')
     });
   }
 
   onAddTrackToPlaylist(track: Track): void {
     this.addTrackToPlaylistUseCase.execute(track.songId, false).subscribe({
-      next: () => console.log('Track added to playlist:', track.title),
-      error: error => console.error('Error adding track to playlist:', error)
+      error: () => void this.notifications.error('No se ha podido añadir la pista a la cola')
     });
   }
 
   onPlayAlbum(albumId: number): void {
     this.addAlbumToPlaylistUseCase.execute(albumId, true).subscribe({
       next: () => this.albumSelected.emit(albumId),
-      error: error => console.error('Error playing album:', error)
+      error: () => void this.notifications.error('No se ha podido reproducir el álbum')
     });
   }
 
   onAddAlbumToPlaylist(albumId: number): void {
     this.addAlbumToPlaylistUseCase.execute(albumId, false).subscribe({
-      next: () => console.log('Album added to playlist:', albumId),
-      error: error => console.error('Error adding album to playlist:', error)
+      error: () => void this.notifications.error('No se ha podido añadir el álbum a la cola')
     });
   }
 
@@ -80,8 +82,7 @@ export class ArtistDetailComponent {
     this.addArtistToPlaylistUseCase
       .execute(artist.artistId, true)
       .subscribe({
-        next: () => console.log('Playing artist:', artist.name),
-        error: error => console.error('Error playing artist:', error)
+      error: () => void this.notifications.error('No se ha podido reproducir el artista')
       });
   }
 
@@ -91,8 +92,7 @@ export class ArtistDetailComponent {
     this.addArtistToPlaylistUseCase
       .execute(artist.artistId, false)
       .subscribe({
-        next: () => console.log('Added artist to playlist:', artist.name),
-        error: error => console.error('Error adding artist to playlist:', error)
+      error: () => void this.notifications.error('No se ha podido añadir el artista a la cola')
       });
   }
 }

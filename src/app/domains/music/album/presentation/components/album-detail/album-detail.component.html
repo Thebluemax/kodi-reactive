@@ -24,6 +24,10 @@
           <ion-icon slot="start" name="duplicate-outline" />
           Agregar a cola
         </ion-button>
+        <ion-button fill="outline" (click)="onEdit()">
+          <ion-icon slot="start" name="create" />
+          Editar
+        </ion-button>
       </div>
       @if (album().description) {
         <div class="album-detail__description">
@@ -41,6 +45,11 @@
                 >{{ track.trackNumber }}.</span
               >
               {{ track.title }}
+              @if (track.file) {
+                <p class="album-detail__track-file" [title]="track.file">
+                  {{ trackFileName(track) }}
+                </p>
+              }
             </ion-label>
             <ion-note slot="end">{{ track.duration | secondsToStr }}</ion-note>
             <ion-buttons slot="end">
@@ -55,5 +64,16 @@
         }
       </ion-list>
     </div>
+
+    <app-media-path
+      label="Carpeta"
+      [derived]="true"
+      [path]="albumFolder()"
+      [emptyMessage]="
+        tracksAreSpread()
+          ? 'Las pistas de este álbum están repartidas en varias carpetas'
+          : ''
+      "
+    />
   </div>
 </ion-content>

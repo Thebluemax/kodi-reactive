@@ -46,6 +46,14 @@ $overlay-header: rgba($black, 0.6);
 $overlay-content: rgba($black, 0.65);
 $overlay-sidebar: rgba(22, 23, 24, 0.5);
 
+// --- Velos sobre contenido propio (no sobre media) ---
+// Los componentes los escribian a mano con rgba(255, 255, 255, .05) y .1
+// repartidos por nueve archivos.
+$surface-tint: rgba($white, 0.1);
+$surface-tint-subtle: rgba($white, 0.05);
+/** Velo de la tarjeta, para que el titulo se lea sobre la caratula. */
+$overlay-tile: rgba($black, 0.45);
+
 // --- Theme-aware overlays ---
 $overlay-page-light: rgba($white, 0.75);
 $overlay-page-dark: rgba($black, 0.55);
@@ -149,8 +157,23 @@ $transition-fast: 0.2s ease;
 $transition-normal: 0.3s ease;
 $transition-slow: 0.55s ease;
 
+// ==========================================================================
+// Capas
+// ==========================================================================
+// Una sola escala, para no repartir numeros sueltos por los componentes.
+// Los overlays de Ionic se montan a partir de 20000: todo lo propio va por
+// debajo, o acabaria tapando modales y avisos.
+// Los z-index de 0 a 2 que quedan en los componentes son apilamiento local
+// entre hermanos, no capas de la aplicacion: darles nombre seria ruido.
+$z-index-sticky-header: 100;
+$z-index-popover: 1000;
+$z-index-panel-overlay: 9000;
+
 // --- Lateral panel: z-index ---
-$lateral-panel-z-index: 40000;
+// Por debajo de los overlays de Ionic, que se montan a partir de 20000. Con el
+// panel por encima, cualquier modal, alert o action sheet abierto desde dentro
+// del panel quedaba oculto tras el.
+$lateral-panel-z-index: 10000;
 
 // ==========================================================================
 // Media Tile Tokens

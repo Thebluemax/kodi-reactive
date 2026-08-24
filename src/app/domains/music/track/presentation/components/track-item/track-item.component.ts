@@ -8,6 +8,7 @@ import { Track } from '../../../domain/entities/track.entity';
 import { SecondsToStringPipe } from '@shared/pipes/seconds-to-string.pipe';
 import { AddTrackToPlaylistUseCase } from '../../../application/use-cases/add-track-to-playlist.use-case';
 import { PlayTrackUseCase } from '../../../application/use-cases/play-track.use-case';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-track-item',
@@ -26,6 +27,7 @@ import { PlayTrackUseCase } from '../../../application/use-cases/play-track.use-
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TrackItemComponent {
+  private readonly notifications = inject(NotificationService);
   private readonly addTrackToPlaylistUseCase = inject(AddTrackToPlaylistUseCase);
   private readonly playTrackUseCase = inject(PlayTrackUseCase);
 
@@ -41,18 +43,14 @@ export class TrackItemComponent {
       next: () => {
         this.trackPlayed.emit(track);
       },
-      error: (error) => {
-        console.error('Error playing track:', error);
-      }
+      error: () => void this.notifications.error('No se ha podido reproducir la pista')
     });
   }
 
   onAddToPlaylist(): void {
     const track = this.track();
     this.addTrackToPlaylistUseCase.execute(track.songId, false).subscribe({
-      error: (error) => {
-        console.error('Error adding track to playlist:', error);
-      }
+      error: () => void this.notifications.error('No se ha podido añadir la pista a la cola')
     });
   }
 }

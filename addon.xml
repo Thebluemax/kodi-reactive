@@ -1,22 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon 
-   id="webinterface.reaktive" 
-   name="reaktive" 
-   version="0.6.1"
+<addon
+   id="webinterface.reaktive"
+   name="ReaKtive"
+   version="1.0.0"
    provider-name="Thebluemax">
     <requires>
-		<import addon="xbmc.json" version="6.0.0"/>
-	</requires>
-	<extension point="xbmc.webinterface"/>
-	<extension point="xbmc.addon.metadata">
-        <summary lang="es">A modern, reactive frontend to control Kodi media center via WebSockets and JSON-RPC. </summary>
-        <description lang="es">Kodi Reactive is a web-based interface built with Angular and Ionic that allows users to remotely manage their Kodi media library and playback. It communicates with Kodi in real-time through 
-  WebSockets for live updates and a JSON-RPC REST API for library operations. The application supports browsing music and video collections, managing local playlists,         
-  controlling playback, and features both light and dark themes.</description>
+        <import addon="xbmc.json" version="6.0.0"/>
+    </requires>
+    <extension point="xbmc.webinterface"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">A modern, reactive web interface to control Kodi over WebSockets and JSON-RPC.</summary>
+        <summary lang="es">Interfaz web moderna y reactiva para controlar Kodi por WebSockets y JSON-RPC.</summary>
+        <description lang="en">ReaKtive is a web interface built with Angular and Ionic. Browse your music and video libraries, control playback in real time over WebSockets, drive Kodi with a full remote, and manage the play queue from any browser.
+
+It also fixes what scrapers get wrong: edit metadata for albums, artists, movies and TV shows, set artwork by URL or through Kodi's own file browser, re-scrape a single item with the right title, year or IMDb id, export and import an item's data as JSON, and see the real file path behind every entry.
+
+Light and dark themes follow your system preference. No configuration needed: served by Kodi itself, it finds its connection on its own.</description>
+        <description lang="es">ReaKtive es una interfaz web hecha con Angular e Ionic. Navega tus bibliotecas de musica y video, controla la reproduccion en tiempo real por WebSockets, maneja Kodi con un mando completo y gestiona la cola de reproduccion desde cualquier navegador.
+
+Tambien sirve para corregir lo que los scrapers hacen mal: edita los metadatos de albumes, artistas, peliculas y series, asigna el artwork por URL o navegando las fuentes del propio Kodi, vuelve a scrapear un medio indicando el titulo, el año o el IMDb correctos, exporta e importa la ficha de un medio en JSON, y consulta la ruta real del archivo de cada entrada.
+
+Los temas claro y oscuro siguen la preferencia del sistema. No hay nada que configurar: lo sirve el propio Kodi y la conexion se resuelve sola.</description>
         <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
         <source>https://github.com/Thebluemax/kodi-reactive</source>
+        <website>https://maximilianofernandez.net/</website>
+        <news>v1.0.0 - Primera version estable. Edicion de biblioteca (metadatos, artwork, re-scrapeo, exportar/importar), rutas de archivo visibles, reconexion automatica del WebSocket, errores de Kodi visibles con reintento e interfaz completa en castellano.</news>
         <assets>
             <icon>icon.png</icon>
+            <screenshot>resources/screenshot-01-movies-dark.jpg</screenshot>
+            <screenshot>resources/screenshot-02-albums-dark.jpg</screenshot>
+            <screenshot>resources/screenshot-03-remote-control.jpg</screenshot>
+            <screenshot>resources/screenshot-04-albums-light.jpg</screenshot>
+            <screenshot>resources/screenshot-05-play-queue.jpg</screenshot>
         </assets>
     </extension>
-</addon >
+</addon>

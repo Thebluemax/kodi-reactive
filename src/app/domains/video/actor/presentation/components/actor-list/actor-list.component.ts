@@ -27,11 +27,14 @@ import { GetActorsUseCase } from '../../../application/use-cases/get-actors.use-
 import { GetMoviesByActorUseCase } from '../../../application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '../actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-actor-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,
@@ -47,6 +50,7 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ActorListComponent implements OnInit {
+  private readonly notifications = inject(NotificationService);
   private readonly getActorsUseCase = inject(GetActorsUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
@@ -58,7 +62,7 @@ export class ActorListComponent implements OnInit {
 
   // Client-side pagination
   private readonly pageSize = 40;
-  private displayCount = this.pageSize;
+  private readonly displayCount = signal<number>(this.pageSize);
 
   // Filtered actors based on search term
   private readonly filteredActors = computed(() => {
@@ -70,20 +74,25 @@ export class ActorListComponent implements OnInit {
   });
 
   // Displayed actors (sliced from filtered actors)
-  readonly actors = computed(() => this.filteredActors().slice(0, this.displayCount));
+  readonly actors = computed(() => this.filteredActors().slice(0, this.displayCount()));
   readonly totalActors = computed(() => this.filteredActors().length);
-  readonly hasMoreActors = computed(() => this.displayCount < this.totalActors());
+  readonly hasMoreActors = computed(() => this.displayCount() < this.totalActors());
 
   constructor() {
     // Reset pagination when search term changes
     effect(() => {
       this.globalSearch.debouncedSearchTerm();
-      this.displayCount = this.pageSize;
+      this.displayCount.set(this.pageSize);
     });
   }
 
   // State
   readonly isLoading = signal<boolean>(false);
+  /**
+   * Motivo del ultimo fallo de carga. Sin esto una lista vacia por un fallo de
+   * red se anunciaba como biblioteca vacia.
+   */
+  readonly loadError = signal<string>('');
   readonly isPanelOpen = signal<boolean>(false);
 
   // Panel type for cross-navigation
@@ -112,8 +121,8 @@ export class ActorListComponent implements OnInit {
         this.allActors.set(result.actors);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Error loading actors:', err);
+      error: (err: Error) => {
+        this.loadError.set(err.message || 'No se ha podido contactar con Kodi');
         this.isLoading.set(false);
       }
     });
@@ -125,9 +134,7 @@ export class ActorListComponent implements OnInit {
       return;
     }
 
-    this.displayCount += this.pageSize;
-    // Force re-computation by triggering signal update
-    this.allActors.update(actors => [...actors]);
+    this.displayCount.update(current => current + this.pageSize);
 
     setTimeout(() => event.target.complete(), 200);
   }
@@ -145,7 +152,7 @@ export class ActorListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading actor movies:', err);
+        void this.notifications.error('No se han podido cargar las películas del actor');
         this.isLoading.set(false);
       }
     });
@@ -162,7 +169,7 @@ export class ActorListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movie detail:', err);
+        void this.notifications.error('No se ha podido cargar la película');
         this.isLoading.set(false);
       }
     });
@@ -182,7 +189,7 @@ export class ActorListComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error loading actor movies:', err);
+          void this.notifications.error('No se han podido cargar las películas del actor');
           this.isLoading.set(false);
         }
       });
@@ -191,14 +198,14 @@ export class ActorListComponent implements OnInit {
 
   onPlayMovieFromActor(movieId: number): void {
     this.addToPlaylistUseCase.execute(movieId, true).subscribe({
-      error: (err) => console.error('Error playing movie:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir la película')
     });
   }
 
   onAddToPlaylist(event: { media: unknown; playMedia: boolean }): void {
     const movie = event.media as Movie;
     this.addToPlaylistUseCase.execute(movie.movieId, event.playMedia).subscribe({
-      error: (err) => console.error('Error adding to playlist:', err)
+      error: () => void this.notifications.error('No se ha podido añadir a la cola')
     });
   }
 
@@ -207,5 +214,10 @@ export class ActorListComponent implements OnInit {
     this.selectedActor.set(null);
     this.selectedMovie.set(null);
     this.panelType.set('actor');
+  }
+
+  /** Vuelve a intentar la carga que fallo. */
+  onRetry(): void {
+    this.loadActors();
   }
 }

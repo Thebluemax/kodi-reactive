@@ -1,0 +1,10 @@
+@if (hasPath()) {
+  <div class="media-path">
+    <span class="media-path__label">
+      {{ label() }}@if (derived()) {<span class="media-path__derived"> (deducida de las pistas)</span>}
+    </span>
+    <code class="media-path__value" [title]="path()">{{ path() }}</code>
+  </div>
+} @else if (showsEmptyMessage()) {
+  <ion-note class="media-path__empty">{{ emptyMessage() }}</ion-note>
+}

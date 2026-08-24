@@ -93,7 +93,12 @@ export class LateralPanelComponent implements OnInit, OnDestroy {
     this.width.set(this.parseWidth(this.customWidth()));
     this.constrainWidth();
 
-    document.body.appendChild(this.hostElement);
+    // A ion-app, no a document.body: Ionic monta ahi sus overlays
+    // (`getAppRoot` de @ionic/core devuelve `ion-app` y cae a `body`). Colgando
+    // del mismo contenedor, el z-index del panel y el de un modal o un alert se
+    // comparan entre si en vez de quedar en apilamientos separados.
+    const appRoot = document.querySelector('ion-app') ?? document.body;
+    appRoot.appendChild(this.hostElement);
 
     this.hostElement.addEventListener('click', (e: Event) => {
       const target = e.target as HTMLElement;

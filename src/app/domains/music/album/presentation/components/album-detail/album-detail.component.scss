@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 // ==========================================================================
 // COMPONENT - Album Detail (BEM)
 // ==========================================================================
@@ -96,7 +98,7 @@
     --padding-start: 0;
 
     &:hover {
-      --background: rgba(255, 255, 255, 0.05);
+      --background: $surface-tint-subtle;
     }
   }
 
@@ -143,5 +145,17 @@
     &__tracks {
       grid-row: 3 / 4;
     }
+  }
+}
+
+.album-detail {
+  // Element: Track file
+  &__track-file {
+    margin: 2px 0 0;
+    font-size: 0.7em;
+    color: var(--ion-color-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

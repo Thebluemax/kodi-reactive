@@ -71,11 +71,11 @@
       }
     </ion-list>
   } @else {
-    <ion-text color="medium" class="empty-message">
-      <ion-icon name="albums" />
-      <p>No hay playlists guardadas</p>
-      <p class="hint">Guarda una playlist desde el reproductor actual</p>
-    </ion-text>
+    <app-empty-state
+      icon="albums"
+      message="No hay playlists guardadas"
+      hint="Guarda una playlist desde el reproductor actual"
+    />
   }
 </ion-content>
 

@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -12,21 +11,69 @@ import {
   Album,
   AlbumListResult,
   AlbumSearchParams,
+  AlbumUpdate,
   AlbumFactory,
   KodiAlbumResponse
 } from '../../domain/entities/album.entity';
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
-import { environment } from 'src/environments/environment';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
+import { Methods } from '@shared/enums/methods';
 
-// TODO: Move to core/infrastructure/config
-const KODI_API_URL = `${environment.serverApiUrl}:${environment.apiPort}/jsonrpc`;
+/**
+ * Kodi responde a los errores con HTTP 200 y el fallo dentro del sobre, asi que
+ * un rechazo no llega como error de red y hay que leerlo del cuerpo.
+ */
+/**
+ * Traduccion del vocabulario del dominio al de AudioLibrary.SetAlbumDetails.
+ * Los nombres de la API son minusculas sin separador; los del dominio siguen la
+ * convencion del resto de entidades.
+ */
+const UPDATE_PARAM_NAMES: Record<keyof AlbumUpdate, string> = {
+  title: 'title',
+  artists: 'artist',
+  description: 'description',
+  genres: 'genre',
+  themes: 'theme',
+  moods: 'mood',
+  styles: 'style',
+  type: 'type',
+  label: 'albumlabel',
+  rating: 'rating',
+  year: 'year',
+  userRating: 'userrating',
+  votes: 'votes',
+  musicBrainzAlbumId: 'musicbrainzalbumid',
+  musicBrainzReleaseGroupId: 'musicbrainzreleasegroupid',
+  sortArtist: 'sortartist',
+  displayArtist: 'displayartist',
+  musicBrainzAlbumArtistIds: 'musicbrainzalbumartistid',
+  art: 'art',
+  isBoxSet: 'isboxset',
+  releaseDate: 'releasedate',
+  originalDate: 'originaldate'
+};
 
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
+/**
+ * El detalle alimenta el editor, asi que pide todo lo que SetAlbumDetails sabe
+ * escribir. Los 22 campos escribibles figuran en Audio.Fields.Album, de modo
+ * que no hay ninguno que se pueda escribir y no leer.
+ */
+const ALBUM_DETAIL_PROPERTIES = [
+  'title', 'description', 'artist', 'artistid', 'genre', 'theme', 'mood',
+  'style', 'type', 'albumlabel', 'rating', 'userrating', 'votes', 'year',
+  'musicbrainzalbumid', 'musicbrainzreleasegroupid', 'musicbrainzalbumartistid',
+  'sortartist', 'displayartist', 'isboxset', 'releasedate', 'originaldate',
+  'thumbnail', 'fanart', 'playcount', 'dateadded', 'art'
+];
+
+/**
+ * La lista pagina de 40 en 40 y sus tarjetas solo pintan titulo, artistas,
+ * caratula y año. Pedir mas multiplicaria la carga util de cada pagina sin que
+ * nadie lo lea: al abrir el detalle se recarga el album entero de todas formas.
+ */
+const ALBUM_LIST_PROPERTIES = [
+  'artist', 'artistid', 'thumbnail', 'year'
+];
 
 interface KodiAlbumsResponse {
   result: {
@@ -60,52 +107,38 @@ interface KodiTracksResponse {
   providedIn: 'root'
 })
 export class AlbumKodiRepository extends AlbumRepository {
-  private readonly http = inject(HttpClient);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getAlbums(params: AlbumSearchParams): Observable<AlbumListResult> {
-    const request = this.buildAlbumsRequest(params);
-
-    return this.http.post<KodiAlbumsResponse>(KODI_API_URL, request).pipe(
-      map(response => ({
-        albums: AlbumFactory.fromKodiResponseList(response.result.albums || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
-    );
-  }
-
-  getAlbumById(albumId: number): Observable<Album> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'AudioLibrary.GetAlbumDetails',
-      params: {
-        albumid: albumId,
-        properties: [
-          'thumbnail', 'playcount', 'artistid', 'artist', 'genre',
-          'albumlabel', 'year', 'dateadded', 'style', 'fanart',
-          'mood', 'description', 'rating', 'type', 'theme'
-        ]
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiAlbumDetailResponse>(KODI_API_URL, request).pipe(
-      map(response => {
-        if ((response as any).error) {
-          throw new Error((response as any).error.message || 'Unknown Kodi error');
-        }
-        return AlbumFactory.fromKodiResponse(response.result.albumdetails);
+    return this.rpc
+      .query<KodiAlbumsResponse['result']>(
+        Methods.AudioLibraryGetAlbums,
+        this.buildAlbumsParams(params)
+      )
+      .pipe(
+      map(result => {
+        return {
+        albums: AlbumFactory.fromKodiResponseList(result.albums || []),
+        total: result.limits.total,
+        start: result.limits.start,
+        end: result.limits.end
+        };
       })
     );
   }
 
+  getAlbumById(albumId: number): Observable<Album> {
+    return this.rpc
+      .query<KodiAlbumDetailResponse['result']>(Methods.AudioLibraryGetAlbumDetails, {
+        albumid: albumId,
+        properties: ALBUM_DETAIL_PROPERTIES
+      })
+      .pipe(map(result => AlbumFactory.fromKodiResponse(result.albumdetails)));
+  }
+
   getAlbumTracks(albumId: number): Observable<Track[]> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'AudioLibrary.GetSongs',
-      params: {
+    return this.rpc
+      .query<KodiTracksResponse['result']>(Methods.AudioLibraryGetSongs, {
         filter: { albumid: albumId },
         properties: [
           'title', 'artist', 'albumartist', 'genre', 'year', 'rating',
@@ -113,61 +146,66 @@ export class AlbumKodiRepository extends AlbumRepository {
           'thumbnail', 'file', 'artistid', 'albumid'
         ],
         sort: { order: 'ascending', method: 'track' }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiTracksResponse>(KODI_API_URL, request).pipe(
-      map(response => TrackFactory.fromKodiResponseList(response.result.songs || []))
-    );
+      })
+      .pipe(map(result => TrackFactory.fromKodiResponseList(result.songs || [])));
   }
 
   addToPlaylist(albumId: number, playImmediately: boolean): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: playImmediately ? 'Player.Open' : 'Playlist.Add',
-      params: playImmediately
-        ? { item: { albumid: albumId } }
-        : { playlistid: 0, item: { albumid: albumId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<unknown>(KODI_API_URL, request).pipe(
-      map(() => void 0)
-    );
+    return playImmediately
+      ? this.rpc.command(Methods.PlayerOpen, { item: { albumid: albumId } })
+      : this.rpc.command(Methods.PlaylistAdd, {
+          playlistid: 0,
+          item: { albumid: albumId }
+        });
   }
 
-  private buildAlbumsRequest(params: AlbumSearchParams): KodiJsonRpcRequest {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'AudioLibrary.GetAlbums',
-      params: {
-        limits: {
-          start: params.start,
-          end: params.end
-        },
-        properties: [
-          'title', 'description', 'artist', 'genre', 'theme', 'mood',
-          'style', 'type', 'albumlabel', 'rating', 'year',
-          'fanart', 'thumbnail', 'playcount', 'artistid', 'dateadded'
-        ],
-        sort: { order: 'ascending', method: 'album' }
+  updateAlbum(albumId: number, patch: AlbumUpdate): Observable<void> {
+    return this.rpc.command(Methods.AudioLibrarySetAlbumDetails, {
+      albumid: albumId,
+      ...this.toKodiParams(patch)
+    });
+  }
+
+  /**
+   * Solo viajan los campos presentes en el patch. `undefined` significa "no
+   * tocar" y se descarta; `null` si viaja, porque en las listas y en el artwork
+   * es como se borra un valor.
+   */
+  private toKodiParams(patch: AlbumUpdate): Record<string, unknown> {
+    const params: Record<string, unknown> = {};
+
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === undefined) {
+        continue;
+      }
+
+      const name = UPDATE_PARAM_NAMES[field as keyof AlbumUpdate];
+      if (name) {
+        params[name] = value;
+      }
+    }
+
+    return params;
+  }
+
+  private buildAlbumsParams(params: AlbumSearchParams): Record<string, unknown> {
+    const query: Record<string, unknown> = {
+      limits: {
+        start: params.start,
+        end: params.end
       },
-      id: this.getNextId()
+      properties: ALBUM_LIST_PROPERTIES,
+      sort: { order: 'ascending', method: 'album' }
     };
 
     if (params.searchTerm) {
-      (request.params as Record<string, unknown>)['filter'] = {
+      query['filter'] = {
         field: params.field || 'album',
         operator: params.operator || 'contains',
         value: params.searchTerm
       };
     }
 
-    return request;
-  }
-
-  private getNextId(): number {
-    return this.requestId++;
+    return query;
   }
 }

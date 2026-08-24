@@ -1,0 +1,17 @@
+<ion-button fill="clear" size="small" [disabled]="disabled()" (click)="onExport()">
+  <ion-icon slot="start" name="download-outline" />
+  Exportar
+</ion-button>
+
+<ion-button fill="clear" size="small" [disabled]="disabled()" (click)="picker.click()">
+  <ion-icon slot="start" name="document-outline" />
+  Importar
+</ion-button>
+
+<input
+  #picker
+  hidden
+  type="file"
+  accept=".json,.xml,.nfo,application/json,text/xml,application/xml"
+  (change)="onFileSelected($event)"
+/>

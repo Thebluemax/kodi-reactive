@@ -2,6 +2,8 @@
 // DOMAIN ENTITY - Movie
 // ==========================================================================
 
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+
 /**
  * Movie Entity
  * Represents a movie in the video domain
@@ -24,6 +26,69 @@ export interface Movie {
   readonly tagline: string;
   readonly studio: string[];
   readonly country: string[];
+  readonly originalTitle: string;
+  readonly sortTitle: string;
+  readonly plotOutline: string;
+  readonly writer: string[];
+  readonly tag: string[];
+  readonly showlink: string[];
+  /** Fecha de estreno. Kodi la vincula con `year` y esta manda sobre el. */
+  readonly premiered: string;
+  readonly mpaa: string;
+  readonly imdbNumber: string;
+  /** Cadena, no numero: asi lo declara SetMovieDetails para pelicula. */
+  readonly votes: string;
+  readonly top250: number;
+  readonly userRating: number;
+  readonly trailer: string;
+  /** Coleccion a la que pertenece, por ejemplo «El Padrino». */
+  readonly set: string;
+  readonly art: MediaArtworkSet;
+}
+
+/**
+ * Movie Update
+ * Campos que VideoLibrary.SetMovieDetails admite escribir, en el vocabulario
+ * del dominio. Todos opcionales: un campo ausente le dice a Kodi que no lo
+ * toque.
+ *
+ * `cast` no figura: el reparto no se puede modificar por la API, y es la razon
+ * por la que los actores quedaron fuera del editor.
+ */
+export interface MovieUpdate {
+  readonly title?: string;
+  readonly originalTitle?: string;
+  readonly sortTitle?: string;
+  readonly tagline?: string;
+  readonly plot?: string;
+  readonly plotOutline?: string;
+  readonly genre?: string[] | null;
+  readonly director?: string[] | null;
+  readonly writer?: string[] | null;
+  readonly studio?: string[] | null;
+  readonly country?: string[] | null;
+  readonly tag?: string[] | null;
+  readonly showlink?: string[] | null;
+  readonly year?: number;
+  readonly premiered?: string;
+  /** En segundos, aunque la interfaz suela hablar de minutos. */
+  readonly runtime?: number;
+  readonly rating?: number;
+  readonly userRating?: number;
+  readonly votes?: string;
+  readonly top250?: number;
+  readonly mpaa?: string;
+  readonly imdbNumber?: string;
+  readonly trailer?: string;
+  readonly set?: string;
+  readonly art?: MediaArtworkSet | null;
+  /**
+   * Identificadores por proveedor: `{ imdb: 'tt0068646', tmdb: '238' }`. No
+   * figura en el esquema del editor porque es un diccionario y no un campo
+   * plano, pero escribirlo antes de un re-scrapeo es lo que desambigua dos
+   * peliculas homonimas.
+   */
+  readonly uniqueId?: Record<string, string>;
 }
 
 export interface CastMember {
@@ -87,7 +152,22 @@ export class MovieFactory {
       file: raw.file || '',
       tagline: raw.tagline || '',
       studio: raw.studio || [],
-      country: raw.country || []
+      country: raw.country || [],
+      originalTitle: raw.originaltitle || '',
+      sortTitle: raw.sorttitle || '',
+      plotOutline: raw.plotoutline || '',
+      writer: raw.writer || [],
+      tag: raw.tag || [],
+      showlink: raw.showlink || [],
+      premiered: raw.premiered || '',
+      mpaa: raw.mpaa || '',
+      imdbNumber: raw.imdbnumber || '',
+      votes: raw.votes || '',
+      top250: raw.top250 || 0,
+      userRating: raw.userrating || 0,
+      trailer: raw.trailer || '',
+      set: raw.set || '',
+      art: raw.art ?? {}
     };
   }
 
@@ -119,6 +199,21 @@ export interface KodiMovieResponse {
   tagline?: string;
   studio?: string[];
   country?: string[];
+  originaltitle?: string;
+  sorttitle?: string;
+  plotoutline?: string;
+  writer?: string[];
+  tag?: string[];
+  showlink?: string[];
+  premiered?: string;
+  mpaa?: string;
+  imdbnumber?: string;
+  votes?: string;
+  top250?: number;
+  userrating?: number;
+  trailer?: string;
+  set?: string;
+  art?: Record<string, string>;
 }
 
 export interface KodiCastResponse {

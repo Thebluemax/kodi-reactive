@@ -17,11 +17,13 @@ import { Album } from '@domains/music/album/domain/entities/album.entity';
 import { Artist } from '@domains/music/artist/domain/entities/artist.entity';
 import { GetGenresUseCase } from '../../../application/use-cases/get-genres.use-case';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-genre-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonProgressBar,
     IonChip,
@@ -39,6 +41,8 @@ export class GenreListComponent implements OnInit, OnDestroy {
 
   private readonly allGenres = signal<Genre[]>([]);
   readonly isLoading = signal<boolean>(false);
+  /** Motivo del ultimo fallo de carga, para no anunciarlo como lista vacia. */
+  readonly loadError = signal<string>('');
   readonly isPanelOpen = signal<boolean>(false);
   readonly selectedGenre = signal<Genre | null>(null);
   readonly albums = signal<Album[]>([]);
@@ -74,8 +78,8 @@ export class GenreListComponent implements OnInit, OnDestroy {
           this.allGenres.set(result.genres);
           this.isLoading.set(false);
         },
-        error: error => {
-          console.error('Error loading genres:', error);
+        error: (error: Error) => {
+          this.loadError.set(error.message || 'No se ha podido contactar con Kodi');
           this.isLoading.set(false);
         }
       });
@@ -83,5 +87,10 @@ export class GenreListComponent implements OnInit, OnDestroy {
 
   onGenreClick(genre: Genre): void {
     this.router.navigate(['/music/genres', genre.genreId], { state: { genre } });
+  }
+
+  /** Vuelve a intentar la carga que fallo. */
+  onRetry(): void {
+    this.loadGenres();
   }
 }

@@ -63,6 +63,35 @@ export class TrackFactory {
  * Kodi API Response Types
  * Raw response structure from Kodi JSON-RPC
  */
+/**
+ * Track Update
+ * Campos que AudioLibrary.SetSongDetails admite escribir, en el vocabulario del
+ * dominio. Todos opcionales: un campo ausente le dice a Kodi que no lo toque.
+ */
+export interface TrackUpdate {
+  readonly title?: string;
+  readonly artists?: string[] | null;
+  readonly genres?: string[] | null;
+  readonly year?: number;
+  readonly rating?: number;
+  readonly userRating?: number;
+  readonly votes?: number;
+  readonly trackNumber?: number;
+  readonly disc?: number;
+  readonly discTitle?: string;
+  readonly duration?: number;
+  readonly comment?: string;
+  readonly mood?: string;
+  readonly displayArtist?: string;
+  readonly sortArtist?: string;
+  readonly musicBrainzTrackId?: string;
+  readonly musicBrainzArtistId?: string;
+  readonly releaseDate?: string;
+  readonly originalDate?: string;
+  readonly bpm?: number;
+  readonly art?: Record<string, string | null> | null;
+}
+
 export interface KodiTrackResponse {
   songid: number;
   title?: string;

@@ -111,7 +111,7 @@ describe('LibraryKodiRepository', () => {
     httpMock.expectOne(JSON_RPC_URL).flush({ id: 1, result: 'OK' });
 
     expect(next).toHaveBeenCalledOnceWith(undefined);
-    expect(complete).toHaveBeenCalled();
+    expect(complete).toHaveBeenCalledWith();
   });
 
   // Kodi devuelve HTTP 200 aunque el JSON-RPC falle: el error viaja en el body
@@ -124,10 +124,14 @@ describe('LibraryKodiRepository', () => {
       .expectOne(JSON_RPC_URL)
       .flush({ id: 1, error: { code: -32601, message: 'Method not found' } });
 
-    expect(error).toHaveBeenCalled();
-    expect((error.calls.mostRecent().args[0] as Error).message).toBe(
-      `Kodi ${Methods.AudioLibraryScan}: Method not found`
-    );
+    expect(error).toHaveBeenCalledWith(jasmine.any(Error));
+    // El mensaje lo compone ahora el cliente compartido, y lleva ademas el
+    // codigo, que es con lo que se busca un fallo concreto de Kodi.
+    const message = (error.calls.mostRecent().args[0] as Error).message;
+
+    expect(message).toContain(Methods.AudioLibraryScan);
+    expect(message).toContain('Method not found');
+    expect(message).toContain('-32601');
   });
 
   it('should propagate transport errors', () => {
@@ -139,6 +143,6 @@ describe('LibraryKodiRepository', () => {
       .expectOne(JSON_RPC_URL)
       .flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
 
-    expect(error).toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith(jasmine.anything());
   });
 });

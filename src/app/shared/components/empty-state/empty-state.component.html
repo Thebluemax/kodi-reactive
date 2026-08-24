@@ -1,0 +1,28 @@
+<div class="empty-state">
+  <ion-icon
+    class="empty-state__icon"
+    [class.empty-state__icon--error]="hasError()"
+    [name]="hasError() ? 'cloud-offline-outline' : icon()"
+    aria-hidden="true"
+  />
+
+  @if (hasError()) {
+    <p class="empty-state__message">No se han podido cargar los datos</p>
+    <p class="empty-state__hint">{{ error() }}</p>
+    <ion-button size="small" fill="clear" (click)="onRetry()">
+      Reintentar
+    </ion-button>
+  } @else if (isFiltered()) {
+    <p class="empty-state__message">
+      Sin resultados para «{{ globalSearch.debouncedSearchTerm() }}»
+    </p>
+    <ion-button size="small" fill="clear" (click)="onClearSearch()">
+      Limpiar búsqueda
+    </ion-button>
+  } @else {
+    <p class="empty-state__message">{{ message() }}</p>
+    @if (hint()) {
+      <p class="empty-state__hint">{{ hint() }}</p>
+    }
+  }
+</div>

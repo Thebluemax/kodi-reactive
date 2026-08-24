@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   effect,
+  untracked,
   DestroyRef
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,6 +16,7 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonProgressBar,
+  IonModal,
   InfiniteScrollCustomEvent
 } from '@ionic/angular/standalone';
 
@@ -29,11 +31,27 @@ import { Actor } from '@domains/video/actor/domain/entities/actor.entity';
 import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-cases/get-movies-by-actor.use-case';
 import { ActorDetailComponent } from '@domains/video/actor/presentation/components/actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
+import { UpdateMovieUseCase } from '../../../application/use-cases/update-movie.use-case';
+import { RefreshMovieUseCase } from '../../../application/use-cases/refresh-movie.use-case';
+import { MovieUpdate } from '../../../domain/entities/movie.entity';
+import { MediaEditModalComponent } from '@shared/components/media-edit-modal/media-edit-modal.component';
+import { NotificationService } from '@shared/services/notification.service';
+import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
+import { MediaArtworkSet } from '@shared/types/media-artwork.type';
+import { MediaRefreshOptions, buildSearchTitle } from '@shared/types/media-refresh.type';
+import {
+  MediaRefreshModalComponent,
+  MediaRefreshRequest
+} from '@shared/components/media-refresh-modal/media-refresh-modal.component';
+import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
+import { appendPage } from '@shared/utils/paginated-list';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-movie-list',
   standalone: true,
   imports: [
+    EmptyStateComponent,
     IonContent,
     IonList,
     IonInfiniteScroll,
@@ -42,7 +60,10 @@ import { GlobalSearchService } from '@shared/services/global-search.service';
     MediaTileComponent,
     LateralPanelComponent,
     MovieDetailComponent,
-    ActorDetailComponent
+    ActorDetailComponent,
+    IonModal,
+    MediaEditModalComponent,
+    MediaRefreshModalComponent
   ],
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.scss',
@@ -52,6 +73,9 @@ export class MovieListComponent {
   // Use Cases
   private readonly getMoviesUseCase = inject(GetMoviesUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
+  private readonly updateMovieUseCase = inject(UpdateMovieUseCase);
+  private readonly refreshMovieUseCase = inject(RefreshMovieUseCase);
+  private readonly notifications = inject(NotificationService);
   private readonly addToPlaylistUseCase = inject(AddMovieToPlaylistUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
   private readonly globalSearch = inject(GlobalSearchService);
@@ -66,20 +90,228 @@ export class MovieListComponent {
 
   // Cross-navigation: actor panel
   readonly panelType = signal<'movie' | 'actor'>('movie');
+
+  // Edicion. El panel lateral se saca a si mismo a document.body, fuera de
+  // ion-app, asi que se aparta mientras se edita en vez de competir con el modal.
+  readonly editSchema = MOVIE_EDIT_SCHEMA;
+  readonly movieBeingEdited = signal<Movie | null>(null);
+  readonly movieBeingRefreshed = signal<Movie | null>(null);
+
+  /** Referencia estable, como editValue. */
+  readonly refreshValue = computed<MediaRefreshRequest>(() => {
+    const movie = this.movieBeingRefreshed();
+
+    return {
+      title: movie?.title ?? '',
+      year: movie && movie.year > 0 ? String(movie.year) : '',
+      uniqueId: movie?.imdbNumber ?? '',
+      ignoreNfo: false,
+      refreshEpisodes: false
+    };
+  });
+  readonly isSaving = signal<boolean>(false);
+
+  /** Referencia estable: con un metodo el modal repondria el borrador en cada ciclo. */
+  readonly editValue = computed<Record<string, MediaEditValue>>(() => {
+    const movie = this.movieBeingEdited();
+
+    if (!movie) {
+      return {};
+    }
+
+    return {
+      title: movie.title,
+      originalTitle: movie.originalTitle,
+      sortTitle: movie.sortTitle,
+      tagline: movie.tagline,
+      plot: movie.plot,
+      plotOutline: movie.plotOutline,
+      genre: movie.genre,
+      director: movie.director,
+      writer: movie.writer,
+      studio: movie.studio,
+      country: movie.country,
+      tag: movie.tag,
+      set: movie.set,
+      showlink: movie.showlink,
+      premiered: movie.premiered,
+      year: movie.year,
+      runtime: movie.runtime,
+      rating: movie.rating,
+      userRating: movie.userRating,
+      votes: movie.votes,
+      top250: movie.top250,
+      mpaa: movie.mpaa,
+      imdbNumber: movie.imdbNumber,
+      trailer: movie.trailer
+    };
+  });
+
+  readonly editArtwork = computed<MediaArtworkSet | null>(
+    () => this.movieBeingEdited()?.art ?? null
+  );
+
+  /**
+   * El panel se aparta mientras se pide el titulo: se saca a si mismo a
+   * document.body en su ngOnInit, fuera de ion-app, asi que ninguna capa
+   * montada dentro de la aplicacion queda por encima de el.
+   */
+  onRefreshRequested(movie: Movie): void {
+    this.movieBeingRefreshed.set(movie);
+    this.isPanelOpen.set(false);
+  }
+
+  onRefreshCancelled(): void {
+    const movie = this.movieBeingRefreshed();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingRefreshed.set(null);
+    this.restoreDetail(movie);
+  }
+
+  onRefreshConfirmed(request: MediaRefreshRequest): void {
+    const movie = this.movieBeingRefreshed();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingRefreshed.set(null);
+    this.restoreDetail(movie);
+    this.refreshMovie(
+      movie,
+      {
+        title: buildSearchTitle(request.title, request.year),
+        ignoreNfo: request.ignoreNfo
+      },
+      request.uniqueId
+    );
+  }
+
+  onReloadRequested(movie: Movie): void {
+    this.refreshSelectedMovie(movie.movieId);
+    void this.notifications.info('Datos recargados desde Kodi');
+  }
+
+  /**
+   * El identificador unico, si se indica, se escribe antes de refrescar: es lo
+   * unico que desambigua con garantias, porque el scraper lo respeta en vez de
+   * volver a buscar por titulo.
+   */
+  private refreshMovie(movie: Movie, options: MediaRefreshOptions, imdb: string): void {
+    const refresh$ = this.refreshMovieUseCase.execute(movie.movieId, options);
+
+    const request$ =
+      imdb.length > 0 && imdb !== movie.imdbNumber
+        ? this.updateMovieUseCase
+            .execute(movie.movieId, { imdbNumber: imdb, uniqueId: { imdb } })
+            .pipe(switchMap(() => refresh$))
+        : refresh$;
+
+    request$.subscribe({
+      next: () => {
+        // El metodo vuelve enseguida: el scrapeo lo hace Kodi por detras, asi
+        // que recargar aqui devolveria los datos viejos.
+        void this.notifications.info(
+          'Kodi está buscando los datos. Usa «recargar» cuando termine.'
+        );
+      },
+      error: (error: Error) => void this.notifications.error(error.message)
+    });
+  }
+
+  onEditRequested(movie: Movie): void {
+    this.movieBeingEdited.set(movie);
+    this.isPanelOpen.set(false);
+  }
+
+  onEditCancelled(): void {
+    const movie = this.movieBeingEdited();
+
+    if (!movie) {
+      return;
+    }
+
+    this.movieBeingEdited.set(null);
+    this.restoreDetail(movie);
+  }
+
+  onEditSave(patch: MediaEditPatch): void {
+    const movie = this.movieBeingEdited();
+
+    if (!movie) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    this.updateMovieUseCase.execute(movie.movieId, patch as MovieUpdate).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.movieBeingEdited.set(null);
+        void this.notifications.success('Película actualizada');
+        this.restoreDetail(movie);
+        this.refreshSelectedMovie(movie.movieId);
+      },
+      error: (error: Error) => {
+        this.isSaving.set(false);
+        void this.notifications.error(error.message);
+      }
+    });
+  }
+
+  /**
+   * Cerrar el panel emite panelClosed, que limpia la pelicula y devuelve el
+   * panel a su modo por defecto, asi que volver al detalle exige reponer ambos.
+   */
+  private restoreDetail(movie: Movie): void {
+    this.selectedMovie.set(movie);
+    this.panelType.set('movie');
+    this.isPanelOpen.set(true);
+  }
+
+  /** Tras guardar, el detalle debe mostrar lo que Kodi tiene ahora. */
+  private refreshSelectedMovie(movieId: number): void {
+    this.getMovieDetailUseCase.execute(movieId).subscribe({
+      next: detail => this.selectedMovie.set(detail)
+    });
+  }
   readonly selectedActor = signal<Actor | null>(null);
   readonly actorMovies = signal<Movie[]>([]);
 
   // Pagination
   private readonly limit = 40;
-  private start = 0;
-  private end = this.limit;
+  /**
+   * Motivo del ultimo fallo de carga, o cadena vacia si fue bien.
+   *
+   * Sin esto una lista vacia por un fallo de red se anunciaba como biblioteca
+   * vacia: el catchError devolvia EMPTY y el empty state decia lo mismo que
+   * diria sin elementos.
+   */
+  readonly loadError = signal<string>('');
+  private readonly reachedEnd = signal<boolean>(false);
+  private readonly start = signal<number>(0);
+  private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
 
   // Unico punto de entrada de carga: una peticion nueva cancela la que este en vuelo
   private readonly loadRequest$ = new Subject<MovieSearchParams>();
 
   // Computed
-  readonly hasMoreMovies = computed(() => this.start < this.totalMovies());
+  /**
+   * Corta por lo que hay cargado, no por `start`, que apunta al principio de la
+   * pagina ya pedida y no a la siguiente: comparandolo se pedia una pagina de
+   * mas, fuera de rango, y Kodi respondia con la lista entera.
+   *
+   * `reachedEnd` cubre el otro caso: una respuesta mas corta de lo que el total
+   * promete dejaria el scroll pidiendo indefinidamente.
+   */
+  readonly hasMoreMovies = computed(
+    () => !this.reachedEnd() && this.movies().length < this.totalMovies()
+  );
   readonly panelTitle = computed(() => {
     if (this.panelType() === 'actor' && this.selectedActor()) {
       return this.selectedActor()!.name;
@@ -92,8 +324,10 @@ export class MovieListComponent {
       .pipe(
         switchMap(params =>
           this.getMoviesUseCase.execute(params).pipe(
-            catchError(err => {
-              console.error('Error loading movies:', err);
+            catchError((err: Error) => {
+              this.loadError.set(
+                err.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               return EMPTY;
             })
@@ -103,34 +337,53 @@ export class MovieListComponent {
       )
       .subscribe(result => {
         this.totalMovies.set(result.total);
-        this.movies.update(current => [...current, ...result.movies]);
+        this.movies.update(current =>
+          appendPage(current, result.movies, item => item.movieId)
+        );
+
+        if (result.movies.length === 0) {
+          this.reachedEnd.set(true);
+        }
         this.isLoading.set(false);
       });
 
     effect(() => {
       const term = this.globalSearch.debouncedSearchTerm();
-      if (this.currentSearchTerm !== term) {
-        this.currentSearchTerm = term;
-        this.resetPagination();
-        this.loadMovies();
-      }
+
+      // El effect solo debe depender del termino: resetPagination y loadMovies
+      // escriben y leen los signals de paginacion, que si no quedarian
+      // registrados como dependencias del propio effect.
+      untracked(() => {
+        if (this.currentSearchTerm !== term) {
+          this.currentSearchTerm = term;
+          this.resetPagination();
+          this.loadMovies();
+        }
+      });
     });
   }
 
   private resetPagination(): void {
-    this.start = 0;
-    this.end = this.limit;
+    this.reachedEnd.set(false);
+    this.start.set(0);
+    this.end.set(this.limit);
     this.movies.set([]);
   }
 
   loadMovies(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
-      start: this.start,
-      end: this.end,
+      start: this.start(),
+      end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
+  }
+
+  /** Vuelve a pedir la pagina que fallo, sin perder lo ya cargado. */
+  onRetry(): void {
+    this.loadMovies();
   }
 
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
@@ -139,8 +392,8 @@ export class MovieListComponent {
       return;
     }
 
-    this.start = this.end + 1;
-    this.end = this.end + this.limit;
+    this.start.set(this.end());
+    this.end.update(current => current + this.limit);
     this.loadMovies();
 
     setTimeout(() => event.target.complete(), 500);
@@ -158,7 +411,7 @@ export class MovieListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movie detail:', err);
+        void this.notifications.error('No se ha podido cargar la película');
         this.isLoading.set(false);
       }
     });
@@ -189,7 +442,7 @@ export class MovieListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading actor movies:', err);
+        void this.notifications.error('No se han podido cargar las películas del actor');
         this.isLoading.set(false);
       }
     });
@@ -206,7 +459,7 @@ export class MovieListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movie detail:', err);
+        void this.notifications.error('No se ha podido cargar la película');
         this.isLoading.set(false);
       }
     });
@@ -214,14 +467,14 @@ export class MovieListComponent {
 
   onPlayMovieFromActor(movieId: number): void {
     this.addToPlaylistUseCase.execute(movieId, true).subscribe({
-      error: (err) => console.error('Error playing movie:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir la película')
     });
   }
 
   onAddToPlaylist(event: { media: unknown; playMedia: boolean }): void {
     const movie = event.media as Movie;
     this.addToPlaylistUseCase.execute(movie.movieId, event.playMedia).subscribe({
-      error: (err) => console.error('Error adding to playlist:', err)
+      error: () => void this.notifications.error('No se ha podido añadir a la cola')
     });
   }
 
