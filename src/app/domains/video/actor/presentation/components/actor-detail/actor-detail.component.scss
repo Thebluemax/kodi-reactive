@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 // ==========================================================================
 // COMPONENT - Actor Detail (BEM)
 // ==========================================================================
@@ -32,7 +34,7 @@
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: $surface-tint;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,7 +83,7 @@
     cursor: pointer;
 
     &:hover {
-      --background: rgba(255, 255, 255, 0.05);
+      --background: $surface-tint-subtle;
     }
 
     h3 {

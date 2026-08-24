@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 .genre-detail-content {
   --padding-start: 16px;
   --padding-end: 16px;
@@ -40,7 +42,7 @@ ion-list-header {
   cursor: pointer;
 
   ion-card-header {
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: $overlay-header;
     bottom: 0;
     color: white;
     font-size: 1em;
@@ -59,7 +61,7 @@ ion-list-header {
 
     ion-card-subtitle {
       font-size: 0.75em;
-      color: #ccc;
+      color: $text-on-media-secondary;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

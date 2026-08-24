@@ -32,7 +32,6 @@ import { LibraryFacade } from '@domains/library/application/library.facade';
     IonSearchbar,
     IonContent,
     IonMenuToggle,
-    AssetsPipe,
   ],
   providers: [AssetsPipe],
   changeDetection: ChangeDetectionStrategy.OnPush

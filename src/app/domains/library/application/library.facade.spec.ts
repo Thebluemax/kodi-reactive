@@ -83,8 +83,9 @@ describe('LibraryFacade', () => {
     facade.connect();
     facade.disconnect();
 
-    expect(mockWebSocket.connect).toHaveBeenCalled();
-    expect(mockWebSocket.disconnect).toHaveBeenCalled();
+    // No reciben argumentos: la forma sin ellos es la que hay que afirmar.
+    expect(mockWebSocket.connect).toHaveBeenCalledWith();
+    expect(mockWebSocket.disconnect).toHaveBeenCalledWith();
   });
 
   // ========================================================================

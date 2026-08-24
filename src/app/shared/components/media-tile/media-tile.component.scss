@@ -48,7 +48,7 @@
     @include absolute-fill;
     @include flex-center;
     gap: 12px;
-    background-color: rgba(0, 0, 0, 0.45);
+    background-color: $overlay-tile;
     opacity: 0;
     @include transition(opacity);
     z-index: 1;

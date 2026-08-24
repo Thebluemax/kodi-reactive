@@ -328,7 +328,4 @@ export class AlbumListComponent {
     this.selectedAlbum.set(null);
   }
 
-  onTrackAddToPlaylist(track: Track): void {
-    // TODO: Implement track add to playlist use case
-  }
 }

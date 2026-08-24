@@ -9,13 +9,15 @@ import { LibraryType } from '../../domain/entities/library-type.entity';
 describe('CleanLibraryUseCase', () => {
   let useCase: CleanLibraryUseCase;
 
-  const mockLibraryRepository = {
-    scan: jasmine.createSpy('scan').and.returnValue(of(void 0)),
-    clean: jasmine.createSpy('clean').and.returnValue(of(void 0))
-  };
+  // Los espias se crean por test: compartirlos entre ellos hace que el orden
+  // de ejecucion importe.
+  let mockLibraryRepository: { scan: jasmine.Spy; clean: jasmine.Spy };
 
   beforeEach(() => {
-    mockLibraryRepository.clean.calls.reset();
+    mockLibraryRepository = {
+      scan: jasmine.createSpy('scan').and.returnValue(of(void 0)),
+      clean: jasmine.createSpy('clean').and.returnValue(of(void 0))
+    };
 
     TestBed.configureTestingModule({
       providers: [
