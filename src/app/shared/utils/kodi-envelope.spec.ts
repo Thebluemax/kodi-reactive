@@ -42,7 +42,7 @@ describe('assertKodiOk', () => {
     expect(() => assertKodiOk({})).not.toThrow();
   });
 
-  it('lanza con el mensaje de Kodi', () => {
+  it('lanza tambien en las ordenes, con el mensaje de Kodi', () => {
     expect(() =>
       assertKodiOk({ error: { code: -32602, message: 'Invalid params' } })
     ).toThrowError(/Invalid params/);
