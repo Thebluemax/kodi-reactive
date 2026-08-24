@@ -100,6 +100,10 @@ Scrapers get things wrong. ReaKtive lets you correct them without leaving the br
   - **WebSocket** access (port `9090` by default; configurable from _Settings_ inside the app)
   - **HTTP JSON-RPC** access on Kodi's web server port (`8080` by default)
 
+> **Do not expose these ports to the internet unprotected.** Kodi's JSON-RPC API
+> can read, modify and delete your whole library. Reach it over your LAN, a VPN,
+> or a reverse proxy with authentication.
+
 ## Installation
 
 ```bash
@@ -232,30 +236,6 @@ and `KodiSocketService` the single WebSocket, both in `shared/services`.
 - [ ] Song-level editing UI
 - [ ] Favourites
 - [ ] Mobile-first improvements and PWA support
-
-## FAQ
-
-**Q: Does ReaKtive work on mobile devices?**
-A: Yes. The interface is fully responsive and adapts to both desktop and mobile screens.
-
-**Q: Which Kodi versions are supported?**
-A: ReaKtive declares `xbmc.json` 6.0.0 and is developed against Kodi 20 (Nexus) and
-later. The editing features lean on JSON-RPC v12 methods (`Media.Artwork.Set`,
-`VideoLibrary.Refresh*`), so on older releases browsing and playback work while
-some editing actions may be rejected by Kodi.
-
-**Q: Can I use it outside my local network?**
-A: Yes, as long as you can reach your Kodi instance's web server port and its
-WebSocket port (`9090` by default). A reverse proxy with authentication is
-strongly recommended: Kodi's JSON-RPC API can control and modify your whole
-library, so do not expose it to the internet unprotected.
-
-**Q: How do I change the Kodi connection settings?**
-A: Installed as an add-on, ReaKtive needs no configuration: it takes protocol,
-host and HTTP port from the URL Kodi serves it on. Only the WebSocket port is
-adjustable, in the app's _Settings_ page, and it is remembered in the browser.
-For local development, point the proxy at your box with
-`KODI_URL=http://<host>:<port> npm run proxy`.
 
 ## Contributing
 
