@@ -37,18 +37,18 @@
           <ion-button
             fill="outline"
             (click)="onPlayArtist()"
-            title="Play Artist"
+            title="Reproducir artista"
           >
             <ion-icon slot="start" name="play" />
-            Play Artist
+            Reproducir artista
           </ion-button>
           <ion-button
             fill="outline"
             (click)="onAddArtistToPlaylist()"
-            title="Add to Playlist"
+            title="Añadir a la cola"
           >
             <ion-icon slot="start" name="add" />
-            Add to Playlist
+            Añadir a la cola
           </ion-button>
           <ion-button
             fill="outline"
@@ -75,7 +75,7 @@
                 <ion-buttons>
                   <ion-button
                     (click)="onPlayAlbum(album.albumId)"
-                    title="Play Album"
+                    title="Reproducir álbum"
                   >
                     <ion-icon
                       slot="icon-only"
@@ -86,7 +86,7 @@
                   </ion-button>
                   <ion-button
                     (click)="onAddAlbumToPlaylist(album.albumId)"
-                    title="Add Album to Playlist"
+                    title="Añadir el álbum a la cola"
                   >
                     <ion-icon
                       slot="icon-only"
@@ -111,7 +111,7 @@
                       <ion-button
                         fill="clear"
                         (click)="onPlayTrack(track); $event.stopPropagation()"
-                        title="Play Track"
+                        title="Reproducir pista"
                       >
                         <ion-icon slot="icon-only" color="dark" name="play" />
                       </ion-button>
@@ -120,7 +120,7 @@
                         (click)="
                           onAddTrackToPlaylist(track); $event.stopPropagation()
                         "
-                        title="Add to Playlist"
+                        title="Añadir a la cola"
                       >
                         <ion-icon slot="icon-only" color="dark" name="add" />
                       </ion-button>
