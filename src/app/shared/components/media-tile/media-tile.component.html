@@ -6,7 +6,8 @@
     (thumbnail() | assets) +
     '\'), url(assets/site/no_cover.png)'
   "
-  [style.backgroundSize]="'cover'"
+  [style.backgroundSize]="backgroundSize()"
+  [style.backgroundPosition]="backgroundPosition()"
   (click)="toggleActions()"
 >
   @if (showActionButtons()) {
