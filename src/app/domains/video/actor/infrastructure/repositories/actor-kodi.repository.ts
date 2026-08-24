@@ -16,6 +16,7 @@ import {
 } from '@domains/video/movie/domain/entities/movie.entity';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { unwrapKodiResult } from '@shared/utils/kodi-envelope';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -66,7 +67,9 @@ export class ActorKodiRepository extends ActorRepository {
 
     return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
-        const movies = MovieFactory.fromKodiResponseList(response.result.movies || []);
+        const movies = MovieFactory.fromKodiResponseList(
+          unwrapKodiResult(response).movies || []
+        );
         const actors = ActorFactory.fromMovieCastData(movies);
         return {
           actors,
@@ -93,7 +96,9 @@ export class ActorKodiRepository extends ActorRepository {
     };
 
     return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => MovieFactory.fromKodiResponseList(response.result.movies || []))
+      map(response =>
+        MovieFactory.fromKodiResponseList(unwrapKodiResult(response).movies || [])
+      )
     );
   }
 

@@ -20,6 +20,7 @@ import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/dom
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
+import { KodiEnvelope, assertKodiOk, unwrapKodiResult } from '@shared/utils/kodi-envelope';
 
 /**
  * Kodi responde a los errores con HTTP 200 y el fallo dentro del sobre, asi que
@@ -132,12 +133,16 @@ export class AlbumKodiRepository extends AlbumRepository {
     const request = this.buildAlbumsRequest(params);
 
     return this.http.post<KodiAlbumsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ({
-        albums: AlbumFactory.fromKodiResponseList(response.result.albums || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+      map(response => {
+        const result = unwrapKodiResult(response);
+
+        return {
+        albums: AlbumFactory.fromKodiResponseList(result.albums || []),
+        total: result.limits.total,
+        start: result.limits.start,
+        end: result.limits.end
+        };
+      })
     );
   }
 
@@ -154,10 +159,7 @@ export class AlbumKodiRepository extends AlbumRepository {
 
     return this.http.post<KodiAlbumDetailResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
-        if ((response as any).error) {
-          throw new Error((response as any).error.message || 'Unknown Kodi error');
-        }
-        return AlbumFactory.fromKodiResponse(response.result.albumdetails);
+        return AlbumFactory.fromKodiResponse(unwrapKodiResult(response).albumdetails);
       })
     );
   }
@@ -179,7 +181,9 @@ export class AlbumKodiRepository extends AlbumRepository {
     };
 
     return this.http.post<KodiTracksResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => TrackFactory.fromKodiResponseList(response.result.songs || []))
+      map(response =>
+        TrackFactory.fromKodiResponseList(unwrapKodiResult(response).songs || [])
+      )
     );
   }
 
@@ -193,8 +197,12 @@ export class AlbumKodiRepository extends AlbumRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 

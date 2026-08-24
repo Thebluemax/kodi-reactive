@@ -18,6 +18,7 @@ import {
 import { Track, TrackFactory, KodiTrackResponse } from '@domains/music/track/domain/entities/track.entity';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { KodiEnvelope, assertKodiOk, unwrapKodiResult } from '@shared/utils/kodi-envelope';
 import { Methods } from '@shared/enums/methods';
 
 /** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
@@ -105,12 +106,16 @@ export class ArtistKodiRepository extends ArtistRepository {
     const request = this.buildArtistsRequest(params);
 
     return this.http.post<KodiArtistsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ({
-        artists: ArtistFactory.fromKodiResponseList(response.result.artists || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+      map(response => {
+        const result = unwrapKodiResult(response);
+
+        return {
+          artists: ArtistFactory.fromKodiResponseList(result.artists || []),
+          total: result.limits.total,
+          start: result.limits.start,
+          end: result.limits.end
+        };
+      })
     );
   }
 
@@ -126,7 +131,9 @@ export class ArtistKodiRepository extends ArtistRepository {
     };
 
     return this.http.post<KodiArtistDetailResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ArtistFactory.fromKodiResponse(response.result.artistdetails))
+      map(response =>
+        ArtistFactory.fromKodiResponse(unwrapKodiResult(response).artistdetails)
+      )
     );
   }
 
@@ -147,7 +154,7 @@ export class ArtistKodiRepository extends ArtistRepository {
     };
 
     return this.http.post<KodiSongsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => this.groupSongsByAlbumId(response.result.songs || []))
+      map(response => this.groupSongsByAlbumId(unwrapKodiResult(response).songs || []))
     );
   }
 
@@ -161,8 +168,12 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 
@@ -176,8 +187,12 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 
@@ -192,8 +207,12 @@ export class ArtistKodiRepository extends ArtistRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 

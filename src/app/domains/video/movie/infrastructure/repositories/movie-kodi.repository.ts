@@ -18,6 +18,7 @@ import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
 import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
+import { KodiEnvelope, assertKodiOk, unwrapKodiResult } from '@shared/utils/kodi-envelope';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -131,12 +132,16 @@ export class MovieKodiRepository extends MovieRepository {
     const request = this.buildMoviesRequest(params);
 
     return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ({
-        movies: MovieFactory.fromKodiResponseList(response.result.movies || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+      map(response => {
+        const result = unwrapKodiResult(response);
+
+        return {
+        movies: MovieFactory.fromKodiResponseList(result.movies || []),
+        total: result.limits.total,
+        start: result.limits.start,
+        end: result.limits.end
+        };
+      })
     );
   }
 
@@ -153,10 +158,7 @@ export class MovieKodiRepository extends MovieRepository {
 
     return this.http.post<KodiMovieDetailResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
-        if ((response as any).error) {
-          throw new Error((response as any).error.message || 'Unknown Kodi error');
-        }
-        return MovieFactory.fromKodiResponse(response.result.moviedetails);
+        return MovieFactory.fromKodiResponse(unwrapKodiResult(response).moviedetails);
       })
     );
   }
@@ -171,8 +173,12 @@ export class MovieKodiRepository extends MovieRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 

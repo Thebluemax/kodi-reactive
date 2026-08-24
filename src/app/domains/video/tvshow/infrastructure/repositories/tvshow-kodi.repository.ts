@@ -23,6 +23,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
+import { KodiEnvelope, assertKodiOk, unwrapKodiResult } from '@shared/utils/kodi-envelope';
 import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
 
 interface KodiJsonRpcRequest {
@@ -154,12 +155,16 @@ export class TVShowKodiRepository extends TVShowRepository {
     const request = this.buildTVShowsRequest(params);
 
     return this.http.post<KodiTVShowsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ({
-        tvshows: TVShowFactory.fromKodiResponseList(response.result.tvshows || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+      map(response => {
+        const result = unwrapKodiResult(response);
+
+        return {
+        tvshows: TVShowFactory.fromKodiResponseList(result.tvshows || []),
+        total: result.limits.total,
+        start: result.limits.start,
+        end: result.limits.end
+        };
+      })
     );
   }
 
@@ -175,12 +180,9 @@ export class TVShowKodiRepository extends TVShowRepository {
     };
 
     return this.http.post<KodiTVShowDetailResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if ((response as any).error) {
-          throw new Error((response as any).error.message || 'Unknown Kodi error');
-        }
-        return TVShowFactory.fromKodiResponse(response.result.tvshowdetails);
-      })
+      map(response =>
+        TVShowFactory.fromKodiResponse(unwrapKodiResult(response).tvshowdetails)
+      )
     );
   }
 
@@ -197,7 +199,9 @@ export class TVShowKodiRepository extends TVShowRepository {
     };
 
     return this.http.post<KodiSeasonsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => SeasonFactory.fromKodiResponseList(response.result.seasons || []))
+      map(response =>
+        SeasonFactory.fromKodiResponseList(unwrapKodiResult(response).seasons || [])
+      )
     );
   }
 
@@ -215,7 +219,9 @@ export class TVShowKodiRepository extends TVShowRepository {
     };
 
     return this.http.post<KodiEpisodesResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => EpisodeFactory.fromKodiResponseList(response.result.episodes || []))
+      map(response =>
+        EpisodeFactory.fromKodiResponseList(unwrapKodiResult(response).episodes || [])
+      )
     );
   }
 
@@ -229,8 +235,12 @@ export class TVShowKodiRepository extends TVShowRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 
