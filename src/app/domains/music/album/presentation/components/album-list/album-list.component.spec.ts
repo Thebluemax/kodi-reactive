@@ -10,8 +10,27 @@ import { GetAlbumsUseCase } from '../../../application/use-cases/get-albums.use-
 import { GetAlbumDetailUseCase } from '../../../application/use-cases/get-album-detail.use-case';
 import { UpdateAlbumUseCase } from '../../../application/use-cases/update-album.use-case';
 import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-album-to-playlist.use-case';
+import { AlbumListResult } from '../../../domain/entities/album.entity';
 
 const PAGE_SIZE = 40;
+const TOTAL = 500;
+
+
+/**
+ * Pagina realista: `start` elementos ya servidos y otros tantos nuevos. Los
+ * mocks devolvian listas vacias con un total distinto de cero, que no puede
+ * pasar, y por eso el guard del scroll pudo estar mal sin que nadie se enterara.
+ */
+function page(start: number, total: number) {
+  const size = Math.max(0, Math.min(PAGE_SIZE, total - start));
+
+  return {
+    albums: Array.from({ length: size }, (_, i) => ({ albumId: start + i, title: `Album ${start + i}`, artists: [], thumbnail: '', year: 2000 })),
+    total,
+    start,
+    end: start + size
+  };
+}
 
 describe('AlbumListComponent', () => {
   let fixture: ComponentFixture<AlbumListComponent>;
@@ -32,8 +51,9 @@ describe('AlbumListComponent', () => {
 
   beforeEach(async () => {
     getAlbums = jasmine.createSpyObj<GetAlbumsUseCase>('GetAlbumsUseCase', ['execute']);
-    getAlbums.execute.and.returnValue(
-      of({ albums: [], total: 500, start: 0, end: PAGE_SIZE })
+    // Cada llamada sirve la pagina que se le pide, como haria Kodi.
+    getAlbums.execute.and.callFake((params: { start: number }) =>
+      of(page(params.start, TOTAL) as unknown as AlbumListResult)
     );
 
     updateAlbum = jasmine.createSpyObj<UpdateAlbumUseCase>('UpdateAlbumUseCase', ['execute']);
@@ -244,5 +264,42 @@ describe('AlbumListComponent', () => {
 
       expect(getAlbumDetail.execute).toHaveBeenCalledWith(42);
     });
+  });
+
+  // ========================================================================
+  // Regresion: el scroll pedia una pagina de mas y duplicaba la lista
+  // ========================================================================
+
+  describe('final de la lista', () => {
+    const EXACT = PAGE_SIZE * 2;
+
+    beforeEach(() => {
+      getAlbums.execute.and.callFake((params: { start: number }) =>
+        of(page(params.start, EXACT) as unknown as AlbumListResult)
+      );
+      component.onInfiniteScroll(scrollEvent());
+    });
+
+    it('no pide ninguna pagina de mas con un total multiplo del tamaño de pagina', () => {
+      // El guard comparaba `start`, que apunta a la pagina ya pedida: con 80
+      // elementos pedia start=80, fuera de rango, y Kodi respondia con la lista
+      // entera.
+      const calls = getAlbums.execute.calls.count();
+      component.onInfiniteScroll(scrollEvent());
+
+      expect(getAlbums.execute.calls.count()).toBe(calls);
+    });
+
+    it('corta al tener todo cargado', () => {
+      expect(component.hasMoreAlbums()).toBeFalse();
+    });
+
+    it('no repite ningun elemento', () => {
+      const ids = component.albums().map(item => item.albumId);
+
+      expect(ids.length).toBe(EXACT);
+      expect(new Set(ids).size).toBe(EXACT);
+    });
+
   });
 });

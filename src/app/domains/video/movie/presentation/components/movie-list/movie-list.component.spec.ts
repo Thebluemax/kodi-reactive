@@ -12,8 +12,27 @@ import { MOVIE_EDIT_SCHEMA } from '../../schemas/movie-edit.schema';
 import { GetMovieDetailUseCase } from '../../../application/use-cases/get-movie-detail.use-case';
 import { AddMovieToPlaylistUseCase } from '../../../application/use-cases/add-movie-to-playlist.use-case';
 import { GetMoviesByActorUseCase } from '@domains/video/actor/application/use-cases/get-movies-by-actor.use-case';
+import { MovieListResult } from '../../../domain/entities/movie.entity';
 
 const PAGE_SIZE = 40;
+const TOTAL = 500;
+
+
+/**
+ * Pagina realista: `start` elementos ya servidos y otros tantos nuevos. Los
+ * mocks devolvian listas vacias con un total distinto de cero, que no puede
+ * pasar, y por eso el guard del scroll pudo estar mal sin que nadie se enterara.
+ */
+function page(start: number, total: number) {
+  const size = Math.max(0, Math.min(PAGE_SIZE, total - start));
+
+  return {
+    movies: Array.from({ length: size }, (_, i) => ({ movieId: start + i, title: `Pelicula ${start + i}`, genre: [], fanart: '', year: 2000 })),
+    total,
+    start,
+    end: start + size
+  };
+}
 
 describe('MovieListComponent', () => {
   let fixture: ComponentFixture<MovieListComponent>;
@@ -32,8 +51,9 @@ describe('MovieListComponent', () => {
 
   beforeEach(async () => {
     getMovies = jasmine.createSpyObj<GetMoviesUseCase>('GetMoviesUseCase', ['execute']);
-    getMovies.execute.and.returnValue(
-      of({ movies: [], total: 500, start: 0, end: PAGE_SIZE })
+    // Cada llamada sirve la pagina que se le pide, como haria Kodi.
+    getMovies.execute.and.callFake((params: { start: number }) =>
+      of(page(params.start, TOTAL) as unknown as MovieListResult)
     );
 
     await TestBed.configureTestingModule({
@@ -134,5 +154,42 @@ describe('MovieListComponent', () => {
 
       expect(sinValor).toEqual([]);
     });
+  });
+
+  // ========================================================================
+  // Regresion: el scroll pedia una pagina de mas y duplicaba la lista
+  // ========================================================================
+
+  describe('final de la lista', () => {
+    const EXACT = PAGE_SIZE * 2;
+
+    beforeEach(() => {
+      getMovies.execute.and.callFake((params: { start: number }) =>
+        of(page(params.start, EXACT) as unknown as MovieListResult)
+      );
+      component.onInfiniteScroll(scrollEvent());
+    });
+
+    it('no pide ninguna pagina de mas con un total multiplo del tamaño de pagina', () => {
+      // El guard comparaba `start`, que apunta a la pagina ya pedida: con 80
+      // elementos pedia start=80, fuera de rango, y Kodi respondia con la lista
+      // entera.
+      const calls = getMovies.execute.calls.count();
+      component.onInfiniteScroll(scrollEvent());
+
+      expect(getMovies.execute.calls.count()).toBe(calls);
+    });
+
+    it('corta al tener todo cargado', () => {
+      expect(component.hasMoreMovies()).toBeFalse();
+    });
+
+    it('no repite ningun elemento', () => {
+      const ids = component.movies().map(item => item.movieId);
+
+      expect(ids.length).toBe(EXACT);
+      expect(new Set(ids).size).toBe(EXACT);
+    });
+
   });
 });

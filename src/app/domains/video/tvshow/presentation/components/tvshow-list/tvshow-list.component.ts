@@ -43,6 +43,7 @@ import { NotificationService } from '@shared/services/notification.service';
 import { MediaEditPatch, MediaEditValue } from '@shared/types/media-edit-schema.type';
 import { MediaArtworkSet } from '@shared/types/media-artwork.type';
 import { TVSHOW_EDIT_SCHEMA } from '../../schemas/tvshow-edit.schema';
+import { appendPage } from '@shared/utils/paginated-list';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
@@ -90,6 +91,7 @@ export class TVShowListComponent {
 
   // Pagination
   private readonly limit = 40;
+  private readonly reachedEnd = signal<boolean>(false);
   private readonly start = signal<number>(0);
   private readonly end = signal<number>(this.limit);
   private currentSearchTerm: string | null = null;
@@ -98,7 +100,17 @@ export class TVShowListComponent {
   private readonly loadRequest$ = new Subject<TVShowSearchParams>();
 
   // Computed
-  readonly hasMoreTVShows = computed(() => this.start() < this.totalTVShows());
+  /**
+   * Corta por lo que hay cargado, no por `start`, que apunta al principio de la
+   * pagina ya pedida y no a la siguiente: comparandolo se pedia una pagina de
+   * mas, fuera de rango, y Kodi respondia con la lista entera.
+   *
+   * `reachedEnd` cubre el otro caso: una respuesta mas corta de lo que el total
+   * promete dejaria el scroll pidiendo indefinidamente.
+   */
+  readonly hasMoreTVShows = computed(
+    () => !this.reachedEnd() && this.tvshows().length < this.totalTVShows()
+  );
   readonly panelTitle = computed(() => this.selectedTVShow()?.title ?? '');
 
   constructor() {
@@ -117,7 +129,13 @@ export class TVShowListComponent {
       )
       .subscribe(result => {
         this.totalTVShows.set(result.total);
-        this.tvshows.update(current => [...current, ...result.tvshows]);
+        this.tvshows.update(current =>
+          appendPage(current, result.tvshows, item => item.tvshowId)
+        );
+
+        if (result.tvshows.length === 0) {
+          this.reachedEnd.set(true);
+        }
         this.isLoading.set(false);
       });
 
@@ -138,6 +156,7 @@ export class TVShowListComponent {
   }
 
   private resetPagination(): void {
+    this.reachedEnd.set(false);
     this.start.set(0);
     this.end.set(this.limit);
     this.tvshows.set([]);
