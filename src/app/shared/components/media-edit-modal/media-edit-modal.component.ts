@@ -17,6 +17,10 @@ import {
 import { FormsModule } from '@angular/forms';
 
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
+import {
+  MediaTransferComponent,
+  MediaTransferFields
+} from '@shared/components/media-transfer/media-transfer.component';
 // El navegador de ficheros vive en su dominio, no en shared: es una capacidad
 // de Kodi, no un ladrillo de interfaz. Se importa aqui para que los cinco
 // medios lo hereden sin cablearlo cada uno.
@@ -62,6 +66,7 @@ const KNOWN_ART_KEYS = ['thumb', 'poster', 'fanart', 'banner'] as const;
   imports: [
     FormsModule,
     AssetsPipe,
+    MediaTransferComponent,
     FilePickerComponent,
     IonButton,
     IonButtons,
@@ -249,6 +254,37 @@ export class MediaEditModalComponent {
       [field.key]: this.parse(field, raw)
     }));
   }
+
+  /**
+   * Lo importado rellena el borrador, no se guarda. Asi pasa por el mismo diff
+   * que una edicion a mano: solo viaja lo que de verdad cambia, y hay ocasion
+   * de revisarlo antes.
+   */
+  onImported(fields: MediaTransferFields): void {
+    this.draft.update(current => {
+      const next = { ...current };
+
+      for (const field of this.schema()) {
+        if (field.key in fields) {
+          next[field.key] = this.normalize(field, fields[field.key] as MediaEditValue);
+        }
+      }
+
+      return next;
+    });
+  }
+
+  /** Lo que se exporta: el borrador tal cual, con las claves del esquema. */
+  readonly exportFields = computed<MediaTransferFields>(() => {
+    const draft = this.draft();
+    const fields: MediaTransferFields = {};
+
+    for (const field of this.schema()) {
+      fields[field.key] = draft[field.key];
+    }
+
+    return fields;
+  });
 
   onSave(): void {
     const patch = this.buildPatch();

@@ -57,7 +57,7 @@ const OPERATION_LABELS: Record<LibraryOperation, string> = {
     IonRadio,
     IonInput,
     IonButton,
-    IonSpinner,
+    IonSpinner
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
