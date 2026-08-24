@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.0] - 2026-08-24
 
 ### Added
 
@@ -29,6 +29,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Metadatos del add-on**: `addon.xml` declaraba en `lang="es"` un resumen y una descripción escritos en inglés, así que Kodi los servía como castellano a quien tuviera el idioma puesto. Ahora hay resumen y descripción en ambos idiomas, la descripción cuenta también lo que el add-on hace desde #192 —editar la biblioteca— y no sólo navegar y reproducir, y se declaran `license`, `website` y `news`, que `repo.reaktive` ya traía y el add-on principal no. El nombre visible pasa de `reaktive` a `ReaKtive`; el `id` no se toca, porque es la clave con la que Kodi resuelve las actualizaciones
+
+- **README como presentación del proyecto**: Encabezaba con dos logos sobre fondo transparente, que GitHub renderiza en blanco sobre blanco, y describía el prototipo: listaba carpetas que ya no existen (`core/`, `components/`), daba por pendientes la arquitectura DDD, la configuración externalizada, el empaquetado y el vídeo —los cuatro hechos—, presentaba el 8008 como puerto de Kodi cuando es el del proxy de desarrollo, y explicaba la conexión como si siguiera codificada a mano. Ahora abre con el logo y una captura real, muestra las cinco capturas que ya empaqueta el add-on, agrupa las funciones por lo que la aplicación hace y por lo que la distingue —corregir la biblioteca—, documenta el proxy y `KODI_URL`, que hacían falta para desarrollar y no se mencionaban, y retira la FAQ, que repetía lo demás. El aviso de no exponer JSON-RPC sin protección pasa a Prerequisites (#248)
 - **Restos de prototipo en el facade de reproducción**: `subscribe()` tenía el cuerpo entero comentado y no hacía nada, pero el shell lo llamaba en cada arranque; `unsubscribe()` recorría tres campos de suscripción que ningún código asignaba, porque lo que los llenaba también estaba comentado. Fuera los cuatro, y los signals del facade pasan a `readonly` con la indentación arreglada (#236)
 - **Deuda menor de la revisión previa a la v1**: Los catorce colores escritos a mano en los componentes pasan a los tokens que ya existían, con tres nuevos para los velos que se repetían. Los `z-index` de aplicación —cabecera fija, desplegable de volumen, velo del panel— dejan de ser números sueltos; los de 0 a 2 se quedan, porque son apilamiento local entre hermanos y darles nombre sería ruido. `ops/proxy.js` toma la dirección de Kodi de `KODI_URL` en lugar de tenerla escrita. Sin avisos de lint ni de compilación, sin `TODO`, y dos `!important` menos: apuntaban al cajón lateral retirado en #231 (#238)
 - **Cliente JSON-RPC compartido**: Los trece repositorios redeclaraban el sobre y la petición, numeraban sus llamadas con su propio contador desde 1 —así que dos peticiones simultáneas de repositorios distintos compartían identificador— y decidían por su cuenta si mirar el error. Cada repetición era una ocasión de olvidarse de algo, y en cinco se olvidaron del error (#233). Ahora todos pasan por `KodiRpcService`, con `query` para las lecturas y `command` para las órdenes, y se quedan sólo con lo suyo: qué método, qué parámetros y cómo mapear la respuesta. Los métodos escritos a mano van al enum `Methods`, y el mensaje de error incluye ahora el método que falló. De paso se retira `playlist-api.adapter`, un duplicado del repositorio de listas que no usaba nadie. Balance: −1091 líneas (#234)
