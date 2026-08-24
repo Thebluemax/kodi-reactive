@@ -77,7 +77,6 @@ export class AppShellComponent implements OnInit, OnDestroy {
     // Ajustes esta a la vista: comparten socket con el reproductor, asi que no
     // cuesta una conexion mas.
     this.library.connect();
-    this.playBackFacade.subscribe();
 
     // Detect initial route
     this.isRemoteActive.set(this.router.url.startsWith('/remote'));
