@@ -10,6 +10,7 @@ import { map } from 'rxjs/operators';
 import { InputRepository } from '../../domain/repositories/input.repository';
 import { InputAction } from '../../domain/entities/input-action.entity';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { assertKodiOk, KodiEnvelope } from '@shared/utils/kodi-envelope';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -90,8 +91,12 @@ export class InputKodiRepository extends InputRepository {
   }
 
   private executeCommand(request: KodiJsonRpcRequest): Observable<void> {
-    return this.http.post<unknown>(this.apiUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.apiUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo, la orden pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 

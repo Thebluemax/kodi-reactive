@@ -21,6 +21,7 @@ import {
 } from '@domains/video/movie';
 import { environment } from 'src/environments/environment';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { unwrapKodiResult } from '@shared/utils/kodi-envelope';
 
 interface KodiJsonRpcRequest {
   jsonrpc: string;
@@ -74,7 +75,9 @@ export class VideoGenreKodiRepository extends VideoGenreRepository {
 
     return this.http.post<KodiGenresResponse>(this.config.jsonRpcUrl, request).pipe(
       map(response => {
-        const genres = VideoGenreFactory.fromKodiResponseList(response.result.genres || []);
+        const genres = VideoGenreFactory.fromKodiResponseList(
+          unwrapKodiResult(response).genres || []
+        );
         return {
           genres,
           total: genres.length
@@ -104,12 +107,16 @@ export class VideoGenreKodiRepository extends VideoGenreRepository {
     };
 
     return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ({
-        movies: MovieFactory.fromKodiResponseList(response.result.movies || []),
-        total: response.result.limits.total,
-        start: response.result.limits.start,
-        end: response.result.limits.end
-      }))
+      map(response => {
+        const result = unwrapKodiResult(response);
+
+        return {
+          movies: MovieFactory.fromKodiResponseList(result.movies || []),
+          total: result.limits.total,
+          start: result.limits.start,
+          end: result.limits.end
+        };
+      })
     );
   }
 

@@ -11,6 +11,7 @@ import { TrackRepository } from '../../domain/repositories/track.repository';
 import { TrackUpdate } from '../../domain/entities/track.entity';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
+import { KodiEnvelope, assertKodiOk } from '@shared/utils/kodi-envelope';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -71,8 +72,12 @@ export class TrackKodiRepository extends TrackRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 
@@ -84,8 +89,12 @@ export class TrackKodiRepository extends TrackRepository {
       id: this.getNextId()
     };
 
-    return this.http.post<unknown>(this.config.jsonRpcUrl, request).pipe(
-      map(() => void 0)
+    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
+      map(response => {
+        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
+        assertKodiOk(response);
+        return void 0;
+      })
     );
   }
 

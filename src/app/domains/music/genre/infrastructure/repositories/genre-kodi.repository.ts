@@ -17,6 +17,7 @@ import {
 import { Album, AlbumFactory, KodiAlbumResponse } from '@domains/music/album/domain/entities/album.entity';
 import { Artist, ArtistFactory, KodiArtistResponse } from '@domains/music/artist/domain/entities/artist.entity';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { unwrapKodiResult } from '@shared/utils/kodi-envelope';
 
 interface KodiJsonRpcRequest {
   jsonrpc: '2.0';
@@ -82,10 +83,14 @@ export class GenreKodiRepository extends GenreRepository {
     };
 
     return this.http.post<KodiGenresResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ({
-        genres: GenreFactory.fromKodiResponseList(response.result.genres || []),
-        total: response.result.limits.total
-      }))
+      map(response => {
+        const result = unwrapKodiResult(response);
+
+        return {
+          genres: GenreFactory.fromKodiResponseList(result.genres || []),
+          total: result.limits.total
+        };
+      })
     );
   }
 
@@ -110,7 +115,9 @@ export class GenreKodiRepository extends GenreRepository {
     };
 
     return this.http.post<KodiAlbumsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => AlbumFactory.fromKodiResponseList(response.result.albums || []))
+      map(response =>
+        AlbumFactory.fromKodiResponseList(unwrapKodiResult(response).albums || [])
+      )
     );
   }
 
@@ -135,7 +142,9 @@ export class GenreKodiRepository extends GenreRepository {
     };
 
     return this.http.post<KodiArtistsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => ArtistFactory.fromKodiResponseList(response.result.artists || []))
+      map(response =>
+        ArtistFactory.fromKodiResponseList(unwrapKodiResult(response).artists || [])
+      )
     );
   }
 
