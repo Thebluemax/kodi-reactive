@@ -15,6 +15,7 @@ package: clean-package ## Prepara el contenido y genera el archivo .zip para Kod
 	cp -r $(BUILD_DIR)/* $(PACKAGE_DIR)/
 	cp ./logo.png $(PACKAGE_DIR)/icon.png
 	cp addon.xml $(PACKAGE_DIR)/
+	cp -r ./resources $(PACKAGE_DIR)/
 	
 	@echo "Comprimiendo en $(ZIP_FILE)..."
 	cd $(ADDON_DIR) && zip -r -q ../$(ZIP_FILE) $(ADDON_ID)
