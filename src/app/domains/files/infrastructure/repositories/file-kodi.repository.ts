@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -14,24 +13,9 @@ import {
   FileMedia,
   KodiFileResponse
 } from '../../domain/entities/file-item.entity';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
 import { KodiConfigService } from '@shared/services/kodi-config.service';
 import { Methods } from '@shared/enums/methods';
-import { environment } from 'src/environments/environment';
-
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
-
-interface KodiJsonRpcEnvelope<T> {
-  result?: T;
-  error?: {
-    code: number;
-    message: string;
-  };
-}
 
 interface KodiSourcesResult {
   sources?: KodiFileResponse[];
@@ -51,9 +35,9 @@ interface KodiPrepareDownloadResult {
   providedIn: 'root'
 })
 export class FileKodiRepository extends FileRepository {
-  private readonly http = inject(HttpClient);
+  private readonly rpc = inject(KodiRpcService);
+  /** Solo para componer la URL de descarga, no para hablar JSON-RPC. */
   private readonly config = inject(KodiConfigService);
-  private requestId = 1;
 
   getSources(media: FileMedia): Observable<FileItem[]> {
     return this.send<KodiSourcesResult>(Methods.FilesGetSources, { media }).pipe(
@@ -90,23 +74,6 @@ export class FileKodiRepository extends FileRepository {
   }
 
   private send<T>(method: Methods, params: Record<string, unknown>): Observable<T> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method,
-      params,
-      id: this.requestId++
-    };
-
-    return this.http.post<KodiJsonRpcEnvelope<T>>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(
-            `Kodi rechazo la peticion: ${response.error.message} (codigo ${response.error.code})`
-          );
-        }
-
-        return (response.result ?? {}) as T;
-      })
-    );
+    return this.rpc.query<T>(method, params);
   }
 }

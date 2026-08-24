@@ -3,31 +3,18 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { PlayerRepository } from '../../domain/repositories/player.repository';
 import { PlayerWebSocketAdapter } from '../adapters/player-websocket.adapter';
-import { KodiConfigService } from '@shared/services/kodi-config.service';
-import { assertKodiOk, KodiEnvelope } from '@shared/utils/kodi-envelope';
-
-interface KodiJsonRpcRequest {
-  jsonrpc: '2.0';
-  method: string;
-  params?: Record<string, unknown> | unknown[];
-  id: number;
-}
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerKodiRepository extends PlayerRepository {
-  private readonly http = inject(HttpClient);
-  private readonly config = inject(KodiConfigService);
+  private readonly rpc = inject(KodiRpcService);
   private readonly wsAdapter = inject(PlayerWebSocketAdapter);
-  private readonly apiUrl = this.config.jsonRpcUrl;
-  private requestId = 1;
 
   private get playerId(): number {
     return this.wsAdapter.activePlayerId;
@@ -38,28 +25,23 @@ export class PlayerKodiRepository extends PlayerRepository {
   // ========================================================================
 
   playPause(): Observable<void> {
-    const request = this.buildRequest('Player.PlayPause', [this.playerId, 'toggle']);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.PlayPause', [this.playerId, 'toggle']);
   }
 
   stop(): Observable<void> {
-    const request = this.buildRequest('Player.Stop', [this.playerId]);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.Stop', [this.playerId]);
   }
 
   nextTrack(): Observable<void> {
-    const request = this.buildRequest('Player.GoTo', [this.playerId, 'next']);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.GoTo', [this.playerId, 'next']);
   }
 
   previousTrack(): Observable<void> {
-    const request = this.buildRequest('Player.GoTo', [this.playerId, 'previous']);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.GoTo', [this.playerId, 'previous']);
   }
 
   seek(percentage: number): Observable<void> {
-    const request = this.buildRequest('Player.Seek', [this.playerId, { percentage }]);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.Seek', [this.playerId, { percentage }]);
   }
 
   // ========================================================================
@@ -67,18 +49,15 @@ export class PlayerKodiRepository extends PlayerRepository {
   // ========================================================================
 
   toggleShuffle(): Observable<void> {
-    const request = this.buildRequest('Player.SetShuffle', [this.playerId, 'toggle']);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.SetShuffle', [this.playerId, 'toggle']);
   }
 
   cycleRepeat(): Observable<void> {
-    const request = this.buildRequest('Player.SetRepeat', [this.playerId, 'cycle']);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.SetRepeat', [this.playerId, 'cycle']);
   }
 
   togglePartyMode(): Observable<void> {
-    const request = this.buildRequest('Player.SetPartymode', [this.playerId, 'toggle']);
-    return this.executeCommand(request);
+    return this.rpc.command('Player.SetPartymode', [this.playerId, 'toggle']);
   }
 
   // ========================================================================
@@ -87,39 +66,11 @@ export class PlayerKodiRepository extends PlayerRepository {
 
   setVolume(level: number): Observable<void> {
     const clampedLevel = Math.max(0, Math.min(100, Math.round(level)));
-    const request = this.buildRequest('Application.SetVolume', [clampedLevel]);
-    return this.executeCommand(request);
+    return this.rpc.command('Application.SetVolume', [clampedLevel]);
   }
 
   toggleMute(): Observable<void> {
-    const request = this.buildRequest('Application.SetMute', ['toggle']);
-    return this.executeCommand(request);
+    return this.rpc.command('Application.SetMute', ['toggle']);
   }
 
-  // ========================================================================
-  // Private Helpers
-  // ========================================================================
-
-  private buildRequest(method: string, params: unknown[] | Record<string, unknown>): KodiJsonRpcRequest {
-    return {
-      jsonrpc: '2.0',
-      method,
-      params,
-      id: this.getNextId()
-    };
-  }
-
-  private executeCommand(request: KodiJsonRpcRequest): Observable<void> {
-    return this.http.post<KodiEnvelope<unknown>>(this.apiUrl, request).pipe(
-      map(response => {
-        // Un rechazo llega con HTTP 200: sin mirarlo, la orden pasaba por buena.
-        assertKodiOk(response);
-        return void 0;
-      })
-    );
-  }
-
-  private getNextId(): number {
-    return this.requestId++;
-  }
 }

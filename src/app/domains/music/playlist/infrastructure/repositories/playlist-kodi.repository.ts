@@ -5,28 +5,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 
 import { PlaylistRepository } from '../../domain/repositories/playlist.repository';
 import { PlaylistItem, PlaylistItemFactory, PlaylistResult, KodiPlaylistItemResponse } from '../../domain/entities/playlist-item.entity';
-import { KodiConfigService } from '@shared/services/kodi-config.service';
-
-interface KodiJsonRpcRequest {
-  jsonrpc: '2.0';
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
-
-interface KodiJsonRpcResponse<T = unknown> {
-  jsonrpc: '2.0';
-  result?: T;
-  error?: {
-    code: number;
-    message: string;
-  };
-  id: number;
-}
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
+import { Methods } from '@shared/enums/methods';
 
 interface KodiPlaylistResponse {
   limits: {
@@ -41,143 +24,63 @@ interface KodiPlaylistResponse {
   providedIn: 'root'
 })
 export class PlaylistKodiRepository extends PlaylistRepository {
-  private readonly http = inject(HttpClient);
-  private readonly config = inject(KodiConfigService);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getPlaylist(playlistId: number = 0): Observable<PlaylistResult> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Playlist.GetItems',
-      params: {
+    return this.rpc
+      .query<KodiPlaylistResponse>(Methods.PlaylistGetItems, {
         playlistid: playlistId,
         properties: [
           'title', 'artist', 'album', 'duration',
           'track', 'year', 'thumbnail', 'fanart', 'file'
         ]
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcResponse<KodiPlaylistResponse>>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(`Kodi API Error: ${response.error.message}`);
-        }
-        const items = PlaylistItemFactory.fromKodiResponseList(response.result?.items || []);
-        return {
-          items,
-          total: response.result?.limits?.total || 0
-        };
       })
-    );
+      .pipe(
+        map(result => ({
+          // Una cola vacia es legitima: Kodi omite `items` en ese caso.
+          items: PlaylistItemFactory.fromKodiResponseList(result.items || []),
+          total: result.limits?.total || 0
+        }))
+      );
   }
 
   clearPlaylist(playlistId: number = 0): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Playlist.Clear',
-      params: {
-        playlistid: playlistId
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(`Failed to clear playlist: ${response.error.message}`);
-        }
-      })
-    );
+    return this.rpc.command(Methods.PlaylistClear, {
+      playlistid: playlistId
+    });
   }
 
   removeItem(position: number, playlistId: number = 0): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Playlist.Remove',
-      params: {
-        playlistid: playlistId,
-        position
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(`Failed to remove item: ${response.error.message}`);
-        }
-      })
-    );
+    return this.rpc.command(Methods.PlaylistRemove, {
+      playlistid: playlistId,
+      position
+    });
   }
 
   swapItems(position1: number, position2: number, playlistId: number = 0): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Playlist.Swap',
-      params: {
-        playlistid: playlistId,
-        position1,
-        position2
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(`Failed to swap items: ${response.error.message}`);
-        }
-      })
-    );
+    return this.rpc.command(Methods.PlaylistSwap, {
+      playlistid: playlistId,
+      position1,
+      position2
+    });
   }
 
   playItem(position: number, playlistId: number = 0): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Player.Open',
-      params: {
-        item: {
-          playlistid: playlistId,
-          position
-        }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(`Failed to play item: ${response.error.message}`);
-        }
-      })
-    );
+    return this.rpc.command(Methods.PlayerOpen, {
+      item: {
+        playlistid: playlistId,
+        position
+      }
+    });
   }
 
   addItem(songId: number, playlistId: number = 0): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: '2.0',
-      method: 'Playlist.Add',
-      params: {
-        playlistid: playlistId,
-        item: {
-          songid: songId
-        }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(`Failed to add item: ${response.error.message}`);
-        }
-      })
-    );
+    return this.rpc.command(Methods.PlaylistAdd, {
+      playlistid: playlistId,
+      item: {
+        songid: songId
+      }
+    });
   }
 
-  private getNextId(): number {
-    return this.requestId++;
-  }
 }

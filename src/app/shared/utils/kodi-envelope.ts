@@ -23,11 +23,9 @@ export interface KodiEnvelope<T> {
  * El mensaje sale tal cual de Kodi porque es el unico dato util para saber que
  * paso; quien llame decide que contarle al usuario.
  */
-export function unwrapKodiResult<T>(response: KodiEnvelope<T>): T {
+export function unwrapKodiResult<T>(response: KodiEnvelope<T>, method?: string): T {
   if (response.error) {
-    throw new Error(
-      `Kodi ha rechazado la petición: ${response.error.message} (código ${response.error.code})`
-    );
+    throw new Error(describeError(response.error, method));
   }
 
   if (response.result === undefined || response.result === null) {
@@ -43,10 +41,22 @@ export function unwrapKodiResult<T>(response: KodiEnvelope<T>): T {
  * Kodi contesta a estas con la cadena "OK", asi que exigir un resultado seria
  * excesivo: basta con que no haya error.
  */
-export function assertKodiOk(response: KodiEnvelope<unknown>): void {
+export function assertKodiOk(response: KodiEnvelope<unknown>, method?: string): void {
   if (response.error) {
-    throw new Error(
-      `Kodi ha rechazado la petición: ${response.error.message} (código ${response.error.code})`
-    );
+    throw new Error(describeError(response.error, method));
   }
+}
+
+/**
+ * El metodo entra en el mensaje cuando se conoce: saber que fallo
+ * `AudioLibrary.Scan` y no una peticion cualquiera ahorra la mitad del
+ * diagnostico.
+ */
+function describeError(
+  error: { code: number; message: string },
+  method?: string
+): string {
+  const what = method ? `la petición ${method}` : 'la petición';
+
+  return `Kodi ha rechazado ${what}: ${error.message} (código ${error.code})`;
 }

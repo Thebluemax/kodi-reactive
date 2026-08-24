@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -14,18 +13,9 @@ import {
   MovieSearchParams,
   MovieFactory,
   KodiMovieResponse, MovieUpdate } from '../../domain/entities/movie.entity';
-import { environment } from 'src/environments/environment';
-import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
 import { Methods } from '@shared/enums/methods';
 import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
-import { KodiEnvelope, assertKodiOk, unwrapKodiResult } from '@shared/utils/kodi-envelope';
-
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
 
 interface KodiMoviesResponse {
   result: {
@@ -41,15 +31,6 @@ interface KodiMoviesResponse {
 interface KodiMovieDetailResponse {
   result: {
     moviedetails: KodiMovieResponse;
-  };
-}
-
-/** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
-interface KodiJsonRpcEnvelope {
-  result?: unknown;
-  error?: {
-    code: number;
-    message: string;
   };
 }
 
@@ -124,17 +105,16 @@ const MOVIE_LIST_PROPERTIES = [
   providedIn: 'root'
 })
 export class MovieKodiRepository extends MovieRepository {
-  private readonly http = inject(HttpClient);
-  private readonly config = inject(KodiConfigService);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getMovies(params: MovieSearchParams): Observable<MovieListResult> {
-    const request = this.buildMoviesRequest(params);
-
-    return this.http.post<KodiMoviesResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        const result = unwrapKodiResult(response);
-
+    return this.rpc
+      .query<KodiMoviesResponse['result']>(
+        Methods.VideoLibraryGetMovies,
+        this.buildMoviesParams(params)
+      )
+      .pipe(
+      map(result => {
         return {
         movies: MovieFactory.fromKodiResponseList(result.movies || []),
         total: result.limits.total,
@@ -146,93 +126,51 @@ export class MovieKodiRepository extends MovieRepository {
   }
 
   getMovieById(movieId: number): Observable<Movie> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetMovieDetails',
-      params: {
-        movieid: movieId,
-        properties: MOVIE_DETAIL_PROPERTIES
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiMovieDetailResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        return MovieFactory.fromKodiResponse(unwrapKodiResult(response).moviedetails);
+    return this.rpc.query<KodiMovieDetailResponse['result']>('VideoLibrary.GetMovieDetails', {
+      movieid: movieId,
+      properties: MOVIE_DETAIL_PROPERTIES
+    }).pipe(
+      map(result => {
+        return MovieFactory.fromKodiResponse(result.moviedetails);
       })
     );
   }
 
   addToPlaylist(movieId: number, playImmediately: boolean): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: playImmediately ? 'Player.Open' : 'Playlist.Add',
-      params: playImmediately
-        ? { item: { movieid: movieId } }
-        : { playlistid: 1, item: { movieid: movieId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
-        assertKodiOk(response);
-        return void 0;
-      })
-    );
+    return playImmediately
+      ? this.rpc.command(Methods.PlayerOpen, { item: { movieid: movieId } })
+      : this.rpc.command(Methods.PlaylistAdd, {
+          playlistid: 1,
+          item: { movieid: movieId }
+        });
   }
 
-  private buildMoviesRequest(params: MovieSearchParams): KodiJsonRpcRequest {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetMovies',
-      params: {
-        limits: {
-          start: params.start,
-          end: params.end
-        },
-        properties: MOVIE_LIST_PROPERTIES,
-        sort: { order: 'ascending', method: 'title' }
+  private buildMoviesParams(params: MovieSearchParams): Record<string, unknown> {
+    const query: Record<string, unknown> = {
+      limits: {
+        start: params.start,
+        end: params.end
       },
-      id: this.getNextId()
+      properties: MOVIE_LIST_PROPERTIES,
+      sort: { order: 'ascending', method: 'title' }
     };
 
     if (params.searchTerm) {
-      (request.params as Record<string, unknown>)['filter'] = {
+      query['filter'] = {
         field: params.field || 'title',
         operator: params.operator || 'contains',
         value: params.searchTerm
       };
     }
 
-    return request;
-  }
-
-  private getNextId(): number {
-    return this.requestId++;
+    return query;
   }
 
   updateMovie(movieId: number, patch: MovieUpdate): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: Methods.VideoLibrarySetMovieDetails,
-      params: {
-        movieid: movieId,
-        ...this.toKodiParams(patch)
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(
-            `Kodi rechazo la actualizacion: ${response.error.message} (codigo ${response.error.code})`
-          );
-        }
-        return void 0;
-      })
-    );
+    return this.rpc.command(Methods.VideoLibrarySetMovieDetails, {
+      movieid: movieId,
+      ...this.toKodiParams(patch)
+    });
   }
 
   /**
@@ -257,25 +195,9 @@ export class MovieKodiRepository extends MovieRepository {
   }
 
   refreshMovie(movieId: number, options: MediaRefreshOptions): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: Methods.VideoLibraryRefreshMovie,
-      params: {
-        movieid: movieId,
-        ...toRefreshParams(options)
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(
-            `Kodi no ha podido volver a buscar los datos: ${response.error.message} (codigo ${response.error.code})`
-          );
-        }
-        return void 0;
-      })
-    );
+    return this.rpc.command(Methods.VideoLibraryRefreshMovie, {
+      movieid: movieId,
+      ...toRefreshParams(options)
+    });
   }
 }

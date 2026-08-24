@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -20,18 +19,9 @@ import {
   KodiTVShowResponse,
   KodiSeasonResponse,
   KodiEpisodeResponse, TVShowUpdate } from '../../domain/entities/tvshow.entity';
-import { environment } from 'src/environments/environment';
-import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { KodiRpcService } from '@shared/services/kodi-rpc.service';
 import { Methods } from '@shared/enums/methods';
-import { KodiEnvelope, assertKodiOk, unwrapKodiResult } from '@shared/utils/kodi-envelope';
 import { MediaRefreshOptions } from '@shared/types/media-refresh.type';
-
-interface KodiJsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: Record<string, unknown>;
-  id: number;
-}
 
 interface KodiTVShowsResponse {
   result: {
@@ -59,15 +49,6 @@ interface KodiSeasonsResponse {
 interface KodiEpisodesResponse {
   result: {
     episodes: KodiEpisodeResponse[];
-  };
-}
-
-/** Kodi devuelve los rechazos con HTTP 200 y el fallo dentro del sobre. */
-interface KodiJsonRpcEnvelope {
-  result?: unknown;
-  error?: {
-    code: number;
-    message: string;
   };
 }
 
@@ -147,17 +128,16 @@ const EPISODE_PROPERTIES = [
   providedIn: 'root'
 })
 export class TVShowKodiRepository extends TVShowRepository {
-  private readonly http = inject(HttpClient);
-  private readonly config = inject(KodiConfigService);
-  private requestId = 1;
+  private readonly rpc = inject(KodiRpcService);
 
   getTVShows(params: TVShowSearchParams): Observable<TVShowListResult> {
-    const request = this.buildTVShowsRequest(params);
-
-    return this.http.post<KodiTVShowsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        const result = unwrapKodiResult(response);
-
+    return this.rpc
+      .query<KodiTVShowsResponse['result']>(
+        Methods.VideoLibraryGetTVShows,
+        this.buildTVShowsParams(params)
+      )
+      .pipe(
+      map(result => {
         return {
         tvshows: TVShowFactory.fromKodiResponseList(result.tvshows || []),
         total: result.limits.total,
@@ -169,132 +149,76 @@ export class TVShowKodiRepository extends TVShowRepository {
   }
 
   getTVShowById(tvshowId: number): Observable<TVShow> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetTVShowDetails',
-      params: {
-        tvshowid: tvshowId,
-        properties: TVSHOW_DETAIL_PROPERTIES
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiTVShowDetailResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response =>
-        TVShowFactory.fromKodiResponse(unwrapKodiResult(response).tvshowdetails)
+    return this.rpc.query<KodiTVShowDetailResponse['result']>('VideoLibrary.GetTVShowDetails', {
+      tvshowid: tvshowId,
+      properties: TVSHOW_DETAIL_PROPERTIES
+    }).pipe(
+      map(result =>
+        TVShowFactory.fromKodiResponse(result.tvshowdetails)
       )
     );
   }
 
   getSeasons(tvshowId: number): Observable<Season[]> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetSeasons',
-      params: {
-        tvshowid: tvshowId,
-        properties: SEASON_PROPERTIES,
-        sort: { order: 'ascending', method: 'season' }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiSeasonsResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response =>
-        SeasonFactory.fromKodiResponseList(unwrapKodiResult(response).seasons || [])
+    return this.rpc.query<KodiSeasonsResponse['result']>('VideoLibrary.GetSeasons', {
+      tvshowid: tvshowId,
+      properties: SEASON_PROPERTIES,
+      sort: { order: 'ascending', method: 'season' }
+    }).pipe(
+      map(result =>
+        SeasonFactory.fromKodiResponseList(result.seasons || [])
       )
     );
   }
 
   getEpisodes(tvshowId: number, season: number): Observable<Episode[]> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetEpisodes',
-      params: {
-        tvshowid: tvshowId,
-        season: season,
-        properties: EPISODE_PROPERTIES,
-        sort: { order: 'ascending', method: 'episode' }
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiEpisodesResponse>(this.config.jsonRpcUrl, request).pipe(
-      map(response =>
-        EpisodeFactory.fromKodiResponseList(unwrapKodiResult(response).episodes || [])
+    return this.rpc.query<KodiEpisodesResponse['result']>('VideoLibrary.GetEpisodes', {
+      tvshowid: tvshowId,
+      season: season,
+      properties: EPISODE_PROPERTIES,
+      sort: { order: 'ascending', method: 'episode' }
+    }).pipe(
+      map(result =>
+        EpisodeFactory.fromKodiResponseList(result.episodes || [])
       )
     );
   }
 
   addEpisodeToPlaylist(episodeId: number, playImmediately: boolean): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: playImmediately ? 'Player.Open' : 'Playlist.Add',
-      params: playImmediately
-        ? { item: { episodeid: episodeId } }
-        : { playlistid: 1, item: { episodeid: episodeId } },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiEnvelope<unknown>>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        // Un rechazo llega con HTTP 200: sin mirarlo pasaba por buena.
-        assertKodiOk(response);
-        return void 0;
-      })
-    );
+    return playImmediately
+      ? this.rpc.command(Methods.PlayerOpen, { item: { episodeid: episodeId } })
+      : this.rpc.command(Methods.PlaylistAdd, {
+          playlistid: 1,
+          item: { episodeid: episodeId }
+        });
   }
 
-  private buildTVShowsRequest(params: TVShowSearchParams): KodiJsonRpcRequest {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: 'VideoLibrary.GetTVShows',
-      params: {
-        limits: {
-          start: params.start,
-          end: params.end
-        },
-        properties: TVSHOW_LIST_PROPERTIES,
-        sort: { order: 'ascending', method: 'title' }
+  private buildTVShowsParams(params: TVShowSearchParams): Record<string, unknown> {
+    const query: Record<string, unknown> = {
+      limits: {
+        start: params.start,
+        end: params.end
       },
-      id: this.getNextId()
+      properties: TVSHOW_LIST_PROPERTIES,
+      sort: { order: 'ascending', method: 'title' }
     };
 
     if (params.searchTerm) {
-      (request.params as Record<string, unknown>)['filter'] = {
+      query['filter'] = {
         field: params.field || 'title',
         operator: params.operator || 'contains',
         value: params.searchTerm
       };
     }
 
-    return request;
-  }
-
-  private getNextId(): number {
-    return this.requestId++;
+    return query;
   }
 
   updateTVShow(tvshowId: number, patch: TVShowUpdate): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: Methods.VideoLibrarySetTVShowDetails,
-      params: {
-        tvshowid: tvshowId,
-        ...this.toKodiParams(patch)
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(
-            `Kodi rechazo la actualizacion: ${response.error.message} (codigo ${response.error.code})`
-          );
-        }
-        return void 0;
-      })
-    );
+    return this.rpc.command(Methods.VideoLibrarySetTVShowDetails, {
+      tvshowid: tvshowId,
+      ...this.toKodiParams(patch)
+    });
   }
 
   /**
@@ -319,25 +243,9 @@ export class TVShowKodiRepository extends TVShowRepository {
   }
 
   refreshTVShow(tvshowId: number, options: MediaRefreshOptions): Observable<void> {
-    const request: KodiJsonRpcRequest = {
-      jsonrpc: environment.jsonrpcVersion,
-      method: Methods.VideoLibraryRefreshTVShow,
-      params: {
-        tvshowid: tvshowId,
-        ...toRefreshParams(options)
-      },
-      id: this.getNextId()
-    };
-
-    return this.http.post<KodiJsonRpcEnvelope>(this.config.jsonRpcUrl, request).pipe(
-      map(response => {
-        if (response.error) {
-          throw new Error(
-            `Kodi no ha podido volver a buscar los datos: ${response.error.message} (codigo ${response.error.code})`
-          );
-        }
-        return void 0;
-      })
-    );
+    return this.rpc.command(Methods.VideoLibraryRefreshTVShow, {
+      tvshowid: tvshowId,
+      ...toRefreshParams(options)
+    });
   }
 }
