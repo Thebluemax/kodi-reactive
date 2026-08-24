@@ -10,7 +10,7 @@ import { Artist, ArtistAlbumGroup, ArtistSearchParams } from '../../../domain/en
 import { GetArtistsUseCase } from '../../../application/use-cases/get-artists.use-case';
 import { GetArtistDetailUseCase } from '../../../application/use-cases/get-artist-detail.use-case';
 
-import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { ArtistDetailComponent } from '../artist-detail/artist-detail.component';
 import { UpdateArtistUseCase } from '../../../application/use-cases/update-artist.use-case';
@@ -32,7 +32,7 @@ const PAGE_SIZE = 40;
     EmptyStateComponent,
     IonicModule,
 
-    LateralSlideComponent,
+    LateralPanelComponent,
     ArtistDetailComponent,
     MediaEditModalComponent,
     AssetsPipe

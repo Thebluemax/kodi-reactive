@@ -65,11 +65,11 @@
 </ion-content>
 
 <!-- Album Detail Panel -->
-<app-lateral-slide
-  [id]="'genreAlbumDetail'"
-  [openSlideBar]="isPanelOpen() && panelType() === 'album'"
+<app-lateral-panel
+  [panelId]="'genreAlbumDetail'"
+  [isOpen]="isPanelOpen() && panelType() === 'album'"
   [customWidth]="'60%'"
-  (closeSlideBar)="onClosePanel()"
+  (panelClosed)="onClosePanel()"
 >
   @if (selectedAlbum()) {
     <app-album-detail
@@ -77,14 +77,14 @@
       [tracks]="albumTracks()"
     />
   }
-</app-lateral-slide>
+</app-lateral-panel>
 
 <!-- Artist Detail Panel -->
-<app-lateral-slide
-  [id]="'genreArtistDetail'"
-  [openSlideBar]="isPanelOpen() && panelType() === 'artist'"
+<app-lateral-panel
+  [panelId]="'genreArtistDetail'"
+  [isOpen]="isPanelOpen() && panelType() === 'artist'"
   [customWidth]="'60%'"
-  (closeSlideBar)="onClosePanel()"
+  (panelClosed)="onClosePanel()"
 >
   @if (selectedArtist()) {
     <app-artist-detail
@@ -93,4 +93,4 @@
       (closeDetail)="onClosePanel()"
     />
   }
-</app-lateral-slide>
+</app-lateral-panel>

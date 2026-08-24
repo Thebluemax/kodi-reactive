@@ -64,11 +64,11 @@
 </ion-content>
 
 <!-- Album Detail Nested Panel -->
-<app-lateral-slide
-  [id]="'genreAlbumDetailNested'"
-  [openSlideBar]="isAlbumPanelOpen()"
+<app-lateral-panel
+  [panelId]="'genreAlbumDetailNested'"
+  [isOpen]="isAlbumPanelOpen()"
   [customWidth]="'50%'"
-  (closeSlideBar)="onCloseAlbumPanel()"
+  (panelClosed)="onCloseAlbumPanel()"
 >
   @if (selectedAlbum()) {
     <app-album-detail
@@ -76,4 +76,4 @@
       [tracks]="albumTracks()"
     />
   }
-</app-lateral-slide>
+</app-lateral-panel>

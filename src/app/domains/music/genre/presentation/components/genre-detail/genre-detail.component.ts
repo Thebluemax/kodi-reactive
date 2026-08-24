@@ -14,7 +14,7 @@ import { Track } from '@domains/music/track/domain/entities/track.entity';
 import { GetGenreDetailUseCase } from '../../../application/use-cases/get-genre-detail.use-case';
 import { GetAlbumDetailUseCase, AlbumDetailComponent } from '@domains/music/album';
 import { GetArtistDetailUseCase, ArtistDetailComponent, ArtistAlbumGroup } from '@domains/music/artist';
-import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
 
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { NotificationService } from '@shared/services/notification.service';
@@ -24,7 +24,7 @@ import { NotificationService } from '@shared/services/notification.service';
   standalone: true,
   imports: [
     IonicModule,
-    LateralSlideComponent,
+    LateralPanelComponent,
     AlbumDetailComponent,
     ArtistDetailComponent,
 
