@@ -28,6 +28,7 @@ import { GetMoviesByActorUseCase } from '../../../application/use-cases/get-movi
 import { ActorDetailComponent } from '../actor-detail/actor-detail.component';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-actor-list',
@@ -49,6 +50,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ActorListComponent implements OnInit {
+  private readonly notifications = inject(NotificationService);
   private readonly getActorsUseCase = inject(GetActorsUseCase);
   private readonly getMoviesByActorUseCase = inject(GetMoviesByActorUseCase);
   private readonly getMovieDetailUseCase = inject(GetMovieDetailUseCase);
@@ -86,6 +88,11 @@ export class ActorListComponent implements OnInit {
 
   // State
   readonly isLoading = signal<boolean>(false);
+  /**
+   * Motivo del ultimo fallo de carga. Sin esto una lista vacia por un fallo de
+   * red se anunciaba como biblioteca vacia.
+   */
+  readonly loadError = signal<string>('');
   readonly isPanelOpen = signal<boolean>(false);
 
   // Panel type for cross-navigation
@@ -114,8 +121,8 @@ export class ActorListComponent implements OnInit {
         this.allActors.set(result.actors);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Error loading actors:', err);
+      error: (err: Error) => {
+        this.loadError.set(err.message || 'No se ha podido contactar con Kodi');
         this.isLoading.set(false);
       }
     });
@@ -145,7 +152,7 @@ export class ActorListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading actor movies:', err);
+        void this.notifications.error('No se han podido cargar las películas del actor');
         this.isLoading.set(false);
       }
     });
@@ -162,7 +169,7 @@ export class ActorListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading movie detail:', err);
+        void this.notifications.error('No se ha podido cargar la película');
         this.isLoading.set(false);
       }
     });
@@ -182,7 +189,7 @@ export class ActorListComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error loading actor movies:', err);
+          void this.notifications.error('No se han podido cargar las películas del actor');
           this.isLoading.set(false);
         }
       });
@@ -191,14 +198,14 @@ export class ActorListComponent implements OnInit {
 
   onPlayMovieFromActor(movieId: number): void {
     this.addToPlaylistUseCase.execute(movieId, true).subscribe({
-      error: (err) => console.error('Error playing movie:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir la película')
     });
   }
 
   onAddToPlaylist(event: { media: unknown; playMedia: boolean }): void {
     const movie = event.media as Movie;
     this.addToPlaylistUseCase.execute(movie.movieId, event.playMedia).subscribe({
-      error: (err) => console.error('Error adding to playlist:', err)
+      error: () => void this.notifications.error('No se ha podido añadir a la cola')
     });
   }
 
@@ -207,5 +214,10 @@ export class ActorListComponent implements OnInit {
     this.selectedActor.set(null);
     this.selectedMovie.set(null);
     this.panelType.set('actor');
+  }
+
+  /** Vuelve a intentar la carga que fallo. */
+  onRetry(): void {
+    this.loadActors();
   }
 }

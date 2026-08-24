@@ -31,6 +31,7 @@ import { AddAlbumToPlaylistUseCase, GetAlbumDetailUseCase } from '@domains/music
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
 import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
 import { AlbumDetailComponent } from '@domains/music/album/presentation/components/album-detail/album-detail.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-genre-detail-panel',
@@ -54,6 +55,7 @@ import { AlbumDetailComponent } from '@domains/music/album/presentation/componen
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GenreDetailPanelComponent {
+  private readonly notifications = inject(NotificationService);
   private readonly addAlbumToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
   private readonly getAlbumDetailUseCase = inject(GetAlbumDetailUseCase);
 
@@ -70,13 +72,13 @@ export class GenreDetailPanelComponent {
 
   onPlayAlbum(albumId: number): void {
     this.addAlbumToPlaylistUseCase.execute(albumId, true).subscribe({
-      error: (err) => console.error('Error playing album:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir el álbum')
     });
   }
 
   onAddAlbumToQueue(albumId: number): void {
     this.addAlbumToPlaylistUseCase.execute(albumId, false).subscribe({
-      error: (err) => console.error('Error adding album to queue:', err)
+      error: () => void this.notifications.error('No se ha podido añadir el álbum a la cola')
     });
   }
 
@@ -91,7 +93,7 @@ export class GenreDetailPanelComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading album detail:', err);
+        void this.notifications.error('No se ha podido cargar el álbum');
         this.isLoading.set(false);
       }
     });

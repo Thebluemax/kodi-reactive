@@ -2,7 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { Router } from '@angular/router';
 import { InfiniteScrollCustomEvent } from '@ionic/angular/standalone';
-import { Subject, of } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { AlbumListComponent } from './album-list.component';
 import { ALBUM_EDIT_SCHEMA } from '../../schemas/album-edit.schema';
@@ -301,5 +301,47 @@ describe('AlbumListComponent', () => {
       expect(new Set(ids).size).toBe(EXACT);
     });
 
+  });
+
+  // ========================================================================
+  // Un fallo de carga no es una biblioteca vacia
+  // ========================================================================
+
+  describe('fallo de carga', () => {
+    it('guarda el motivo en vez de dejar la lista muda', () => {
+      getAlbums.execute.and.returnValue(throwError(() => new Error('Kodi no responde')));
+
+      component.onRetry();
+
+      expect(component.loadError()).toBe('Kodi no responde');
+    });
+
+    it('da un motivo aunque el error no traiga mensaje', () => {
+      getAlbums.execute.and.returnValue(throwError(() => new Error('')));
+
+      component.onRetry();
+
+      expect(component.loadError().length).toBeGreaterThan(0);
+    });
+
+    it('limpia el fallo al volver a intentarlo', () => {
+      getAlbums.execute.and.returnValue(throwError(() => new Error('Kodi no responde')));
+      component.onRetry();
+
+      getAlbums.execute.and.returnValue(
+        of(page(0, TOTAL) as unknown as AlbumListResult)
+      );
+      component.onRetry();
+
+      expect(component.loadError()).toBe('');
+    });
+
+    it('reintentar vuelve a pedir', () => {
+      const calls = getAlbums.execute.calls.count();
+
+      component.onRetry();
+
+      expect(getAlbums.execute.calls.count()).toBe(calls + 1);
+    });
   });
 });

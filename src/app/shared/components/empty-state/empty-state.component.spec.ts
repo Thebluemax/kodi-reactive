@@ -77,4 +77,59 @@ describe('EmptyStateComponent', () => {
 
     expect(searchStub.clearSearch).toHaveBeenCalledWith();
   });
+
+  // ========================================================================
+  // Fallo de carga
+  // ========================================================================
+
+  describe('error', () => {
+    it('dice que no se ha podido cargar, no que no hay nada', () => {
+      // Anunciar "biblioteca vacia" tras un fallo de red es mentir, y parece un
+      // fallo del add-on.
+      fixture.componentRef.setInput('message', 'No hay películas en la biblioteca');
+      fixture.componentRef.setInput('error', 'Kodi no responde');
+      fixture.detectChanges();
+
+      expect(text()).toContain('No se han podido cargar los datos');
+      expect(text()).not.toContain('No hay películas en la biblioteca');
+    });
+
+    it('muestra el motivo del fallo', () => {
+      fixture.componentRef.setInput('error', 'Kodi no responde');
+      fixture.detectChanges();
+
+      expect(text()).toContain('Kodi no responde');
+    });
+
+    it('ofrece reintentar', () => {
+      let retried = false;
+      fixture.componentRef.setInput('error', 'Kodi no responde');
+      fixture.detectChanges();
+      fixture.componentInstance.retry.subscribe(() => (retried = true));
+
+      fixture.componentInstance.onRetry();
+
+      expect(retried).toBeTrue();
+    });
+
+    it('el fallo manda sobre el filtro activo', () => {
+      // Sin datos no se puede afirmar que el filtro no encontro nada.
+      searchStub.isSearchVisible.set(true);
+      searchStub.debouncedSearchTerm.set('rock');
+      fixture.componentRef.setInput('error', 'Kodi no responde');
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.isFiltered()).toBeFalse();
+      expect(text()).toContain('No se han podido cargar los datos');
+    });
+
+    it('sin error se comporta como antes', () => {
+      fixture.componentRef.setInput('message', 'No hay álbumes');
+      fixture.componentRef.setInput('error', '');
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.hasError()).toBeFalse();
+      expect(text()).toContain('No hay álbumes');
+    });
+  });
 });

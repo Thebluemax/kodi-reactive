@@ -91,6 +91,14 @@ export class TVShowListComponent {
 
   // Pagination
   private readonly limit = 40;
+  /**
+   * Motivo del ultimo fallo de carga, o cadena vacia si fue bien.
+   *
+   * Sin esto una lista vacia por un fallo de red se anunciaba como biblioteca
+   * vacia: el catchError devolvia EMPTY y el empty state decia lo mismo que
+   * diria sin elementos.
+   */
+  readonly loadError = signal<string>('');
   private readonly reachedEnd = signal<boolean>(false);
   private readonly start = signal<number>(0);
   private readonly end = signal<number>(this.limit);
@@ -118,8 +126,10 @@ export class TVShowListComponent {
       .pipe(
         switchMap(params =>
           this.getTVShowsUseCase.execute(params).pipe(
-            catchError(err => {
-              console.error('Error loading TV shows:', err);
+            catchError((err: Error) => {
+              this.loadError.set(
+                err.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               return EMPTY;
             })
@@ -164,12 +174,18 @@ export class TVShowListComponent {
 
   loadTVShows(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
       start: this.start(),
       end: this.end(),
       searchTerm: this.currentSearchTerm || undefined
     });
+  }
+
+  /** Vuelve a pedir la pagina que fallo, sin perder lo ya cargado. */
+  onRetry(): void {
+    this.loadTVShows();
   }
 
   onInfiniteScroll(event: InfiniteScrollCustomEvent): void {
@@ -207,7 +223,7 @@ export class TVShowListComponent {
         }
       },
       error: (err) => {
-        console.error('Error loading TV show detail:', err);
+        void this.notifications.error('No se ha podido cargar la serie');
         this.isLoading.set(false);
       }
     });
@@ -223,13 +239,13 @@ export class TVShowListComponent {
 
   onPlayEpisode(episodeId: number): void {
     this.addEpisodeToPlaylistUseCase.execute(episodeId, true).subscribe({
-      error: (err) => console.error('Error playing episode:', err)
+      error: () => void this.notifications.error('No se ha podido reproducir el episodio')
     });
   }
 
   onAddEpisodeToQueue(episodeId: number): void {
     this.addEpisodeToPlaylistUseCase.execute(episodeId, false).subscribe({
-      error: (err) => console.error('Error adding episode to queue:', err)
+      error: () => void this.notifications.error('No se ha podido añadir el episodio a la cola')
     });
   }
 
@@ -405,7 +421,7 @@ export class TVShowListComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading episodes:', err);
+        void this.notifications.error('No se han podido cargar los episodios');
         this.isLoading.set(false);
       }
     });

@@ -21,7 +21,11 @@
       </ion-card>
     } @empty {
       @if (!isLoading()) {
-        <app-empty-state icon="people" message="No hay artistas en la biblioteca" />
+        <app-empty-state
+          icon="people" message="No hay artistas en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
       }
     }
   </ion-list>

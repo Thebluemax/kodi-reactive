@@ -17,7 +17,11 @@
       />
     } @empty {
       @if (!isLoading()) {
-        <app-empty-state icon="disc" message="No hay álbumes en la biblioteca" />
+        <app-empty-state
+          icon="disc" message="No hay álbumes en la biblioteca"
+          [error]="loadError()"
+          (retry)="onRetry()"
+        />
       }
     }
   </ion-list>

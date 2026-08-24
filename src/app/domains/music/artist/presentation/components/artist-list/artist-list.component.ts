@@ -54,6 +54,11 @@ export class ArtistListComponent implements OnDestroy {
   readonly selectedArtist = signal<Artist | null>(null);
   readonly albums = signal<ArtistAlbumGroup[]>([]);
   readonly isLoading = signal<boolean>(false);
+  /**
+   * Motivo del ultimo fallo de carga. Sin esto una lista vacia por un fallo de
+   * red se anunciaba como biblioteca vacia.
+   */
+  readonly loadError = signal<string>('');
   readonly isPanelOpen = signal<boolean>(false);
 
   // Edicion. El cajon lateral se saca a si mismo a document.body, fuera de
@@ -174,8 +179,10 @@ export class ArtistListComponent implements OnDestroy {
       .pipe(
         switchMap(params =>
           this.getArtistsUseCase.execute(params).pipe(
-            catchError(error => {
-              console.error('Error loading artists:', error);
+            catchError((error: Error) => {
+              this.loadError.set(
+                error.message || 'No se ha podido contactar con Kodi'
+              );
               this.isLoading.set(false);
               this.completePendingScroll();
               return EMPTY;
@@ -221,6 +228,7 @@ export class ArtistListComponent implements OnDestroy {
 
   loadArtists(): void {
     this.isLoading.set(true);
+    this.loadError.set('');
 
     this.loadRequest$.next({
       start: this.start,
@@ -256,7 +264,7 @@ export class ArtistListComponent implements OnDestroy {
           this.isPanelOpen.set(true);
         },
         error: error => {
-          console.error('Error loading artist details:', error);
+          void this.notifications.error('No se ha podido cargar el artista');
           this.isLoading.set(false);
         }
       });
@@ -266,5 +274,10 @@ export class ArtistListComponent implements OnDestroy {
     this.selectedArtist.set(null);
     this.albums.set([]);
     this.isPanelOpen.set(false);
+  }
+
+  /** Vuelve a intentar la carga que fallo. */
+  onRetry(): void {
+    this.loadArtists();
   }
 }

@@ -27,6 +27,7 @@ import { AddAlbumToPlaylistUseCase } from '../../../application/use-cases/add-al
 import { AddTrackToPlaylistUseCase, PlayTrackUseCase } from '@domains/music/track';
 import { MediaPathComponent } from '@shared/components/media-path/media-path.component';
 import { commonFolder, fileName, isSpreadAcrossFolders } from '@shared/utils/media-path';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-album-detail',
@@ -51,6 +52,7 @@ import { commonFolder, fileName, isSpreadAcrossFolders } from '@shared/utils/med
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlbumDetailComponent {
+  private readonly notifications = inject(NotificationService);
   private readonly addAlbumToPlaylistUseCase = inject(AddAlbumToPlaylistUseCase);
   private readonly addTrackToPlaylistUseCase = inject(AddTrackToPlaylistUseCase);
   private readonly playTrackUseCase = inject(PlayTrackUseCase);
@@ -92,35 +94,20 @@ export class AlbumDetailComponent {
 
   onPlayTrack(track: Track): void {
     this.playTrackUseCase.execute(track.songId).subscribe({
-      next: () => {
-        console.log('Track started playing:', track.title);
-      },
-      error: (error) => {
-        console.error('Error playing track:', error);
-      }
+      error: () => void this.notifications.error('No se ha podido reproducir la pista')
     });
   }
 
   onAddTrack(track: Track): void {
     this.addTrackToPlaylistUseCase.execute(track.songId, false).subscribe({
-      next: () => {
-        console.log('Track added to playlist successfully:', track.title);
-      },
-      error: (error) => {
-        console.error('Error adding track to playlist:', error);
-      }
+      error: () => void this.notifications.error('No se ha podido añadir la pista a la cola')
     });
   }
 
   onAddAlbumToPlaylist(): void {
     const albumId = this.album().albumId;
     this.addAlbumToPlaylistUseCase.execute(albumId, false).subscribe({
-      next: () => {
-        console.log('Album added to playlist successfully');
-      },
-      error: (error) => {
-        console.error('Error adding album to playlist:', error);
-      }
+      error: () => void this.notifications.error('No se ha podido añadir el álbum a la cola')
     });
   }
 }

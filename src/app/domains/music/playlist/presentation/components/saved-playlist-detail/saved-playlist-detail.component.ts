@@ -26,6 +26,7 @@ import { UpdateSavedPlaylistUseCase } from '../../../application/use-cases/updat
 import { DeleteSavedPlaylistUseCase } from '../../../application/use-cases/delete-saved-playlist.use-case';
 import { LoadSavedPlaylistUseCase } from '../../../application/use-cases/load-saved-playlist.use-case';
 import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-playlist-item.use-case';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-saved-playlist-detail',
@@ -50,6 +51,7 @@ import { PlayPlaylistItemUseCase } from '../../../application/use-cases/play-pla
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SavedPlaylistDetailComponent {
+  private readonly notifications = inject(NotificationService);
   private readonly alertController = inject(AlertController);
   private readonly updateUseCase = inject(UpdateSavedPlaylistUseCase);
   private readonly deleteUseCase = inject(DeleteSavedPlaylistUseCase);
@@ -128,7 +130,7 @@ export class SavedPlaylistDetailComponent {
     ).subscribe({
       next: () => this.isLoading.set(false),
       error: (err) => {
-        console.error('Failed to play playlist:', err);
+        void this.notifications.error('No se ha podido reproducir la lista');
         this.isLoading.set(false);
       }
     });

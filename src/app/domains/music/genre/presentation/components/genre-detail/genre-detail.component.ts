@@ -17,6 +17,7 @@ import { GetArtistDetailUseCase, ArtistDetailComponent, ArtistAlbumGroup } from 
 import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
 
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-genre-detail',
@@ -34,6 +35,7 @@ import { AssetsPipe } from '@shared/pipes/assets.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GenreDetailComponent implements OnInit, OnDestroy {
+  private readonly notifications = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly getGenreDetailUseCase = inject(GetGenreDetailUseCase);
@@ -94,7 +96,7 @@ export class GenreDetailComponent implements OnInit, OnDestroy {
           this.isLoading.set(false);
         },
         error: error => {
-          console.error('Error loading genre detail:', error);
+          void this.notifications.error('No se ha podido cargar el género');
           this.isLoading.set(false);
         }
       });
@@ -115,7 +117,7 @@ export class GenreDetailComponent implements OnInit, OnDestroy {
           this.isLoading.set(false);
         },
         error: error => {
-          console.error('Error loading album detail:', error);
+          void this.notifications.error('No se ha podido cargar el álbum');
           this.isLoading.set(false);
         }
       });
@@ -136,7 +138,7 @@ export class GenreDetailComponent implements OnInit, OnDestroy {
           this.isLoading.set(false);
         },
         error: error => {
-          console.error('Error loading artist detail:', error);
+          void this.notifications.error('No se ha podido cargar el artista');
           this.isLoading.set(false);
         }
       });
