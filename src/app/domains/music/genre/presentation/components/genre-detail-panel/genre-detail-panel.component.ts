@@ -29,7 +29,7 @@ import { Artist } from '@domains/music/artist/domain/entities/artist.entity';
 import { Track } from '@domains/music/track/domain/entities/track.entity';
 import { AddAlbumToPlaylistUseCase, GetAlbumDetailUseCase } from '@domains/music/album';
 import { AssetsPipe } from '@shared/pipes/assets.pipe';
-import { LateralSlideComponent } from '@shared/components/lateral-slide/lateral-slide.component';
+import { LateralPanelComponent } from '@shared/components/lateral-panel/lateral-panel.component';
 import { AlbumDetailComponent } from '@domains/music/album/presentation/components/album-detail/album-detail.component';
 import { NotificationService } from '@shared/services/notification.service';
 
@@ -47,7 +47,7 @@ import { NotificationService } from '@shared/services/notification.service';
     IonListHeader,
     IonProgressBar,
     AssetsPipe,
-    LateralSlideComponent,
+    LateralPanelComponent,
     AlbumDetailComponent
   ],
   templateUrl: './genre-detail-panel.component.html',

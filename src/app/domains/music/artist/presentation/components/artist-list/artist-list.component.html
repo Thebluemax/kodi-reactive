@@ -35,19 +35,19 @@
   </ion-infinite-scroll>
 </ion-content>
 
-<app-lateral-slide
-  [id]="'artistDetail'"
+<app-lateral-panel
+  [panelId]="'artistDetail'"
   [title]="selectedArtist()?.name ?? ''"
-  [openSlideBar]="isPanelOpen()"
+  [isOpen]="isPanelOpen()"
   [customWidth]="'60%'"
-  (closeSlideBar)="onClosePanel()"
+  (panelClosed)="onClosePanel()"
 >
   <app-artist-detail
     [artist]="selectedArtist()"
     [albums]="albums()"
     (editRequested)="onEditRequested($event)"
   />
-</app-lateral-slide>
+</app-lateral-panel>
 
 <!--
   Fuera del cajon lateral: se saca a si mismo a document.body, asi que ningun
