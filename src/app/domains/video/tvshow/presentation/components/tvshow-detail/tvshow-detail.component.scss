@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 // ==========================================================================
 // COMPONENT - TVShow Detail (BEM)
 // ==========================================================================
@@ -67,7 +69,7 @@
     margin-bottom: 12px;
 
     ion-chip {
-      --background: rgba(255, 255, 255, 0.1);
+      --background: $surface-tint;
       font-size: 0.8em;
     }
   }
@@ -117,7 +119,7 @@
     gap: 4px;
 
     ion-chip {
-      --background: rgba(255, 255, 255, 0.1);
+      --background: $surface-tint;
       font-size: 0.8em;
       cursor: pointer;
     }
@@ -125,6 +127,7 @@
 
   // Modifier: Active Season Chip
   &__season-chip--active {
+    // La variable la fija Ionic en su propio estado activo, con mas peso.
     --background: var(--ion-color-primary) !important;
     --color: var(--ion-color-primary-contrast);
   }
@@ -146,7 +149,7 @@
     --padding-start: 0;
 
     &:hover {
-      --background: rgba(255, 255, 255, 0.05);
+      --background: $surface-tint-subtle;
     }
   }
 

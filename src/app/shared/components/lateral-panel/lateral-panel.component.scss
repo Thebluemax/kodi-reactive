@@ -16,7 +16,7 @@
   right: -100%;
   z-index: $lateral-panel-z-index;
   @include flex-column;
-  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 15px 0 $border-subtle-on-light;
   @include transition(right, $transition-slow);
 
   // Modifier: Open
@@ -87,7 +87,7 @@
     width: 100%;
     height: 100%;
     background: $overlay-sidebar;
-    z-index: $lateral-panel-z-index - 1000;
+    z-index: $z-index-panel-overlay;
     display: none;
   }
 }

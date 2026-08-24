@@ -1,9 +1,11 @@
+@use 'settings' as *;
+
 .track-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid var(--ion-color-light-shade, #ccc);
+  border-bottom: 1px solid var(--ion-color-light-shade, $text-on-media-secondary);
 
   ion-label {
     flex: 1;

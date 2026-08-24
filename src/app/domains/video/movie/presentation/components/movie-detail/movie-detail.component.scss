@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 // ==========================================================================
 // COMPONENT - Movie Detail (BEM)
 // ==========================================================================
@@ -75,7 +77,7 @@
     margin-bottom: 12px;
 
     ion-chip {
-      --background: rgba(255, 255, 255, 0.1);
+      --background: $surface-tint;
       font-size: 0.8em;
     }
   }
@@ -136,7 +138,7 @@
     --padding-start: 0;
 
     &:hover {
-      --background: rgba(255, 255, 255, 0.05);
+      --background: $surface-tint-subtle;
     }
   }
 }

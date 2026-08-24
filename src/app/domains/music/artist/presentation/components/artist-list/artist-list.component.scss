@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 .flex-tile-list {
   width: 100%;
 
@@ -29,7 +31,7 @@
     overflow: hidden;
 
     ion-card-header {
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: $overlay-header;
       bottom: 0;
       color: white;
       font-size: 1em;

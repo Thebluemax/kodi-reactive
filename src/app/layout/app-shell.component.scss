@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 .app-logo {
     height: 32px;
     width: auto;
@@ -27,7 +29,7 @@ ion-searchbar {
     align-items: center;
     flex-direction: row;
     height: 90px;
-    z-index: 100;
+    z-index: $z-index-sticky-header;
     padding: 12px 32px;
     gap: 48px;
     overflow: hidden;

@@ -1,3 +1,5 @@
+@use 'settings' as *;
+
 .sound-container {
   position: relative;
   display: flex;
@@ -6,7 +8,7 @@
 
 .volume-popup {
   position: fixed;
-  z-index: 1000;
+  z-index: $z-index-popover;
 
   .volume-popup-content {
     display: flex;
@@ -51,6 +53,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: $z-index-popover - 1;
   background: transparent;
 }

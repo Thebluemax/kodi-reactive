@@ -15,7 +15,6 @@ import {
   IonAvatar,
   IonLabel,
   IonReorder,
-  IonText,
   AlertController,
   ItemReorderEventDetail
 } from '@ionic/angular/standalone';
@@ -45,7 +44,6 @@ import { NotificationService } from '@shared/services/notification.service';
     IonAvatar,
     IonLabel,
     IonReorder,
-    IonText,
     AssetsPipe
   ],
   templateUrl: './current-play-list.component.html',

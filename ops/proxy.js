@@ -1,6 +1,10 @@
 const axios = require('axios');
 const http = require('http');
-const urlPath = 'http://192.168.0.178:8080/jsonrpc';
+// La direccion de Kodi sale del entorno: hardcodearla obliga a editar el
+// archivo a cualquiera que clone el repositorio.
+//   KODI_URL=http://192.168.1.50:8080 npm run proxy
+const KODI_URL = process.env.KODI_URL || 'http://localhost:8080';
+const urlPath = `${KODI_URL.replace(/\/$/, '')}/jsonrpc`;
 
 async function postData(url, data) {
   const response = await axios.post(url, data);
@@ -53,5 +57,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(8008, 'localhost', () => {
+  console.log(`Reenviando a ${urlPath}`);
   console.log('Server running at http://localhost:8008/');
 });

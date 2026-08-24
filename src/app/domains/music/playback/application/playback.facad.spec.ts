@@ -9,27 +9,34 @@ import { GetPlaylistUseCase } from '@domains/music/playlist';
 describe('PlaybackFacadeService', () => {
   let service: PlaybackFacade;
 
-  const mockPlayerWebSocketAdapter = {
-    getPlaylistChangedStream: () => EMPTY,
-    getStateStream: () => EMPTY,
-    getCurrentTrackStream: () => EMPTY,
-    connect: jasmine.createSpy('connect'),
-    disconnect: jasmine.createSpy('disconnect')
-  };
-
-  const mockSetVolumeUseCase = {
-    execute: jasmine.createSpy('execute').and.returnValue(of('OK'))
-  };
-
-  const mockGetPlaylistUseCase = {
-    execute: jasmine.createSpy('execute').and.returnValue(of({ items: [], total: 0 }))
-  };
-
-  const mockTogglePartyModeUseCase = {
-    execute: jasmine.createSpy('execute').and.returnValue(of(void 0))
-  };
+  // Los espias se crean por test: compartirlos entre ellos hace que el orden
+  // de ejecucion importe.
+  let mockPlayerWebSocketAdapter: Record<string, unknown>;
+  let mockSetVolumeUseCase: { execute: jasmine.Spy };
+  let mockGetPlaylistUseCase: { execute: jasmine.Spy };
+  let mockTogglePartyModeUseCase: { execute: jasmine.Spy };
 
   beforeEach(() => {
+    mockPlayerWebSocketAdapter = {
+      getPlaylistChangedStream: () => EMPTY,
+      getStateStream: () => EMPTY,
+      getCurrentTrackStream: () => EMPTY,
+      connect: jasmine.createSpy('connect'),
+      disconnect: jasmine.createSpy('disconnect')
+    };
+
+    mockSetVolumeUseCase = {
+      execute: jasmine.createSpy('execute').and.returnValue(of('OK'))
+    };
+
+    mockGetPlaylistUseCase = {
+      execute: jasmine.createSpy('execute').and.returnValue(of({ items: [], total: 0 }))
+    };
+
+    mockTogglePartyModeUseCase = {
+      execute: jasmine.createSpy('execute').and.returnValue(of(void 0))
+    };
+
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),

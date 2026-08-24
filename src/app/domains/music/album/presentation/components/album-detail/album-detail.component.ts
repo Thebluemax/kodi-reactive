@@ -62,8 +62,6 @@ export class AlbumDetailComponent {
   readonly tracks = input<Track[]>([]);
 
   // Outputs
-  readonly trackSelected = output<Track>();
-
   /**
    * La API no expone `file` para album: Audio.Fields.Album no lo declara. La
    * carpeta solo puede deducirse de la de sus pistas, y solo vale si todas

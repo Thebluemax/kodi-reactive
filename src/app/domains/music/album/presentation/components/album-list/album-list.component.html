@@ -42,7 +42,6 @@
     <app-album-detail
       [album]="selectedAlbum()!"
       [tracks]="tracks()"
-      (trackSelected)="onTrackAddToPlaylist($event)"
       (editRequested)="onEditRequested($event)"
     />
   }
