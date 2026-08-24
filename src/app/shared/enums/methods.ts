@@ -34,6 +34,17 @@ export enum Methods {
   AudioLibraryOnCleanStarted = 'AudioLibrary.OnCleanStarted',
   AudioLibraryOnCleanFinished = 'AudioLibrary.OnCleanFinished',
 
+  // Metodos que hasta ahora se escribian a mano en los repositorios
+  AudioLibraryGetAlbumDetails = 'AudioLibrary.GetAlbumDetails',
+  AudioLibraryGetArtistDetails = 'AudioLibrary.GetArtistDetails',
+  PlayerGetActivePlayers = 'Player.GetActivePlayers',
+  PlayerOpen = 'Player.Open',
+  PlaylistAdd = 'Playlist.Add',
+  PlaylistClear = 'Playlist.Clear',
+  PlaylistGetProperties = 'Playlist.GetProperties',
+  PlaylistRemove = 'Playlist.Remove',
+  PlaylistSwap = 'Playlist.Swap',
+
   // Files
   FilesGetSources = 'Files.GetSources',
   FilesGetDirectory = 'Files.GetDirectory',

@@ -125,9 +125,13 @@ describe('LibraryKodiRepository', () => {
       .flush({ id: 1, error: { code: -32601, message: 'Method not found' } });
 
     expect(error).toHaveBeenCalled();
-    expect((error.calls.mostRecent().args[0] as Error).message).toBe(
-      `Kodi ${Methods.AudioLibraryScan}: Method not found`
-    );
+    // El mensaje lo compone ahora el cliente compartido, y lleva ademas el
+    // codigo, que es con lo que se busca un fallo concreto de Kodi.
+    const message = (error.calls.mostRecent().args[0] as Error).message;
+
+    expect(message).toContain(Methods.AudioLibraryScan);
+    expect(message).toContain('Method not found');
+    expect(message).toContain('-32601');
   });
 
   it('should propagate transport errors', () => {
