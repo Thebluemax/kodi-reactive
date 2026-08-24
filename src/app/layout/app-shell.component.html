@@ -23,6 +23,21 @@
       />
     }
     <ion-buttons slot="end">
+      @if (!isKodiConnected()) {
+        <span
+          class="app-shell__offline"
+          [title]="
+            isKodiReconnecting()
+              ? 'Sin conexión con Kodi. Reintentando…'
+              : 'Sin conexión con Kodi'
+          "
+        >
+          <ion-icon name="cloud-offline-outline" aria-hidden="true" />
+          <span class="app-shell__offline-text">
+            {{ isKodiReconnecting() ? 'Reconectando…' : 'Sin conexión' }}
+          </span>
+        </span>
+      }
       <ion-button
         size="small"
         fill="clear"

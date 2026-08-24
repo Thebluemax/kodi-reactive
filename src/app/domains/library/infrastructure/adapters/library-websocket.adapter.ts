@@ -7,9 +7,9 @@
 // ==========================================================================
 
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject , Subscription } from 'rxjs';
 
-import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { KodiSocketService } from '@shared/services/kodi-socket.service';
 import { Methods } from '@shared/enums/methods';
 import { LibraryType, LibraryOperation } from '../../domain/entities/library-type.entity';
 import {
@@ -74,9 +74,10 @@ const NOTIFICATION_MAP: Record<
   providedIn: 'root'
 })
 export class LibraryWebSocketAdapter implements OnDestroy {
-  private readonly kodiConfig = inject(KodiConfigService);
+  private readonly socket = inject(KodiSocketService);
 
-  private webSocket: WebSocket | null = null;
+  private subscription: Subscription | null = null;
+  private connectionSubscription: Subscription | null = null;
 
   private readonly eventSubject = new Subject<LibraryEvent>();
   private readonly connectionSubject = new BehaviorSubject<boolean>(false);
@@ -94,33 +95,32 @@ export class LibraryWebSocketAdapter implements OnDestroy {
    * Abre la conexión con Kodi. Idempotente.
    */
   connect(): void {
-    if (
-      this.webSocket &&
-      (this.webSocket.readyState === WebSocket.OPEN ||
-        this.webSocket.readyState === WebSocket.CONNECTING)
-    ) {
+    if (this.subscription) {
       return;
     }
 
-    this.webSocket = new WebSocket(this.kodiConfig.wsUrl());
+    // El socket es compartido y reconecta solo: aqui solo se escucha.
+    this.subscription = this.socket.messages$.subscribe(message =>
+      this.processNotification(message as KodiJsonRpcNotification)
+    );
 
-    this.webSocket.onopen = () => this.connectionSubject.next(true);
+    this.connectionSubscription = this.socket.connected$.subscribe(connected =>
+      this.connectionSubject.next(connected)
+    );
 
-    this.webSocket.onmessage = (event) => this.processMessage(event.data);
-
-    this.webSocket.onerror = () =>
-      this.errorSubject.next(new Error('Library WebSocket error'));
-
-    this.webSocket.onclose = () => this.connectionSubject.next(false);
+    this.socket.acquire();
   }
 
   /**
    * Cierra la conexión con Kodi.
    */
   disconnect(): void {
-    if (this.webSocket) {
-      this.webSocket.close();
-      this.webSocket = null;
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+      this.connectionSubscription?.unsubscribe();
+      this.connectionSubscription = null;
+      this.socket.release();
     }
 
     this.connectionSubject.next(false);
@@ -151,16 +151,10 @@ export class LibraryWebSocketAdapter implements OnDestroy {
   // Private Methods
   // ========================================================================
 
-  private processMessage(raw: string): void {
-    let data: KodiJsonRpcNotification | KodiJsonRpcNotification[];
-
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      this.errorSubject.next(new Error('Library WebSocket: mensaje no parseable'));
-      return;
-    }
-
+  /** El parseo lo hace ya el socket compartido: aqui solo se reparte. */
+  private processNotification(
+    data: KodiJsonRpcNotification | KodiJsonRpcNotification[]
+  ): void {
     if (Array.isArray(data)) {
       data.forEach(notification => this.handleNotification(notification));
       return;

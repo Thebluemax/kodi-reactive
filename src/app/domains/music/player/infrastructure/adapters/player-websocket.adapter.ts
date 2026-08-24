@@ -3,8 +3,8 @@
 // ==========================================================================
 
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { KodiConfigService } from '@shared/services/kodi-config.service';
+import { BehaviorSubject, Observable, Subject , Subscription } from 'rxjs';
+import { KodiSocketService } from '@shared/services/kodi-socket.service';
 
 import {
   PlayerState,
@@ -36,7 +36,8 @@ interface KodiJsonRpcResponse {
   providedIn: 'root'
 })
 export class PlayerWebSocketAdapter implements OnDestroy {
-  private webSocket: WebSocket | null = null;
+  private subscription: Subscription | null = null;
+  private connectionSubscription: Subscription | null = null;
   private intervalId: ReturnType<typeof setInterval> | null = null;
   private readonly pollingInterval = 1000; // 1 second
 
@@ -46,7 +47,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
   private readonly errorSubject = new Subject<Error>();
   private readonly playlistChangedSubject = new Subject<string>();
 
-  private readonly kodiConfig = inject(KodiConfigService);
+  private readonly socket = inject(KodiSocketService);
 
   // Request IDs for identifying responses
   private readonly PLAYER_PROPERTIES_ID = 67;
@@ -78,29 +79,27 @@ export class PlayerWebSocketAdapter implements OnDestroy {
    * Connect to Kodi WebSocket and start polling
    */
   connect(): void {
-    if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-      return; // Already connected
+    if (this.subscription) {
+      return;
     }
 
-    this.webSocket = new WebSocket(this.kodiConfig.wsUrl());
+    // El socket es compartido y reconecta solo: aqui solo se escucha y se
+    // arranca o para el sondeo segun este disponible.
+    this.subscription = this.socket.messages$.subscribe(message =>
+      this.processMessage(message as KodiJsonRpcResponse)
+    );
 
-    this.webSocket.onopen = () => {
-      this.connectionSubject.next(true);
-      this.startPolling();
-    };
+    this.connectionSubscription = this.socket.connected$.subscribe(connected => {
+      this.connectionSubject.next(connected);
 
-    this.webSocket.onmessage = (event) => {
-      this.processMessage(JSON.parse(event.data));
-    };
+      if (connected) {
+        this.startPolling();
+      } else {
+        this.stopPolling();
+      }
+    });
 
-    this.webSocket.onerror = (event) => {
-      this.errorSubject.next(new Error('WebSocket error'));
-    };
-
-    this.webSocket.onclose = () => {
-      this.connectionSubject.next(false);
-      this.stopPolling();
-    };
+    this.socket.acquire();
   }
 
   /**
@@ -109,9 +108,12 @@ export class PlayerWebSocketAdapter implements OnDestroy {
   disconnect(): void {
     this.stopPolling();
 
-    if (this.webSocket) {
-      this.webSocket.close();
-      this.webSocket = null;
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+      this.connectionSubscription?.unsubscribe();
+      this.connectionSubscription = null;
+      this.socket.release();
     }
 
     this.connectionSubject.next(false);
@@ -190,7 +192,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
   }
 
   private requestStatus(): void {
-    if (!this.webSocket || this.webSocket.readyState !== WebSocket.OPEN) {
+    if (!this.socket.isConnected()) {
       return;
     }
 
@@ -257,7 +259,7 @@ export class PlayerWebSocketAdapter implements OnDestroy {
       }
     ];
 
-    this.webSocket.send(JSON.stringify(requests));
+    this.socket.send(requests);
   }
 
   private processMessage(data: KodiJsonRpcResponse | KodiJsonRpcResponse[]): void {

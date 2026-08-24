@@ -10,6 +10,8 @@ import { CurrentTrackComponent, PlayerControlComponent, SoundComponent } from '@
 import { PlaybackFacade } from '@domains/music/playback/application/playback.facade';
 import { GlobalSearchService } from '@shared/services/global-search.service';
 import { ThemeService } from '@shared/services/theme.service';
+import { KodiSocketService } from '@shared/services/kodi-socket.service';
+import { LibraryFacade } from '@domains/library/application/library.facade';
 
 @Component({
   selector: 'app-shell',
@@ -40,6 +42,12 @@ export class AppShellComponent implements OnInit, OnDestroy {
   private readonly titleService = inject(Title);
   private readonly destroy$ = new Subject<void>();
   readonly playBackFacade = inject(PlaybackFacade);
+  private readonly socket = inject(KodiSocketService);
+  private readonly library = inject(LibraryFacade);
+
+  /** Estado de la conexion con Kodi, para poder decirlo en la barra. */
+  readonly isKodiConnected = this.socket.isConnected;
+  readonly isKodiReconnecting = this.socket.isReconnecting;
   readonly globalSearch = inject(GlobalSearchService);
   readonly themeService = inject(ThemeService);
 
@@ -66,6 +74,10 @@ export class AppShellComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.playBackFacade.connect();
+    // Los eventos de biblioteca escuchan desde el arranque, no solo mientras
+    // Ajustes esta a la vista: comparten socket con el reproductor, asi que no
+    // cuesta una conexion mas.
+    this.library.connect();
     this.playBackFacade.subscribe();
 
     // Detect initial route
@@ -86,6 +98,7 @@ export class AppShellComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     this.playBackFacade.unsubscribe();
+    this.library.disconnect();
   }
 
   navigateTo(section: string): void {
